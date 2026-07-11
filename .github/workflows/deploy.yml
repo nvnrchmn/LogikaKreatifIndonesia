@@ -12,5 +12,6 @@ jobs:
     steps:
     - name: Trigger Deployment Webhook
       run: |
-        curl -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}" \
+        curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" \
+        -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}" \
         -H "Accept: application/json"
