@@ -21,8 +21,17 @@ new class extends Component
 
     public function uploadFile()
     {
+        $fileCount = OrderFile::where('order_id', $this->order_id)->count();
+        if ($fileCount >= 10) {
+            $this->addError('file', 'Batas maksimal 10 file per proyek telah tercapai.');
+            return;
+        }
+
         $this->validate([
-            'file' => 'required|file|max:20480', // 20MB max
+            'file' => 'required|file|mimes:pdf,zip|max:20480', // 20MB max, pdf/zip
+        ], [
+            'file.mimes' => 'Hanya format PDF atau ZIP yang diizinkan.',
+            'file.max' => 'Ukuran file maksimal 20MB.'
         ]);
 
         $path = $this->file->store('order-files', 'public');
@@ -68,36 +77,54 @@ new class extends Component
             'files' => OrderFile::with('user')
                 ->where('order_id', $this->order_id)
                 ->orderBy('created_at', 'desc')
-                ->get()
+                ->get(),
+            'fileCount' => OrderFile::where('order_id', $this->order_id)->count()
         ];
     }
 };
 ?>
 
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <h3 class="text-lg font-bold text-gray-800">File & Aset Proyek</h3>
+<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+    <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg>
+            File & Aset Proyek
+        </h3>
+        <span class="text-xs font-medium bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{{ $fileCount }} / 10 File</span>
     </div>
     
-    <div class="p-6">
+    <div class="p-6 bg-gray-50/50">
         @if (session()->has('success'))
-            <div class="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg border border-green-200">
+            <div class="mb-5 p-3.5 bg-green-50 text-green-700 text-sm font-medium rounded-xl border border-green-100 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 {{ session('success') }}
             </div>
         @endif
 
-        <form wire:submit="uploadFile" class="mb-6">
-            <div class="flex items-end gap-3">
-                <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Unggah File (Max 20MB)</label>
-                    <input type="file" wire:model="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-gray-300 rounded-lg">
+        <form wire:submit="uploadFile" class="mb-8 bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <label class="block text-sm font-bold text-gray-700 mb-3">Unggah File Baru</label>
+            
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="flex-1 w-full relative">
+                    <input type="file" wire:model="file" accept=".pdf,.zip" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
                 </div>
-                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm font-medium" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="uploadFile">Unggah</span>
-                    <span wire:loading wire:target="uploadFile">Mengunggah...</span>
-                </button>
+                
+                <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                    @if($file)
+                        <button type="button" wire:click="$set('file', null)" class="px-4 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm font-medium border border-gray-200">Batal</button>
+                    @endif
+                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm font-medium flex items-center justify-center gap-2" wire:loading.attr="disabled">
+                        <svg wire:loading.remove wire:target="uploadFile" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <svg wire:loading wire:target="uploadFile" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span wire:loading.remove wire:target="uploadFile">Unggah</span>
+                        <span wire:loading wire:target="uploadFile">Mengunggah...</span>
+                    </button>
+                </div>
             </div>
-            @error('file') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
+            <div class="mt-3 flex items-center justify-between text-xs">
+                <span class="text-gray-500">Format: <strong class="text-gray-700">.PDF, .ZIP</strong> (Maks: 20MB)</span>
+            </div>
+            @error('file') <div class="text-red-500 text-sm mt-3 bg-red-50 p-2.5 rounded-lg border border-red-100">{{ $message }}</div> @enderror
         </form>
 
         <div class="space-y-3">
