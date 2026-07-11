@@ -106,3 +106,16 @@ Route::middleware('auth')->group(function () {
 Route::post('/webhooks/midtrans', [App\Http\Controllers\MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
 Route::post('/webhooks/xendit', [App\Http\Controllers\XenditWebhookController::class, 'handle'])->name('xendit.webhook');
 
+
+
+// Webhook Deployment
+Route::get('/api/deploy/{token}', function ($token) {
+    if ($token !== env('DEPLOY_TOKEN')) {
+        abort(403, 'Unauthorized');
+    }
+    $deployScript = base_path('deploy.sh');
+    $logFile = base_path('deploy.log');
+    shell_exec("nohup bash {$deployScript} > {$logFile} 2>&1 &");
+    return response()->json(['status' => 'success', 'message' => 'Deploy process started in background.']);
+});
+
