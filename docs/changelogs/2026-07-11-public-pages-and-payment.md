@@ -21,6 +21,12 @@
 - **Persetujuan Syarat & Ketentuan (T&C):** Menambahkan mekanisme pelindung hukum (*checkbox* persetujuan) yang wajib dicentang klien sebelum tombol pembayaran (*Pay Now*) Xendit dapat diklik.
 - **Notifikasi Global:** Mengimplementasikan **SweetAlert2** untuk notifikasi keberhasilan (*toast success*) secara dinamis (misal: saat menyimpan Pengaturan Global), membuang notifikasi *flash* bawaan yang kurang interaktif.
 
+### 3. Pemolesan UI/UX & Responsivitas (Mobile)
+- **Desain Logo yang Presisi:** Menyempurnakan ukuran logo di Navbar, Footer, Admin Portal, dan Client Portal menggunakan aspek rasio yang tepat (`h-10 w-auto`), serta menyesuaikan posisi teks "LOGIKRAF" agar sejajar secara vertikal.
+- **Penyempurnaan Invoice PDF:** Menyesuaikan desain *Invoice* PDF menggunakan gambar logo transparan murni, memperbesar ukuran logo (`110px`) dengan *margin negatif* untuk mengakali *whitespace*, mengganti keluarga font (*font-family*) ke *Plus Jakarta Sans*, dan meratakan informasi Order ke sebelah kanan (*text-align: right*).
+- **Portal Responsif di Layar Ponsel:** Melakukan perombakan *layout* pada Admin Portal dan Client Portal agar bekerja sempurna pada layar ponsel. Menambahkan mekanisme menu sisi melayang (*off-canvas sidebar overlay*) yang dapat dimunculkan/disembunyikan melalui tombol *Hamburger Menu* berbekal logika dari Alpine.js.
+- **Sinkronisasi Kode (GitHub):** Menginisialisasi repositori Git lokal dan melakukan unggah kode (push) perdana secara utuh ke repositori jarak jauh (`origin/main`).
+
 ## Status Aplikasi Saat Ini
 - Website publik telah memenuhi kriteria dasar kelayakan untuk pengajuan integrasi ke lingkungan *Live* (Production) Xendit.
 - Klien dapat masuk (*login*), melihat *milestone* penagihan, dan memproses pembayaran menggunakan *invoice* Xendit.
