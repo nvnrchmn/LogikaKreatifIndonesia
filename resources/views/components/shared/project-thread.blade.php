@@ -32,14 +32,14 @@ new class extends Component
     }
 
     #[On('comment-added')]
-    public function render()
+    public function with(): array
     {
-        $comments = OrderComment::with('user')
-            ->where('order_id', $this->order_id)
-            ->orderBy('created_at', 'asc')
-            ->get();
-            
-        return view('livewire.shared.project-thread', compact('comments'));
+        return [
+            'comments' => OrderComment::with('user')
+                ->where('order_id', $this->order_id)
+                ->orderBy('created_at', 'asc')
+                ->get()
+        ];
     }
 };
 ?>

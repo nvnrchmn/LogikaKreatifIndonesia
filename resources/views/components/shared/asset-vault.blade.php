@@ -62,14 +62,14 @@ new class extends Component
 
     #[On('file-uploaded')]
     #[On('file-deleted')]
-    public function render()
+    public function with(): array
     {
-        $files = OrderFile::with('user')
-            ->where('order_id', $this->order_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-            
-        return view('livewire.shared.asset-vault', compact('files'));
+        return [
+            'files' => OrderFile::with('user')
+                ->where('order_id', $this->order_id)
+                ->orderBy('created_at', 'desc')
+                ->get()
+        ];
     }
 };
 ?>
