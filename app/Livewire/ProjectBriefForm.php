@@ -92,6 +92,18 @@ class ProjectBriefForm extends Component
             'budget_range' => $this->budget_range,
         ]);
 
+        // Create client account automatically
+        $user = \App\Models\User::firstOrCreate(
+            ['email' => $this->email],
+            [
+                'name' => $this->name,
+                'password' => bcrypt('logikraf123'),
+            ]
+        );
+        if (!$user->hasRole('client')) {
+            $user->assignRole('client');
+        }
+
         try {
             // Configure SMTP dynamically from Settings if available
             $mailHost = \App\Models\Setting::get('mail_host');

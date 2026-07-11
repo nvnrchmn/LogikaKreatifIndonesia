@@ -20,6 +20,22 @@ Tim kami saat ini sedang meninjau informasi yang Anda berikan dan akan segera me
 
 Jika Anda memiliki pertanyaan tambahan atau ada detail yang ingin diubah, Anda bisa langsung membalas email ini.
 
+---
+
+### Portal Klien Anda
+
+Sembari menunggu tim kami menghubungi Anda, kami telah membuatkan **Akun Klien** untuk Anda. Melalui portal ini, Anda dapat memantau status proyek dan melihat tagihan (setelah proyek disetujui).
+
+<x-mail::button :url="url('/login')">
+Masuk ke Portal Klien
+</x-mail::button>
+
+**URL Login:** {{ url('/login') }}  
+**Email:** {{ $lead->email }}  
+**Password Sementara:** `logikraf123`
+
+*(Mohon segera ganti password Anda setelah berhasil login pertama kali).*
+
 Salam hangat,<br>
-**Tim {{ config('app.name') }}**
+**Tim {{ config('app.name', 'Logika Kreatif Indonesia') }}**
 </x-mail::message>
