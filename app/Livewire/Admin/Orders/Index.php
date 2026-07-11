@@ -65,6 +65,7 @@ class Index extends Component
                     [
                         'name' => $lead->name,
                         'password' => bcrypt('logikraf123'),
+                        'must_change_password' => true,
                     ]
                 );
                 if (!$user->hasRole('client')) {

@@ -98,6 +98,7 @@ class ProjectBriefForm extends Component
             [
                 'name' => $this->name,
                 'password' => bcrypt('logikraf123'),
+                'must_change_password' => true,
             ]
         );
         if (!$user->hasRole('client')) {

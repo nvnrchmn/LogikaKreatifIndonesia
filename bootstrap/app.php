@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'force_password' => \App\Http\Middleware\ForcePasswordChange::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
