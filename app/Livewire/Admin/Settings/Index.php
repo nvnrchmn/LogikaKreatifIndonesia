@@ -20,6 +20,13 @@ class Index extends Component
     public $companyPhone = '';
     public $companyAddress = '';
 
+    public $mailHost = '';
+    public $mailPort = '';
+    public $mailUsername = '';
+    public $mailPassword = '';
+    public $mailEncryption = '';
+    public $mailFromAddress = '';
+
     public function mount()
     {
         $this->paymentGateway = Setting::get('payment_gateway_driver', 'midtrans');
@@ -31,6 +38,13 @@ class Index extends Component
         $this->companyEmail = Setting::get('company_email', 'hello@logikraf.id');
         $this->companyPhone = Setting::get('company_phone', '+62 811-1234-5678');
         $this->companyAddress = Setting::get('company_address', 'Gedung Inovasi Lt. 3, Jl. Sudirman No. 123, Jakarta Selatan, 12190');
+
+        $this->mailHost = Setting::get('mail_host', env('MAIL_HOST', '127.0.0.1'));
+        $this->mailPort = Setting::get('mail_port', env('MAIL_PORT', '2525'));
+        $this->mailUsername = Setting::get('mail_username', env('MAIL_USERNAME', ''));
+        $this->mailPassword = Setting::get('mail_password', env('MAIL_PASSWORD', ''));
+        $this->mailEncryption = Setting::get('mail_encryption', env('MAIL_ENCRYPTION', 'tls'));
+        $this->mailFromAddress = Setting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@logikraf.id'));
     }
 
     public function savePayment()
@@ -61,6 +75,26 @@ class Index extends Component
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
             'text' => 'Kontak Perusahaan berhasil disimpan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
+    }
+
+    public function saveEmail()
+    {
+        Setting::set('mail_host', $this->mailHost);
+        Setting::set('mail_port', $this->mailPort);
+        Setting::set('mail_username', $this->mailUsername);
+        Setting::set('mail_password', $this->mailPassword);
+        Setting::set('mail_encryption', $this->mailEncryption);
+        Setting::set('mail_from_address', $this->mailFromAddress);
+        
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => 'Pengaturan SMTP Email berhasil disimpan.',
             'icon' => 'success',
             'toast' => true,
             'position' => 'top-end',

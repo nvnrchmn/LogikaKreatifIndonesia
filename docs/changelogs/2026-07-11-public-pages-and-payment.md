@@ -40,3 +40,10 @@
 - Mengaktifkan fitur keamanan *Callback Token* untuk Xendit Webhook di XenditWebhookController.php.
 - Mengubah pembuatan *password* akun Client yang berasal dari Lead menjadi *default password* (logikraf123) agar Admin bisa langsung membagikannya kepada klien.
 
+
+### Pengaturan Global & Notifikasi Email
+- Menambahkan menu konfigurasi SMTP Email dinamis di halaman Pengaturan Global Admin.
+- Mengintegrasikan SweetAlert2 (*popup alert*) secara global di halaman utama klien (*frontend*).
+- Membuat sistem pengiriman email otomatis (ClientLeadNotification) kepada calon klien yang baru saja men-*submit* formulir Mulai Proyek.
+- Memunculkan notifikasi pop-up SweetAlert ucapan terima kasih kepada klien setelah formulir sukses terkirim.
+

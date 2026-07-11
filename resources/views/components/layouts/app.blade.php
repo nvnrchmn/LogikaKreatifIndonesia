@@ -39,6 +39,25 @@
     <!-- Footer -->
     <livewire:footer />
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('swal', (event) => {
+                const data = event[0];
+                Swal.fire({
+                    title: data.title,
+                    text: data.text,
+                    icon: data.icon,
+                    toast: data.toast || false,
+                    position: data.position || 'center',
+                    showConfirmButton: data.showConfirmButton ?? true,
+                    timer: data.timer || null
+                });
+            });
+        });
+    </script>
+    
     @livewireScripts
 </body>
 </html>

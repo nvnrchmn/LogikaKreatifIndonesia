@@ -93,12 +93,36 @@ class ProjectBriefForm extends Component
         ]);
 
         try {
+            // Configure SMTP dynamically from Settings if available
+            $mailHost = \App\Models\Setting::get('mail_host');
+            if ($mailHost) {
+                config([
+                    'mail.mailers.smtp.host' => $mailHost,
+                    'mail.mailers.smtp.port' => \App\Models\Setting::get('mail_port'),
+                    'mail.mailers.smtp.username' => \App\Models\Setting::get('mail_username'),
+                    'mail.mailers.smtp.password' => \App\Models\Setting::get('mail_password'),
+                    'mail.mailers.smtp.encryption' => \App\Models\Setting::get('mail_encryption'),
+                    'mail.from.address' => \App\Models\Setting::get('mail_from_address', 'hello@logikraf.id'),
+                ]);
+            }
+
+            // Send Email to Admin
             \Illuminate\Support\Facades\Mail::to('admin@logikraf.id')->send(new \App\Mail\NewLeadNotification($lead));
+            
+            // Send Email to Client
+            \Illuminate\Support\Facades\Mail::to($lead->email)->send(new \App\Mail\ClientLeadNotification($lead));
         } catch (\Exception $e) {
-            // Ignore email error for now
+            \Illuminate\Support\Facades\Log::error('Failed to send lead emails: ' . $e->getMessage());
         }
 
         $this->submitted = true;
+        
+        $this->dispatch('swal', [
+            'title' => 'Terima Kasih!',
+            'text' => 'Pengajuan proyek Anda telah berhasil dikirim. Silakan cek email Anda.',
+            'icon' => 'success',
+            'timer' => 5000
+        ]);
     }
 
     public function render()

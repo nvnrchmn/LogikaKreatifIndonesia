@@ -99,4 +99,55 @@
             </form>
         </div>
     </div>
+        
+        <!-- Card Pengaturan SMTP Email -->
+        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl mt-6">
+            <form wire:submit="saveEmail">
+                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Pengaturan SMTP Email</h3>
+                <p class="text-xs text-txt-muted mb-6">Konfigurasi *server* email yang digunakan untuk mengirim notifikasi kepada klien.</p>
+                
+                <div class="mb-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Host</label>
+                            <input wire:model="mailHost" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="smtp.gmail.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Port</label>
+                            <input wire:model="mailPort" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="587">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-txt-main mb-2">Mail Username (Email)</label>
+                        <input wire:model="mailUsername" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="email@domain.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-txt-main mb-2">Mail Password (App Password)</label>
+                        <input wire:model="mailPassword" type="password" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="********">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Encryption</label>
+                            <select wire:model="mailEncryption" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
+                                <option value="tls">TLS</option>
+                                <option value="ssl">SSL</option>
+                                <option value="">None</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Email Pengirim (From Address)</label>
+                            <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end pt-4 border-t border-border-minimal">
+                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+                        Simpan Pengaturan Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
