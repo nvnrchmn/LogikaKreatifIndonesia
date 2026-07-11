@@ -30,3 +30,13 @@
 ## Status Aplikasi Saat Ini
 - Website publik telah memenuhi kriteria dasar kelayakan untuk pengajuan integrasi ke lingkungan *Live* (Production) Xendit.
 - Klien dapat masuk (*login*), melihat *milestone* penagihan, dan memproses pembayaran menggunakan *invoice* Xendit.
+
+### Sistem Deploy Otomatis (CI/CD Webhook)
+- Menambahkan konfigurasi GitHub Actions (.github/workflows/deploy.yml).
+- Membuat rute Webhook berbasis *flag* di outes/web.php untuk mem-bypass restriksi shell_exec di DirectAdmin.
+- Mengaktifkan metode *cronjob polling* menggunakan file deploy.sh dan deploy.flag.
+
+### Klien dan Integrasi Xendit
+- Mengaktifkan fitur keamanan *Callback Token* untuk Xendit Webhook di XenditWebhookController.php.
+- Mengubah pembuatan *password* akun Client yang berasal dari Lead menjadi *default password* (logikraf123) agar Admin bisa langsung membagikannya kepada klien.
+

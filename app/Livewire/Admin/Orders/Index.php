@@ -64,7 +64,7 @@ class Index extends Component
                     ['email' => $lead->email],
                     [
                         'name' => $lead->name,
-                        'password' => bcrypt(\Illuminate\Support\Str::random(12)),
+                        'password' => bcrypt('logikraf123'),
                     ]
                 );
                 if (!$user->hasRole('client')) {
@@ -115,7 +115,7 @@ class Index extends Component
             }
         });
 
-        session()->flash('success', 'Order dan tagihan milestone berhasil dibuat.');
+        session()->flash('success', 'Order dan tagihan milestone berhasil dibuat. Jika Lead baru, akun Client dibuat otomatis (Password Default: logikraf123).');
         $this->closeModal();
     }
 
