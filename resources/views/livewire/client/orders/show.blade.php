@@ -84,6 +84,10 @@
                 </div>
             </div>
             
+            <div class="mt-6">
+                <livewire:shared.asset-vault :order_id="$order->id" />
+            </div>
+            
             <div class="bg-brand-primary p-6 rounded-xl shadow-sm text-white">
                 <h3 class="font-display font-semibold text-lg mb-2">Butuh Bantuan?</h3>
                 <p class="text-white/80 text-sm mb-4">Hubungi tim account executive kami untuk pertanyaan seputar teknis maupun pembayaran.</p>
@@ -181,5 +185,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Diskusi Proyek (Full Width Bottom) -->
+    <div class="mt-6">
+        <livewire:shared.project-thread :order_id="$order->id" />
     </div>
 </div>

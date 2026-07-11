@@ -78,6 +78,22 @@ class Order extends Model
     }
 
     /**
+     * Get the files for this order.
+     */
+    public function files(): HasMany
+    {
+        return $this->hasMany(OrderFile::class);
+    }
+
+    /**
+     * Get the comments for this order.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(OrderComment::class);
+    }
+
+    /**
      * Get formatted total amount as Rupiah.
      */
     public function getFormattedAmountAttribute(): string

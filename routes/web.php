@@ -89,6 +89,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/portfolios', App\Livewire\Admin\Portfolios\Index::class)->name('portfolios.index');
         Route::get('/leads', App\Livewire\Admin\Leads\Index::class)->name('leads.index');
         Route::get('/orders', App\Livewire\Admin\Orders\Index::class)->name('orders.index');
+        \Livewire\Livewire::component('admin.orders.show', 'components.admin.orders.show');
+        Route::get('/orders/{order}', function (\App\Models\Order $order) { return view('components.admin.orders.show', ['order' => $order]); })->name('orders.show');
         Route::get('/transactions', App\Livewire\Admin\Transactions\Index::class)->name('transactions.index');
         Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings.index');
     });
