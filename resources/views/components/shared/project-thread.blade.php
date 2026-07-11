@@ -85,7 +85,7 @@ new class extends Component {
             <div class="flex items-end gap-3 relative">
                 <div class="flex-1">
                     <textarea wire:model="body" rows="2"
-                        class="block w-full rounded-xl border-border-minimal bg-canvas-light shadow-sm focus:bg-white focus:border-brand-primary focus:ring-brand-primary text-sm resize-none p-6 transition-colors placeholder-txt-muted"
+                        class="block w-full rounded-xl border-border-minimal bg-canvas-light shadow-sm focus:bg-white focus:border-brand-primary focus:ring-brand-primary text-sm resize-none p-4 transition-colors placeholder-txt-muted"
                         placeholder="Ketik pesan Anda di sini..." required></textarea>
                 </div>
                 <button type="submit"
