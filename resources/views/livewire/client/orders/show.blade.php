@@ -144,7 +144,7 @@
                                 @if($trx->status === 'settlement')
                                     <div class="flex items-center gap-2 mt-2">
                                         <span class="badge bg-status-success text-white text-[10px] px-2 py-0.5 rounded">Lunas</span>
-                                        <span class="text-[10px] text-txt-muted">Pada {{ $trx->settled_at ? $trx->settled_at->format('d M Y, H:i') : '' }}</span>
+                                        <span class="text-[10px] text-txt-muted">Pada {{ $trx->settled_at ? \Carbon\Carbon::parse($trx->settled_at)->format('d M Y, H:i') : '' }}</span>
                                     </div>
                                 @elseif($trx->status === 'cancelled')
                                     <div class="flex items-center gap-2 mt-2">

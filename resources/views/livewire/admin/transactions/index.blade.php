@@ -44,7 +44,7 @@
                             <td class="px-6 py-4">
                                 @if($trx->status === 'settlement')
                                     <span class="badge bg-status-success/10 text-status-success text-[10px]">Lunas</span>
-                                    <div class="text-[10px] text-txt-muted mt-1">Pada: {{ $trx->settled_at ? $trx->settled_at->format('d M Y') : '-' }}</div>
+                                    <div class="text-[10px] text-txt-muted mt-1">Pada: {{ $trx->settled_at ? \Carbon\Carbon::parse($trx->settled_at)->format('d M Y') : '-' }}</div>
                                 @elseif($trx->status === 'pending')
                                     <span class="badge bg-status-warning/10 text-status-warning text-[10px]">Menunggu Pembayaran</span>
                                 @else

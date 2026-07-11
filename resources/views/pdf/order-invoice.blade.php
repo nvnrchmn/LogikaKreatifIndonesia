@@ -78,7 +78,7 @@
                 <td>
                     <strong>{{ $trx->milestone_name }}</strong>
                     @if($trx->status === 'settlement' && $trx->settled_at)
-                        <div style="font-size: 11px; color: #777; margin-top: 5px;">Dibayar pada: {{ $trx->settled_at->format('d M Y, H:i') }}</div>
+                        <div style="font-size: 11px; color: #777; margin-top: 5px;">Dibayar pada: {{ \Carbon\Carbon::parse($trx->settled_at)->format('d M Y, H:i') }}</div>
                     @endif
                 </td>
                 <td style="font-size: 12px; color: #555;">{{ $trx->transaction_reference }}</td>

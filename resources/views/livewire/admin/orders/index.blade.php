@@ -209,7 +209,7 @@
                                     <p class="font-display text-sm font-bold text-txt-main">Rp {{ number_format($trx->amount, 0, ',', '.') }}</p>
                                     <div class="mt-1">
                                         @if($trx->status === 'settlement')
-                                            <span class="badge bg-status-success/10 text-status-success text-[10px]">Lunas ({{ $trx->settled_at ? $trx->settled_at->format('d M Y') : '' }})</span>
+                                            <span class="badge bg-status-success/10 text-status-success text-[10px]">Lunas ({{ $trx->settled_at ? \Carbon\Carbon::parse($trx->settled_at)->format('d M Y') : '' }})</span>
                                         @elseif($trx->status === 'pending')
                                             <span class="badge bg-status-warning/10 text-status-warning text-[10px]">Belum Dibayar</span>
                                         @else
