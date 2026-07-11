@@ -104,7 +104,7 @@
         </div>
 
         <!-- Right: Milestones & Invoices -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 space-y-6">
             <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-6">Tagihan & Milestone</h3>
                 
@@ -184,11 +184,8 @@
                     
                 </div>
             </div>
+            
+            <livewire:shared.project-thread :order_id="$order->id" />
         </div>
-    </div>
-
-    <!-- Diskusi Proyek (Full Width Bottom) -->
-    <div class="mt-6">
-        <livewire:shared.project-thread :order_id="$order->id" />
     </div>
 </div>

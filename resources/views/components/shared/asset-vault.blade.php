@@ -84,15 +84,15 @@ new class extends Component
 };
 ?>
 
-<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-    <div class="px-6 py-5 border-b border-gray-100 bg-white flex justify-between items-center">
-        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+<div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="font-display font-semibold text-lg text-txt-main">
             File & Aset Proyek
         </h3>
-        <span class="text-xs font-medium bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{{ $fileCount }} / 10 File</span>
+        <span class="text-[10px] font-semibold bg-canvas-light text-txt-muted px-2 py-1 rounded">{{ $fileCount }} / 10</span>
     </div>
     
-    <div class="p-6 bg-gray-50/50">
+    <div>
         @if (session()->has('success'))
             <div class="mb-5 p-3.5 bg-green-50 text-green-700 text-sm font-medium rounded-xl border border-green-100 flex items-center gap-2">
                 <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
