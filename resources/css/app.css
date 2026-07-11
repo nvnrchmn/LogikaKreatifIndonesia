@@ -1,0 +1,210 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* ============================================================
+   LOGIKRAF.ID — Tailwind CSS v4 Theme Configuration
+   Sesuai: ai-ui-ux-theme-style.md
+   ============================================================ */
+
+@theme {
+    /* Canvas & Backgrounds */
+    --color-canvas-dark: #0B0F19;
+    --color-canvas-light: #F8FAFC;
+    --color-canvas-card: #FFFFFF;
+    --color-canvas-overlay: #F3F4F6;
+
+    /* Brand Accents (High Contrast CTAs) */
+    --color-brand-primary: #0052FF;
+    --color-brand-primary-hover: #0041CC;
+    --color-brand-accent: #10B981;
+    --color-brand-accent-hover: #059669;
+
+    /* Typography & Line Colors */
+    --color-txt-main: #0F172A;
+    --color-txt-muted: #64748B;
+    --color-txt-light: #CBD5E1;
+    --color-border-minimal: #E2E8F0;
+
+    /* Status Colors */
+    --color-status-success: #10B981;
+    --color-status-warning: #F59E0B;
+    --color-status-danger: #EF4444;
+    --color-status-info: #3B82F6;
+
+    /* Font Families */
+    --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============================================================
+   Global Styles (Base Layer)
+   ============================================================ */
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-canvas-light text-txt-main antialiased font-body;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-display;
+    }
+
+    /* Focus ring for accessibility */
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-brand-primary;
+    }
+
+    /* Selection color */
+    ::selection {
+        @apply bg-brand-primary/20 text-brand-primary;
+    }
+}
+
+/* ============================================================
+   Component Utilities (using plain CSS for v4 compatibility)
+   ============================================================ */
+
+/* Card Styling */
+.card {
+    @apply bg-canvas-card shadow-sm border border-border-minimal rounded-xl;
+}
+
+.card-hover {
+    @apply bg-canvas-card shadow-sm border border-border-minimal rounded-xl transition-all duration-300 ease-in-out;
+}
+.card-hover:hover {
+    @apply shadow-lg -translate-y-1;
+}
+
+/* Button Styles */
+.btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-primary text-white font-body font-semibold text-sm rounded-lg transition-all duration-200 ease-in-out;
+}
+.btn-primary:hover {
+    @apply bg-brand-primary-hover shadow-lg shadow-brand-primary/25;
+}
+.btn-primary:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2;
+}
+.btn-primary:active {
+    @apply scale-[0.98];
+}
+
+.btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-transparent border-2 border-brand-primary text-brand-primary font-body font-semibold text-sm rounded-lg transition-all duration-200 ease-in-out;
+}
+.btn-secondary:hover {
+    @apply bg-brand-primary text-white;
+}
+.btn-secondary:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2;
+}
+.btn-secondary:active {
+    @apply scale-[0.98];
+}
+
+.btn-accent {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-accent text-white font-body font-semibold text-sm rounded-lg transition-all duration-200 ease-in-out;
+}
+.btn-accent:hover {
+    @apply bg-brand-accent-hover shadow-lg shadow-brand-accent/25;
+}
+.btn-accent:focus-visible {
+    @apply outline-none ring-2 ring-brand-accent ring-offset-2;
+}
+.btn-accent:active {
+    @apply scale-[0.98];
+}
+
+/* Form Inputs */
+.form-input {
+    @apply w-full px-4 py-3 bg-white border border-border-minimal rounded-lg text-txt-main font-body text-base transition-colors duration-200;
+}
+.form-input::placeholder {
+    @apply text-txt-muted/60;
+}
+.form-input:focus {
+    @apply border-brand-primary ring-2 ring-brand-primary/20 outline-none;
+}
+
+.form-input-error {
+    @apply border-status-danger ring-2 ring-status-danger/20;
+}
+
+/* Badge */
+.badge {
+    @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full;
+}
+
+.badge-primary {
+    @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-brand-primary/10 text-brand-primary;
+}
+
+.badge-accent {
+    @apply inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-brand-accent/10 text-brand-accent;
+}
+
+/* Section spacing */
+.section-padding {
+    @apply py-20 md:py-28 lg:py-32;
+}
+
+.container-narrow {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Gradient overlays */
+.gradient-dark-bottom {
+    background: linear-gradient(to bottom, transparent, var(--color-canvas-dark));
+}
+
+.gradient-radial-hero {
+    background: radial-gradient(ellipse at center, rgba(0, 82, 255, 0.15) 0%, transparent 70%);
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
