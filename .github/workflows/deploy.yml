@@ -1,0 +1,14 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deployment Webhook
+        run: |
+          curl -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}"
