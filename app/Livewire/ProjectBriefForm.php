@@ -97,7 +97,7 @@ class ProjectBriefForm extends Component
             ['email' => $this->email],
             [
                 'name' => $this->name,
-                'password' => bcrypt('logikraf123'),
+                'password' => 'logikraf123',
                 'must_change_password' => true,
             ]
         );

@@ -64,7 +64,7 @@ class Index extends Component
                     ['email' => $lead->email],
                     [
                         'name' => $lead->name,
-                        'password' => bcrypt('logikraf123'),
+                        'password' => 'logikraf123',
                         'must_change_password' => true,
                     ]
                 );
@@ -149,12 +149,12 @@ class Index extends Component
             'milestone_status' => 'cancelled',
         ]);
         
-        // Cancel all unpaid transactions
+        // Cancel all unpaid transactions by setting them to expired
         $order->transactions()->where('status', 'pending')->update([
-            'status' => 'cancelled'
+            'status' => 'expired'
         ]);
         
-        session()->flash('success', 'Proyek berhasil dibatalkan. Tagihan yang belum lunas otomatis ikut dibatalkan.');
+        session()->flash('success', 'Proyek berhasil dibatalkan. Tagihan yang belum lunas otomatis dibatalkan.');
         if ($this->viewingOrder && $this->viewingOrder->id === $id) {
             $this->viewOrder($id);
         }
