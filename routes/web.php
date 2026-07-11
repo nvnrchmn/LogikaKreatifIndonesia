@@ -113,9 +113,14 @@ Route::get('/api/deploy/{token}', function ($token) {
     if ($token !== env('DEPLOY_TOKEN')) {
         abort(403, 'Unauthorized');
     }
-    $deployScript = base_path('deploy.sh');
-    $logFile = base_path('deploy.log');
-    shell_exec("nohup bash {$deployScript} > {$logFile} 2>&1 &");
-    return response()->json(['status' => 'success', 'message' => 'Deploy process started in background.']);
+    
+    // Karena shell_exec sering dinonaktifkan di server (DirectAdmin),
+    // kita akan menggunakan metode "Flag File" yang akan dideteksi oleh Cronjob.
+    file_put_contents(storage_path('app/deploy.flag'), 'deploy_requested');
+    
+    return response()->json([
+        'status' => 'success', 
+        'message' => 'Deploy request queued! Cronjob akan mengeksekusinya dalam beberapa saat.'
+    ]);
 });
 
