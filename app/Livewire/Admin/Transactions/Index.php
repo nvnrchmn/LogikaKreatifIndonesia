@@ -63,10 +63,10 @@ class Index extends Component
         $transaction = Transaction::findOrFail($id);
         
         $transaction->update([
-            'status' => 'expire',
+            'status' => 'expired',
         ]);
 
-        session()->flash('success', 'Transaksi ditandai gagal/expire.');
+        session()->flash('success', 'Transaksi ditandai gagal/expired.');
     }
 
     public function render()

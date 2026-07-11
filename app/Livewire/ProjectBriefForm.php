@@ -124,11 +124,13 @@ class ProjectBriefForm extends Component
                 app('mail.manager')->purge('smtp');
             }
 
+            $mailer = $mailHost ? \Illuminate\Support\Facades\Mail::mailer('smtp') : \Illuminate\Support\Facades\Mail::mailer();
+
             // Send Email to Admin
-            \Illuminate\Support\Facades\Mail::to('admin@logikraf.id')->send(new \App\Mail\NewLeadNotification($lead));
+            $mailer->to('admin@logikraf.id')->send(new \App\Mail\NewLeadNotification($lead));
             
             // Send Email to Client
-            \Illuminate\Support\Facades\Mail::to($lead->email)->send(new \App\Mail\ClientLeadNotification($lead));
+            $mailer->to($lead->email)->send(new \App\Mail\ClientLeadNotification($lead));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send lead emails: ' . $e->getMessage());
         }
