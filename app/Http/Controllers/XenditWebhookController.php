@@ -14,11 +14,11 @@ class XenditWebhookController extends Controller
             $payload = $request->all();
             Log::info('Xendit Webhook Received', $payload);
             
-            // Xendit callback token for security (optional but recommended in prod)
-            // $xenditToken = $request->header('x-callback-token');
-            // if ($xenditToken !== env('XENDIT_CALLBACK_TOKEN')) {
-            //     return response()->json(['message' => 'Unauthorized'], 401);
-            // }
+            // Xendit callback token for security
+            $xenditToken = $request->header('x-callback-token');
+            if ($xenditToken !== env('XENDIT_CALLBACK_TOKEN')) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
 
             $orderId = $payload['external_id'] ?? null;
             $status = $payload['status'] ?? null;
