@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: Trigger Deployment Webhook
         run: |
-          curl -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}"
+          curl -sS -L -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}" -H "Accept: application/json" -H "User-Agent: GitHubActions/1.0"
