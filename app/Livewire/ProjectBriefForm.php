@@ -97,13 +97,18 @@ class ProjectBriefForm extends Component
             $mailHost = \App\Models\Setting::get('mail_host');
             if ($mailHost) {
                 config([
+                    'mail.default' => 'smtp',
                     'mail.mailers.smtp.host' => $mailHost,
                     'mail.mailers.smtp.port' => \App\Models\Setting::get('mail_port'),
                     'mail.mailers.smtp.username' => \App\Models\Setting::get('mail_username'),
                     'mail.mailers.smtp.password' => \App\Models\Setting::get('mail_password'),
                     'mail.mailers.smtp.encryption' => \App\Models\Setting::get('mail_encryption'),
                     'mail.from.address' => \App\Models\Setting::get('mail_from_address', 'hello@logikraf.id'),
+                    'mail.from.name' => 'Logika Kreatif Indonesia',
                 ]);
+                
+                // Force Laravel to forget the cached mailer instance and reload with new config
+                app('mail.manager')->purge('smtp');
             }
 
             // Send Email to Admin
