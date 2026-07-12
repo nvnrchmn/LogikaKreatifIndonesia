@@ -64,7 +64,9 @@ class InvoiceController extends Controller
         }
 
         // Call Xendit API WITH for-user-id header
-        $response = Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+        $secretKey = \App\Models\Setting::get('xendit_secret_key', config('services.xendit.secret_key'));
+
+        $response = Http::withBasicAuth($secretKey, '')
             ->withHeaders([
                 'for-user-id' => $subAccount->xendit_account_id
             ])

@@ -32,7 +32,9 @@ class SubAccountController extends Controller
         }
 
         // Call Xendit API to create Sub-Account (xenPlatform)
-        $response = Http::withBasicAuth(env('XENDIT_SECRET_KEY'), '')
+        $secretKey = \App\Models\Setting::get('xendit_secret_key', config('services.xendit.secret_key'));
+        
+        $response = Http::withBasicAuth($secretKey, '')
             ->post('https://api.xendit.co/v2/accounts', [
                 'email' => $request->email,
                 'type' => 'OWNED',
