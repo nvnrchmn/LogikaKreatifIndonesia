@@ -92,6 +92,8 @@ Route::middleware('auth')->group(function () {
         \Livewire\Livewire::component('admin.orders.show', 'components.admin.orders.show');
         Route::get('/orders/{order}', function (\App\Models\Order $order) { return view('components.admin.orders.show', ['order' => $order]); })->name('orders.show');
         Route::get('/transactions', App\Livewire\Admin\Transactions\Index::class)->name('transactions.index');
+        Route::get('/tickets', App\Livewire\Admin\Tickets\Index::class)->name('tickets.index');
+        Route::get('/tickets/{ticket}', App\Livewire\Admin\Tickets\Show::class)->name('tickets.show');
         Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings.index');
     });
 
@@ -102,6 +104,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders', App\Livewire\Client\Orders\Index::class)->name('orders.index');
         Route::get('/orders/{order}', App\Livewire\Client\Orders\Show::class)->name('orders.show');
         Route::get('/orders/{order}/pdf', [App\Http\Controllers\Client\OrderPdfController::class, 'download'])->name('orders.pdf');
+        Route::get('/tickets', App\Livewire\Client\Tickets\Index::class)->name('tickets.index');
+        Route::get('/tickets/{ticket}', App\Livewire\Client\Tickets\Show::class)->name('tickets.show');
     });
 });
 

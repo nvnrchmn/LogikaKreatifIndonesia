@@ -186,6 +186,7 @@
             </div>
             
             <livewire:shared.project-thread :order_id="$order->id" />
+            <livewire:client.orders.progress-board :order="$order" />
         </div>
     </div>
 </div>

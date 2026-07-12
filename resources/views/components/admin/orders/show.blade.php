@@ -55,6 +55,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Detail Pesanan'])] class e
         <!-- Kolom Kanan: Chat -->
         <div class="lg:col-span-2">
             <livewire:shared.project-thread :order_id="$order->id" />
+            <livewire:admin.orders.kanban-board :order="$order" />
         </div>
     </div>
 </div>
