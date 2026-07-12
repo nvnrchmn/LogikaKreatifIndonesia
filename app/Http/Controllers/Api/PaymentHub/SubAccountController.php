@@ -38,7 +38,7 @@ class SubAccountController extends Controller
             ->post('https://api.xendit.co/v2/accounts', [
                 'email' => $request->email,
                 'type' => 'OWNED',
-                'business_profile' => [
+                'public_profile' => [
                     'business_name' => $request->business_name
                 ]
             ]);
