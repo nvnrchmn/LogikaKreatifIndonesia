@@ -62,7 +62,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <button type="button" wire:click="viewOrder({{ $order->id }})" class="text-brand-primary hover:underline text-sm font-medium">Detail & Tagihan</button>
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn text-brand-primary hover:underline text-sm font-medium">Detail & Tagihan</a>
                             </td>
                         </tr>
                     @empty
