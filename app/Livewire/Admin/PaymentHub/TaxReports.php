@@ -101,7 +101,7 @@ class TaxReports extends Component
         $internalTransactions = Transaction::where('status', 'settlement')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->with(['order', 'order.client'])
+            ->with(['order', 'order.user'])
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -136,7 +136,7 @@ class TaxReports extends Component
                     'Jasa IT Internal',
                     $t->created_at->format('Y-m-d H:i:s'),
                     $t->transaction_reference,
-                    $t->order->client->company_name ?? $t->order->client->name,
+                    $t->order->user->company_name ?? $t->order->user->name,
                     $t->amount,
                     '0.5%',
                     $taxNominal
@@ -175,7 +175,7 @@ class TaxReports extends Component
         $internalTransactions = Transaction::where('status', 'settlement')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->with(['order', 'order.client'])
+            ->with(['order', 'order.user'])
             ->orderBy('created_at', 'asc')
             ->get();
 

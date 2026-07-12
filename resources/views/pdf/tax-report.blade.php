@@ -80,7 +80,7 @@
                 <tr>
                     <td>{{ $t->created_at->format('d/m/Y H:i') }}</td>
                     <td>{{ $t->transaction_reference }}</td>
-                    <td>{{ $t->order->client->company_name ?? $t->order->client->name }}</td>
+                    <td>{{ $t->order->user->company_name ?? $t->order->user->name }}</td>
                     <td class="text-right">{{ number_format($t->amount, 0, ',', '.') }}</td>
                 </tr>
             @empty
