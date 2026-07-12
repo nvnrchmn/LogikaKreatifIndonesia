@@ -94,7 +94,7 @@ class TaxReports extends Component
         $phTransactions = PhTransaction::where('status', 'PAID')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->with(['saasApplication', 'phSubAccount'])
+            ->with(['saasApplication'])
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -161,6 +161,36 @@ class TaxReports extends Component
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf($year, $month)
+    {
+        $phTransactions = PhTransaction::where('status', 'PAID')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->with(['saasApplication'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $internalTransactions = Transaction::where('status', 'settlement')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->with(['order', 'order.client'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $monthName = $this->getMonthName($month);
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.tax-report', compact(
+            'phTransactions', 
+            'internalTransactions', 
+            'year', 
+            'monthName'
+        ));
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, "laporan_pajak_gabungan_{$year}_{$month}.pdf");
     }
 
     public function render()
