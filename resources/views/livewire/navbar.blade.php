@@ -23,9 +23,21 @@
                         {{ $link['label'] }}
                     </a>
                 @endforeach
-                <a href="#konsultasi" class="btn-primary text-sm !py-2.5 !px-5">
-                    Mulai Proyek
-                </a>
+                @auth
+                    @if(auth()->user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="btn-primary text-sm !py-2.5 !px-5">
+                            Portal Admin
+                        </a>
+                    @else
+                        <a href="{{ route('client.dashboard') }}" class="btn-primary text-sm !py-2.5 !px-5">
+                            Portal Klien
+                        </a>
+                    @endif
+                @else
+                    <a href="#konsultasi" class="btn-primary text-sm !py-2.5 !px-5">
+                        Mulai Proyek
+                    </a>
+                @endauth
             </div>
 
             <!-- Mobile Hamburger -->
@@ -54,9 +66,21 @@
                     </a>
                 @endforeach
                 <div class="pt-2">
-                    <a href="#konsultasi" class="btn-primary w-full text-center text-sm">
-                        Mulai Proyek
-                    </a>
+                    @auth
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="btn-primary w-full text-center text-sm">
+                                Portal Admin
+                            </a>
+                        @else
+                            <a href="{{ route('client.dashboard') }}" class="btn-primary w-full text-center text-sm">
+                                Portal Klien
+                            </a>
+                        @endif
+                    @else
+                        <a href="#konsultasi" class="btn-primary w-full text-center text-sm">
+                            Mulai Proyek
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>
