@@ -1,13 +1,32 @@
 
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center border-b border-border-minimal pb-4">
         <div>
-            <h2 class="text-2xl font-display font-bold text-txt-main">Payment Hub Transactions</h2>
-            <p class="text-txt-muted text-sm mt-1">Pantau seluruh aliran dana dari ekosistem SaaS Logikraf</p>
+            <h2 class="text-3xl font-display font-bold text-txt-main">Data Pembayaran (Payment Hub)</h2>
+            <p class="text-txt-muted text-sm mt-1">Pantau seluruh aliran dana dari ekosistem aplikasi terintegrasi.</p>
         </div>
     </div>
 
-    <div class="bg-canvas-card rounded-2xl border border-border-minimal overflow-hidden">
+    <!-- Filters -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-between items-center bg-canvas-card p-4 rounded-2xl border border-border-minimal shadow-sm">
+        <div class="w-full sm:w-1/3 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari ID Tagihan, Nama Aplikasi, atau Nama RT..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm transition-shadow">
+        </div>
+        <div class="w-full sm:w-1/4">
+            <select wire:model.live="statusFilter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary sm:text-sm rounded-xl transition-shadow bg-white">
+                <option value="">Semua Status</option>
+                <option value="PAID">LUNAS (PAID)</option>
+                <option value="PENDING">PENDING</option>
+                <option value="EXPIRED">EXPIRED</option>
+                <option value="FAILED">FAILED</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="bg-canvas-card rounded-2xl border border-border-minimal overflow-hidden shadow-sm">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-canvas-light border-b border-border-minimal">
