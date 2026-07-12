@@ -1,22 +1,4 @@
-<?php
 
-use Livewire\Volt\Component;
-use App\Models\PaymentHub\PhTransaction;
-use Livewire\Attributes\Layout;
-use Livewire\WithPagination;
-
-new #[Layout('components.layouts.admin', ['title' => 'Payment Hub Transactions'])] class extends Component
-{
-    use WithPagination;
-
-    public function with(): array
-    {
-        return [
-            'transactions' => PhTransaction::with(['saasApplication', 'subAccount'])->latest()->paginate(15)
-        ];
-    }
-};
-?>
 <div class="space-y-6">
     <div class="flex justify-between items-center">
         <div>
