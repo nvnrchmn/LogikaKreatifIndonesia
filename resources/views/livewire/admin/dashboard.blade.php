@@ -33,10 +33,13 @@
                 <div class="w-10 h-10 rounded-lg bg-brand-accent/10 flex items-center justify-center">
                     <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <span class="text-xs font-medium text-txt-muted">{{ $stats['pending_payments'] }} pending</span>
+                <div class="text-right">
+                    <span class="text-xs font-medium text-txt-muted block">Jasa: Rp {{ number_format($stats['internal_revenue'] / 1000, 0, ',', '.') }}K</span>
+                    <span class="text-xs font-medium text-txt-muted block">PH: Rp {{ number_format($stats['ph_revenue'] / 1000, 0, ',', '.') }}K</span>
+                </div>
             </div>
             <p class="font-display text-2xl font-bold text-txt-main">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
-            <p class="font-body text-xs text-txt-muted mt-1">Total Revenue</p>
+            <p class="font-body text-xs text-txt-muted mt-1">Total Omzet</p>
         </div>
 
         <!-- Portfolios -->

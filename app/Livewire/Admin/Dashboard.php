@@ -15,12 +15,17 @@ class Dashboard extends Component
 {
     public function render()
     {
+        $internalRevenue = Transaction::where('status', 'settlement')->sum('amount');
+        $phRevenue = \App\Models\PaymentHub\PhTransaction::where('status', 'PAID')->sum('platform_fee_amount');
+
         $stats = [
             'total_leads' => Lead::count(),
             'new_leads' => Lead::where('status', 'new')->count(),
             'total_orders' => Order::count(),
             'active_orders' => Order::where('status', 'in_progress')->count(),
-            'total_revenue' => Transaction::where('status', 'settlement')->sum('amount'),
+            'total_revenue' => $internalRevenue + $phRevenue,
+            'internal_revenue' => $internalRevenue,
+            'ph_revenue' => $phRevenue,
             'pending_payments' => Transaction::where('status', 'pending')->count(),
             'total_portfolios' => Portfolio::count(),
             'total_services' => Service::where('is_active', true)->count(),
