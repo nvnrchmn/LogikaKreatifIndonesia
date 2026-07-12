@@ -64,6 +64,23 @@ Endpoint: `POST https://logikraf.id/api/payment-hub/v1/invoices`
 
 *Sistem Logikraf akan merespons dengan `checkout_url` yang harus Anda berikan kepada warga untuk dibayar.*
 
+### C. Menarik Dana (Disbursement / Payout)
+Endpoint: `POST https://logikraf.id/api/payment-hub/v1/disbursements`
+
+Gunakan *endpoint* ini ketika pengurus RT ingin memindahkan uang dari Kas RT (Sub-Account) ke rekening bank asli milik RT (seperti BCA, Mandiri, BRI, dll).
+
+**Payload:**
+```json
+{
+  "external_reference_id": "RT-01-RW-02", // Harus sama dengan external_reference_id saat mendaftar Sub-Account
+  "amount": 1500000,
+  "bank_code": "BCA",
+  "account_holder_name": "Bapak Budi Ketua RT",
+  "account_number": "1234567890",
+  "description": "Pencairan Kas Bulan Juli"
+}
+```
+
 ---
 
 ## 4. Menangkap Webhook (Konfirmasi Pembayaran)

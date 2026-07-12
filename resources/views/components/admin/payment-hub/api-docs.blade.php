@@ -121,16 +121,52 @@
             </div>
         </section>
 
-        <!-- Accordion 4: Webhook Integration -->
-        <section class="bg-canvas-card rounded-2xl border border-border-minimal shadow-sm overflow-hidden transition-all duration-300">
+        <!-- Accordion 4: Disbursement (Pencairan Dana) -->
+        <section class="bg-canvas-card rounded-2xl border border-border-minimal shadow-sm overflow-hidden transition-all duration-300 mb-6">
             <button @click="activeAccordion = activeAccordion === 4 ? null : 4" class="w-full flex justify-between items-center p-6 bg-white hover:bg-gray-50/50 transition-colors text-left focus:outline-none">
                 <h3 class="text-xl font-bold text-txt-main flex items-center gap-3">
                     <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary text-sm">4</span>
-                    Notifikasi Pembayaran (Webhook)
+                    Pencairan Dana (Disbursement)
                 </h3>
                 <svg :class="{'rotate-180': activeAccordion === 4}" class="w-6 h-6 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div x-show="activeAccordion === 4" x-collapse>
+                <div class="p-6 pt-0 border-t border-gray-100">
+                    <div class="flex items-center gap-3 mb-6 mt-4">
+                        <span class="badge-primary bg-indigo-100 text-indigo-700 uppercase tracking-wider font-bold">POST</span>
+                        <code class="text-sm bg-gray-100 text-gray-800 px-3 py-1.5 rounded border border-gray-200 shadow-sm font-mono flex-1">/api/payment-hub/v1/disbursements</code>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-5 leading-relaxed">Digunakan untuk memindahkan uang dari Kas RT (Sub-Account) ke rekening bank lokal milik RT secara instan.</p>
+                    
+                    <div class="bg-gray-900 rounded-xl p-5 relative group shadow-inner" style="background-color: #111827;">
+                        <button @click="copyToClipboard(document.getElementById('code-disbursement').innerText)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-opacity p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg flex items-center gap-2 opacity-0 group-hover:opacity-100 focus:opacity-100">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            <span class="text-xs font-semibold">Copy</span>
+                        </button>
+                        <pre class="text-sm font-mono text-gray-300 pr-24 overflow-x-auto"><code id="code-disbursement" class="block whitespace-pre-wrap">{
+    <span style="color: #86efac;">"external_reference_id"</span>: <span style="color: #fde047;">"RT01-PERUM-MAWAR"</span>, <span style="color: #9ca3af;">// Harus sama dengan ID saat registrasi Sub-Account</span>
+    <span style="color: #86efac;">"amount"</span>: <span style="color: #fde047;">1500000</span>, <span style="color: #9ca3af;">// Nominal penarikan</span>
+    <span style="color: #86efac;">"bank_code"</span>: <span style="color: #fde047;">"BCA"</span>, <span style="color: #9ca3af;">// Kode bank tujuan (contoh: BCA, MANDIRI, BNI)</span>
+    <span style="color: #86efac;">"account_holder_name"</span>: <span style="color: #fde047;">"Bapak Budi Ketua RT"</span>,
+    <span style="color: #86efac;">"account_number"</span>: <span style="color: #fde047;">"1234567890"</span>,
+    <span style="color: #86efac;">"description"</span>: <span style="color: #fde047;">"Pencairan Kas Bulan Juli"</span>
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accordion 5: Webhook Integration -->
+        <section class="bg-canvas-card rounded-2xl border border-border-minimal shadow-sm overflow-hidden transition-all duration-300">
+            <button @click="activeAccordion = activeAccordion === 5 ? null : 5" class="w-full flex justify-between items-center p-6 bg-white hover:bg-gray-50/50 transition-colors text-left focus:outline-none">
+                <h3 class="text-xl font-bold text-txt-main flex items-center gap-3">
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary text-sm">5</span>
+                    Notifikasi Pembayaran (Webhook)
+                </h3>
+                <svg :class="{'rotate-180': activeAccordion === 5}" class="w-6 h-6 text-gray-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="activeAccordion === 5" x-collapse>
                 <div class="p-6 pt-0 border-t border-gray-100">
                     <p class="text-gray-600 mb-5 leading-relaxed mt-4">Ketika warga berhasil membayar, Logikraf akan mengirimkan HTTP POST ke <b>Webhook URL</b> yang didaftarkan di menu SaaS Apps. Sistem Anda harus menangkap webhook ini untuk mengubah status tagihan.</p>
                     
