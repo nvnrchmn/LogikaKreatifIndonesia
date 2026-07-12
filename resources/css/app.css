@@ -84,6 +84,11 @@
 }
 
 /* Button Styles */
+.btn {
+    @apply inline-flex items-center justify-center font-body font-semibold transition-all duration-200 ease-in-out whitespace-nowrap rounded-xl;
+    /* rounded-xl gives it a modern consistent radius, whitespace-nowrap prevents weird text wrapping on mobile */
+}
+
 .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 bg-brand-primary text-white font-body font-semibold text-sm rounded-lg transition-all duration-200 ease-in-out;
 }
