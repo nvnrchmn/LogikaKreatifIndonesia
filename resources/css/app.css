@@ -129,14 +129,24 @@
 }
 
 /* Form Inputs */
-.form-input {
-    @apply w-full px-4 py-3 bg-white border border-border-minimal rounded-lg text-txt-main font-body text-base transition-colors duration-200;
+.form-input, .input {
+    @apply w-full px-4 py-2.5 bg-white border border-border-minimal rounded-lg text-txt-main font-body text-sm transition-all duration-200 shadow-sm;
 }
-.form-input::placeholder {
-    @apply text-txt-muted/60;
+.form-input::placeholder, .input::placeholder {
+    @apply text-txt-muted/50;
 }
-.form-input:focus {
-    @apply border-brand-primary ring-2 ring-brand-primary/20 outline-none;
+.form-input:focus, .input:focus {
+    @apply border-brand-primary ring-4 ring-brand-primary/10 outline-none shadow-md shadow-brand-primary/5;
+}
+.form-input:hover:not(:focus), .input:hover:not(:focus) {
+    @apply border-gray-300;
+}
+
+select.input, select.form-input {
+    @apply pr-10 appearance-none bg-no-repeat bg-white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-size: 1.5em 1.5em;
 }
 
 .form-input-error {
