@@ -7,7 +7,7 @@ use App\Models\PaymentHub\SaasApplication;
 use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
 
-#[Layout('components.layouts.admin', ['title' => 'SaaS Applications'])]
+#[Layout('components.layouts.admin', ['title' => 'Aplikasi Terintegrasi'])]
 class SaasApps extends Component
 {
     use WithPagination;

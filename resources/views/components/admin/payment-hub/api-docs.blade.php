@@ -9,7 +9,7 @@
     <div class="flex justify-between items-center border-b border-border-minimal pb-4">
         <div>
             <h2 class="text-3xl font-display font-bold text-txt-main">API Documentation</h2>
-            <p class="text-txt-muted text-sm mt-1">Panduan integrasi Logikraf Payment Hub untuk Produk SaaS Anda.</p>
+            <p class="text-txt-muted text-sm mt-1">Panduan integrasi Logikraf Payment Hub untuk Aplikasi Anda.</p>
         </div>
     </div>
 
@@ -27,7 +27,7 @@
             </button>
             <div x-show="activeAccordion === 1" x-collapse>
                 <div class="p-6 pt-0 border-t border-gray-100">
-                    <p class="text-gray-600 mb-5 leading-relaxed mt-4">Setiap <i>request</i> ke Payment Hub wajib menyertakan <b>API Key</b> di dalam Header HTTP. API Key ini bisa didapatkan pada menu <a href="{{ route('admin.payment-hub.saas-apps') }}" class="text-brand-primary hover:underline font-semibold">SaaS Apps</a>.</p>
+                    <p class="text-gray-600 mb-5 leading-relaxed mt-4">Setiap <i>request</i> ke Payment Hub wajib menyertakan <b>API Key</b> di dalam Header HTTP. API Key ini bisa didapatkan pada menu <a href="{{ route('admin.payment-hub.saas-apps') }}" class="text-brand-primary hover:underline font-semibold">Aplikasi Terintegrasi</a>.</p>
                     
                     <div class="bg-gray-900 rounded-xl p-5 relative group shadow-inner" style="background-color: #111827;">
                         <button @click="copyToClipboard('{\n    &quot;Content-Type&quot;: &quot;application/json&quot;,\n    &quot;Accept&quot;: &quot;application/json&quot;,\n    &quot;X-Logikraf-API-Key&quot;: &quot;sk_test_...&quot;\n}')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-opacity p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg flex items-center gap-2 opacity-0 group-hover:opacity-100 focus:opacity-100">

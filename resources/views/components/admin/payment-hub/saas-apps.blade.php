@@ -1,9 +1,8 @@
-
 <div class="space-y-6">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center border-b border-border-minimal pb-4">
         <div>
-            <h2 class="text-2xl font-display font-bold text-txt-main">SaaS Applications</h2>
-            <p class="text-txt-muted text-sm mt-1">Kelola akses API untuk ekosistem aplikasi Logikraf</p>
+            <h2 class="text-3xl font-display font-bold text-txt-main">Aplikasi Terintegrasi (API Clients)</h2>
+            <p class="text-txt-muted text-sm mt-1">Kelola aplikasi yang terhubung ke Logikraf Payment Hub.</p>
         </div>
     </div>
 
