@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\PaymentHub\PhTransaction;
+use App\Jobs\ForwardWebhookToSaasJob;
+use Illuminate\Support\Str;
 
 class XenditWebhookController extends Controller
 {
@@ -27,6 +30,35 @@ class XenditWebhookController extends Controller
                 return response()->json(['message' => 'Invalid payload'], 400);
             }
 
+            // Check if this is a Payment Hub Transaction
+            if (Str::startsWith($orderId, 'PHUB-')) {
+                // Format: PHUB-{saasAppId}-{external_id}
+                $parts = explode('-', $orderId, 3);
+                
+                if (count($parts) === 3) {
+                    $saasAppId = $parts[1];
+                    $externalId = $parts[2];
+                    
+                    $phTx = PhTransaction::where('saas_application_id', $saasAppId)
+                        ->where('external_id', $externalId)
+                        ->first();
+                        
+                    if ($phTx) {
+                        if ($status === 'PAID' || $status === 'SETTLED') {
+                            $phTx->update(['status' => 'PAID', 'paid_at' => now(), 'payment_method' => $payload['payment_method'] ?? null]);
+                        } elseif ($status === 'EXPIRED') {
+                            $phTx->update(['status' => 'EXPIRED']);
+                        }
+                        
+                        // Dispatch Job to forward webhook to SaaS App
+                        ForwardWebhookToSaasJob::dispatch($phTx, $payload);
+                        
+                        return response()->json(['message' => 'Payment Hub Webhook Processed']);
+                    }
+                }
+            }
+
+            // Fallback to old Transaction logic
             $transaction = Transaction::where('transaction_reference', $orderId)->first();
             
             if (!$transaction) {
