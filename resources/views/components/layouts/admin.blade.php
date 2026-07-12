@@ -54,6 +54,7 @@
                         ['type' => 'header', 'label' => 'Payment Hub (SaaS)'],
                         ['route' => 'admin.payment-hub.saas-apps', 'label' => 'SaaS Apps', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>'],
                         ['route' => 'admin.payment-hub.transactions', 'label' => 'Data Pembayaran', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>'],
+                        ['route' => 'admin.payment-hub.tax-reports', 'label' => 'Laporan Pajak', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v1a3 3 0 11-6 0v-1m6 0v-1m6 0v1a3 3 0 11-6 0v-1m6 0v-1m0 1v1a3 3 0 106 0v-1m-6 0v-1M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/>'],
                         ['route' => 'admin.payment-hub.api-docs', 'label' => 'API Docs', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>'],
                         
                         ['type' => 'header', 'label' => 'Sistem'],

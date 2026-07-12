@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-hub/saas-apps', App\Livewire\Admin\PaymentHub\SaasApps::class)->name('payment-hub.saas-apps');
         Route::get('/payment-hub/transactions', App\Livewire\Admin\PaymentHub\Transactions::class)->name('payment-hub.transactions');
         Route::get('/payment-hub/api-docs', App\Livewire\Admin\PaymentHub\ApiDocs::class)->name('payment-hub.api-docs');
+        Route::get('/payment-hub/tax-reports', App\Livewire\Admin\PaymentHub\TaxReports::class)->name('payment-hub.tax-reports');
     });
 
     // Client Routes
