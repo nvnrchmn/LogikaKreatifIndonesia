@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\PaymentHub;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\PaymentHub\PhTransaction;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -13,30 +14,69 @@ class TaxReports extends Component
 {
     public function getMonthlyReportsProperty()
     {
-        // Get paid transactions grouped by month and year
-        $reports = PhTransaction::where('status', 'PAID')
+        // Get paid Payment Hub transactions
+        $phReports = PhTransaction::where('status', 'PAID')
             ->select(
                 DB::raw('YEAR(created_at) as year'),
                 DB::raw('MONTH(created_at) as month'),
-                DB::raw('COUNT(*) as total_transactions'),
-                DB::raw('SUM(platform_fee_amount) as total_platform_fee')
+                DB::raw('COUNT(*) as total_ph_transactions'),
+                DB::raw('SUM(platform_fee_amount) as total_ph_fee')
             )
             ->groupBy('year', 'month')
-            ->orderBy('year', 'desc')
-            ->orderBy('month', 'desc')
             ->get();
 
-        return $reports->map(function ($report) {
-            $taxAmount = $report->total_platform_fee * 0.005; // 0.5% PPh Final
-            return [
-                'period' => $this->getMonthName($report->month) . ' ' . $report->year,
+        // Get paid Internal Orders
+        $internalReports = Transaction::where('status', 'settlement')
+            ->select(
+                DB::raw('YEAR(created_at) as year'),
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as total_internal_transactions'),
+                DB::raw('SUM(amount) as total_internal_amount')
+            )
+            ->groupBy('year', 'month')
+            ->get();
+
+        $combined = [];
+
+        foreach ($phReports as $report) {
+            $key = $report->year . '-' . $report->month;
+            $combined[$key] = [
                 'year' => $report->year,
                 'month' => $report->month,
-                'total_transactions' => $report->total_transactions,
-                'total_platform_fee' => $report->total_platform_fee,
-                'tax_amount' => $taxAmount,
+                'period' => $this->getMonthName($report->month) . ' ' . $report->year,
+                'ph_omzet' => (int) $report->total_ph_fee,
+                'internal_omzet' => 0,
+                'total_omzet' => (int) $report->total_ph_fee,
             ];
-        });
+        }
+
+        foreach ($internalReports as $report) {
+            $key = $report->year . '-' . $report->month;
+            if (!isset($combined[$key])) {
+                $combined[$key] = [
+                    'year' => $report->year,
+                    'month' => $report->month,
+                    'period' => $this->getMonthName($report->month) . ' ' . $report->year,
+                    'ph_omzet' => 0,
+                    'internal_omzet' => (int) $report->total_internal_amount,
+                    'total_omzet' => (int) $report->total_internal_amount,
+                ];
+            } else {
+                $combined[$key]['internal_omzet'] = (int) $report->total_internal_amount;
+                $combined[$key]['total_omzet'] += (int) $report->total_internal_amount;
+            }
+        }
+        
+        // Sort keys descending
+        krsort($combined);
+
+        $result = [];
+        foreach ($combined as $key => $data) {
+            $data['tax_amount'] = $data['total_omzet'] * 0.005; // 0.5% PPh Final
+            $result[] = $data;
+        }
+
+        return $result;
     }
 
     private function getMonthName($monthNum)
@@ -51,14 +91,21 @@ class TaxReports extends Component
 
     public function exportCsv($year, $month)
     {
-        $transactions = PhTransaction::where('status', 'PAID')
+        $phTransactions = PhTransaction::where('status', 'PAID')
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->with(['saasApplication', 'phSubAccount'])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $fileName = "laporan_pajak_{$year}_{$month}.csv";
+        $internalTransactions = Transaction::where('status', 'settlement')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->with(['order', 'order.client'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $fileName = "laporan_pajak_gabungan_{$year}_{$month}.csv";
 
         $headers = [
             "Content-type"        => "text/csv",
@@ -69,35 +116,47 @@ class TaxReports extends Component
         ];
 
         $columns = [
+            'Tipe Transaksi',
             'Tanggal Transaksi', 
-            'ID Tagihan Logikraf', 
-            'ID Tagihan External', 
-            'SaaS App', 
-            'Sub-Account (RT)', 
-            'Total Dibayar Warga (Rp)', 
-            'Platform Fee (Omzet Logikraf)', 
+            'ID/Referensi', 
+            'Klien/Sumber', 
+            'Nominal Diterima Logikraf (Omzet)', 
             'Tarif Pajak (PPh Final 0.5%)', 
             'Nominal Pajak (Rp)'
         ];
 
-        $callback = function() use($transactions, $columns) {
+        $callback = function() use($phTransactions, $internalTransactions, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
-            foreach ($transactions as $t) {
+            // Export Internal Transactions
+            foreach ($internalTransactions as $t) {
+                $taxNominal = $t->amount * 0.005;
+                fputcsv($file, [
+                    'Jasa IT Internal',
+                    $t->created_at->format('Y-m-d H:i:s'),
+                    $t->transaction_reference,
+                    $t->order->client->company_name ?? $t->order->client->name,
+                    $t->amount,
+                    '0.5%',
+                    $taxNominal
+                ]);
+            }
+
+            // Export Payment Hub Transactions
+            foreach ($phTransactions as $t) {
                 $taxNominal = $t->platform_fee_amount * 0.005;
                 fputcsv($file, [
+                    'SaaS Platform Fee',
                     $t->created_at->format('Y-m-d H:i:s'),
-                    $t->id,
                     $t->external_id,
                     $t->saasApplication ? $t->saasApplication->name : '-',
-                    $t->phSubAccount ? $t->phSubAccount->business_name : '-',
-                    $t->amount,
                     $t->platform_fee_amount,
                     '0.5%',
                     $taxNominal
                 ]);
             }
+            
             fclose($file);
         };
 

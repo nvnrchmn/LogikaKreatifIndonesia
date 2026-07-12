@@ -25,8 +25,9 @@
                 <thead>
                     <tr class="bg-gray-50/50 border-b border-border-minimal text-txt-muted text-xs uppercase tracking-wider">
                         <th class="px-6 py-4 font-semibold">Periode (Bulan)</th>
-                        <th class="px-6 py-4 font-semibold">Total Transaksi</th>
-                        <th class="px-6 py-4 font-semibold">Omzet (Total Platform Fee)</th>
+                        <th class="px-6 py-4 font-semibold">Omzet Jasa Internal</th>
+                        <th class="px-6 py-4 font-semibold">Omzet Aplikasi (Platform Fee)</th>
+                        <th class="px-6 py-4 font-semibold text-gray-800">Total Omzet Keseluruhan</th>
                         <th class="px-6 py-4 font-semibold text-brand-primary">PPh Final 0.5%</th>
                         <th class="px-6 py-4 font-semibold text-right">Aksi</th>
                     </tr>
@@ -38,27 +39,30 @@
                                 {{ $report['period'] }}
                             </td>
                             <td class="px-6 py-4 text-txt-muted">
-                                {{ number_format($report['total_transactions']) }} trx
+                                Rp {{ number_format($report['internal_omzet'], 0, ',', '.') }}
                             </td>
-                            <td class="px-6 py-4 font-medium text-txt-main">
-                                Rp {{ number_format($report['total_platform_fee'], 0, ',', '.') }}
+                            <td class="px-6 py-4 text-txt-muted">
+                                Rp {{ number_format($report['ph_omzet'], 0, ',', '.') }}
                             </td>
-                            <td class="px-6 py-4 font-bold text-brand-primary">
+                            <td class="px-6 py-4 font-bold text-gray-800 bg-gray-50/30">
+                                Rp {{ number_format($report['total_omzet'], 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 font-bold text-brand-primary bg-brand-primary/5">
                                 Rp {{ number_format($report['tax_amount'], 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <button wire:click="exportCsv({{ $report['year'] }}, {{ $report['month'] }})" class="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    Export CSV (Rincian)
+                                    Export CSV Gabungan
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-txt-muted">
+                            <td colspan="6" class="px-6 py-8 text-center text-txt-muted">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    <p>Belum ada data transaksi yang lunas (PAID) untuk dilaporkan.</p>
+                                    <p>Belum ada omzet yang tercatat untuk dilaporkan.</p>
                                 </div>
                             </td>
                         </tr>
