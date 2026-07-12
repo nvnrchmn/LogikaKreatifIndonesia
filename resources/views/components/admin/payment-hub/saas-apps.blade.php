@@ -7,17 +7,28 @@
     </div>
 
     <div class="bg-canvas-card rounded-2xl border border-border-minimal p-6">
-        <form wire:submit="create" class="flex gap-4 items-end">
-            <div class="flex-1">
+        <form wire:submit="create" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div class="lg:col-span-1">
                 <label class="block text-sm font-medium text-txt-main mb-1">Nama Aplikasi</label>
-                <input type="text" wire:model="name" class="input" placeholder="e.g., SB Digital" required>
+                <input type="text" wire:model="name" class="input w-full" placeholder="e.g., SB Digital" required>
             </div>
-            <div class="flex-1">
+            <div class="lg:col-span-1">
                 <label class="block text-sm font-medium text-txt-main mb-1">Webhook URL</label>
-                <input type="url" wire:model="webhook_url" class="input" placeholder="https://sbdigital.id/api/webhooks/logikraf">
+                <input type="url" wire:model="webhook_url" class="input w-full" placeholder="https://sbdigital.id/api/webhooks/logikraf">
             </div>
-            <div>
-                <button type="submit" class="btn-primary">Generate API Key</button>
+            <div class="lg:col-span-1">
+                <label class="block text-sm font-medium text-txt-main mb-1">Tipe Biaya</label>
+                <select wire:model="platform_fee_type" class="input w-full">
+                    <option value="fixed">Fixed (Nominal)</option>
+                    <option value="percentage">Persentase (%)</option>
+                </select>
+            </div>
+            <div class="lg:col-span-1">
+                <label class="block text-sm font-medium text-txt-main mb-1">Besaran Biaya</label>
+                <input type="number" step="0.01" wire:model="platform_fee_amount" class="input w-full" required>
+            </div>
+            <div class="lg:col-span-1">
+                <button type="submit" class="btn-primary w-full">Generate API Key</button>
             </div>
         </form>
     </div>
@@ -29,6 +40,7 @@
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Aplikasi</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">API Key</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Webhook</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Biaya Platform</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Sub-Akun</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Transaksi</th>
                 </tr>
@@ -47,6 +59,13 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-txt-muted">
                             {{ $app->webhook_url ?? '-' }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-txt-muted">
+                            @if($app->platform_fee_type === 'fixed')
+                                Rp {{ number_format($app->platform_fee_amount, 0, ',', '.') }}
+                            @else
+                                {{ $app->platform_fee_amount }}%
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">

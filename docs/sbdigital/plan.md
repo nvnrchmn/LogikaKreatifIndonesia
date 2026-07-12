@@ -10,7 +10,7 @@ Dengan menggunakan Logikraf Payment Hub, SB Digital tidak perlu mendaftar dan me
 
 Sebelum memulai *coding*, pastikan Anda sudah mendapatkan hal berikut dari Admin Logikraf:
 - **API Key Logikraf** (contoh: `sk_test_xxxxxx`).
-- **Webhook URL** (Anda harus memberikan URL *endpoint* di SB Digital yang bisa menerima *request* POST dari Logikraf, contoh: `https://api.sbdigital.id/webhooks/logikraf-payment`).
+- **Webhook URL** (Anda harus memberikan URL *endpoint* di SB Digital yang bisa menerima *request* POST dari Logikraf, contoh: `https://app.sbdigital.biz.id/webhooks/logikraf-payment`).
 
 ---
 
@@ -52,14 +52,16 @@ Endpoint: `POST https://logikraf.id/api/payment-hub/v1/invoices`
 **Payload:**
 ```json
 {
-    "external_id": "INV-2026-001", // ID Tagihan di database SB Digital
-    "external_reference_id": "RT01-PERUM-MAWAR", // ID RT yang didaftarkan di langkah A
-    "amount": 50000, // Total tagihan warga
-    "platform_fee_amount": 2500, // Keuntungan/potongan Logikraf
-    "payer_email": "warga@email.com",
-    "description": "Iuran Kebersihan Juli"
+  "external_id": "INV-SBDIG-001",
+  "external_reference_id": "RT-01-RW-02", 
+  "amount": 50000,
+  "payer_email": "warga@example.com",
+  "description": "Iuran Bulanan RT 01"
 }
 ```
+
+> **Penting (Dynamic Platform Fee):** Anda cukup mengirimkan nominal dasar (`amount`) tagihan warga. Logikraf secara dinamis akan menambahkan biaya platform (Platform Fee) ke dalam Invoice Xendit yang diterbitkan sesuai dengan tarif yang disepakati (misal: Rp 2.500 atau 1%). Klien akan membayar total dari `amount` + `Platform Fee`.
+
 *Sistem Logikraf akan merespons dengan `checkout_url` yang harus Anda berikan kepada warga untuk dibayar.*
 
 ---

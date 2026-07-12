@@ -14,20 +14,26 @@ class SaasApps extends Component
 
     public $name = '';
     public $webhook_url = '';
+    public $platform_fee_type = 'fixed';
+    public $platform_fee_amount = 2500;
 
     public function create()
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'webhook_url' => 'nullable|url'
+            'webhook_url' => 'nullable|url',
+            'platform_fee_type' => 'required|in:fixed,percentage',
+            'platform_fee_amount' => 'required|numeric|min:0'
         ]);
 
         SaasApplication::create([
             'name' => $this->name,
-            'webhook_url' => $this->webhook_url
+            'webhook_url' => $this->webhook_url,
+            'platform_fee_type' => $this->platform_fee_type,
+            'platform_fee_amount' => $this->platform_fee_amount
         ]);
 
-        $this->reset(['name', 'webhook_url']);
+        $this->reset(['name', 'webhook_url', 'platform_fee_type', 'platform_fee_amount']);
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
             'text' => 'SaaS Application berhasil ditambahkan. API Key otomatis di-generate.',

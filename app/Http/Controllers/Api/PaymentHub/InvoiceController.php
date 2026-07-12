@@ -16,13 +16,23 @@ class InvoiceController extends Controller
         $request->validate([
             'external_id' => 'required|string|max:255',
             'external_reference_id' => 'required|string|max:255', // Which sub-account
-            'amount' => 'required|numeric|min:1000',
-            'platform_fee_amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:1000', // Base amount
             'payer_email' => 'required|email',
             'description' => 'required|string|max:255',
         ]);
 
         $saasApp = $request->saas_app;
+
+        // Calculate Platform Fee dynamically
+        $platformFeeAmount = 0;
+        if ($saasApp->platform_fee_type === 'fixed') {
+            $platformFeeAmount = (int) $saasApp->platform_fee_amount;
+        } elseif ($saasApp->platform_fee_type === 'percentage') {
+            $platformFeeAmount = (int) ($request->amount * ($saasApp->platform_fee_amount / 100));
+        }
+
+        // Total amount charged to the end user
+        $totalAmount = $request->amount + $platformFeeAmount;
 
         // Check if transaction already exists to prevent duplicate
         $existingTx = PhTransaction::where('saas_application_id', $saasApp->id)
@@ -48,17 +58,17 @@ class InvoiceController extends Controller
         // Prepare Xendit Payload
         $payload = [
             'external_id' => 'PHUB-' . $saasApp->id . '-' . $request->external_id,
-            'amount' => $request->amount,
+            'amount' => $totalAmount,
             'payer_email' => $request->payer_email,
             'description' => $request->description,
         ];
 
         // Apply Platform Fee dynamically if > 0
-        if ($request->platform_fee_amount > 0) {
+        if ($platformFeeAmount > 0) {
             $payload['fees'] = [
                 [
                     'type' => 'Platform Fee',
-                    'value' => (int) $request->platform_fee_amount
+                    'value' => $platformFeeAmount
                 ]
             ];
         }
@@ -90,7 +100,7 @@ class InvoiceController extends Controller
             'xendit_invoice_id' => $xenditData['id'],
             'invoice_url' => $xenditData['invoice_url'],
             'amount' => $request->amount,
-            'platform_fee_amount' => $request->platform_fee_amount,
+            'platform_fee_amount' => $platformFeeAmount,
             'status' => 'PENDING',
         ]);
 
