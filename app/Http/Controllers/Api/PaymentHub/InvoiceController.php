@@ -63,6 +63,10 @@ class InvoiceController extends Controller
             'description' => $request->description,
         ];
 
+        if ($request->has('success_redirect_url')) {
+            $payload['success_redirect_url'] = $request->success_redirect_url;
+        }
+
         // Apply Platform Fee dynamically if > 0
         if ($platformFeeAmount > 0) {
             $payload['fees'] = [
