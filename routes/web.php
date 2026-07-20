@@ -21,6 +21,13 @@ Route::view('/syarat-ketentuan', 'pages.terms')->name('terms');
 Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
 Route::view('/kontak', 'pages.contact')->name('contact');
 
+// Paket UMKM: produk harga tetap + checkout publik (tanpa login) via Xendit Invoice.
+Route::controller(App\Http\Controllers\PackageController::class)->group(function () {
+    Route::get('/paket', 'index')->name('packages.index');
+    Route::post('/paket/{package:slug}/checkout', 'checkout')->name('packages.checkout');
+    Route::get('/paket/sukses/{orderNumber}', 'success')->name('packages.success');
+});
+
 Route::get('/layanan/{slug}', function ($slug) {
     $services = [
         'software-development' => [

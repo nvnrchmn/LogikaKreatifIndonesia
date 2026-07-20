@@ -1,0 +1,604 @@
+diff --git a/app/Http/Controllers/PackageController.php b/app/Http/Controllers/PackageController.php
+new file mode 100644
+index 0000000..85ca78e
+--- /dev/null
++++ b/app/Http/Controllers/PackageController.php
+@@ -0,0 +1,138 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Http\Controllers;
++
++use App\Models\Order;
++use App\Models\Package;
++use App\Models\Service;
++use App\Models\Setting;
++use App\Models\Transaction;
++use App\Models\User;
++use Illuminate\Http\RedirectResponse;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Http;
++use Illuminate\Support\Facades\Log;
++use Illuminate\Support\Str;
++
++class PackageController extends Controller
++{
++    /**
++     * Halaman publik: daftar paket + form pemesanan (tanpa login).
++     * Ini yang dijadikan bukti "produk/jasa, harga, dan halaman checkout"
++     * untuk verifikasi payment gateway.
++     */
++    public function index()
++    {
++        $packages = Package::active()->orderBy('sort_order')->get();
++
++        return view('pages.packages.index', compact('packages'));
++    }
++
++    /**
++     * Proses checkout: buat Order + Transaction, lalu buat Xendit Invoice
++     * beneran (bukan dummy) dan arahkan pembeli ke halaman pembayaran
++     * resmi Xendit.
++     */
++    public function checkout(Request $request, Package $package): RedirectResponse
++    {
++        if (!$package->is_active) {
++            abort(404);
++        }
++
++        $validated = $request->validate([
++            'guest_name' => 'required|string|max:255',
++            'guest_email' => 'required|email|max:255',
++            'guest_phone' => 'required|string|max:30',
++            'project_brief' => 'nullable|string|max:2000',
++        ]);
++
++        // 1. Cari/buat akun klien ringan berdasarkan email pembeli.
++        //    Dengan ini pembeli juga otomatis punya akses ke Portal Klien
++        //    untuk memantau progres, tanpa perlu proses signup terpisah.
++        $user = User::firstOrNew(['email' => $validated['guest_email']]);
++        if (!$user->exists) {
++            $user->name = $validated['guest_name'];
++            $user->password = bcrypt(Str::random(24));
++            $user->must_change_password = true;
++            $user->save();
++            $user->assignRole('client');
++        }
++
++        // 2. Service generik untuk grup "Paket Website UMKM" (dibuat sekali,
++        //    dipakai ulang oleh semua order paket).
++        $service = Service::firstOrCreate(
++            ['slug' => 'paket-website-umkm'],
++            [
++                'name' => 'Paket Website UMKM',
++                'category' => 'software',
++                'description' => 'Paket website siap pakai untuk UMKM: harga tetap, proses cepat.',
++                'short_description' => 'Paket website siap pakai untuk UMKM.',
++                'base_price' => $package->price,
++                'is_active' => true,
++                'sort_order' => 99,
++            ]
++        );
++
++        // 3. Buat Order.
++        $order = Order::create([
++            'user_id' => $user->id,
++            'service_id' => $service->id,
++            'package_id' => $package->id,
++            'guest_name' => $validated['guest_name'],
++            'guest_email' => $validated['guest_email'],
++            'guest_phone' => $validated['guest_phone'],
++            'project_name' => $package->name,
++            'project_brief' => $validated['project_brief'] ?? null,
++            'total_amount' => $package->price,
++            'status' => 'pending',
++            'milestone_status' => 'dp_pending',
++        ]);
++
++        // 4. Buat Xendit Invoice sungguhan (bukan simulasi).
++        $reference = 'ORD-' . $order->id . '-' . Str::upper(Str::random(6));
++        $secretKey = Setting::get('xendit_secret_key', config('services.xendit.secret_key'));
++
++        $response = Http::withBasicAuth($secretKey, '')->post('https://api.xendit.co/v2/invoices', [
++            'external_id' => $reference,
++            'amount' => $package->price,
++            'payer_email' => $validated['guest_email'],
++            'description' => 'Pembayaran ' . $package->name . ' — Order ' . $order->order_number,
++            'success_redirect_url' => route('packages.success', $order->order_number),
++        ]);
++
++        if ($response->failed()) {
++            Log::error('Xendit Invoice (Package Checkout) Failed', ['response' => $response->json()]);
++
++            return back()
++                ->withInput()
++                ->with('checkout_error', 'Gagal membuat invoice pembayaran. Silakan coba lagi atau hubungi kami langsung.');
++        }
++
++        $xenditData = $response->json();
++
++        Transaction::create([
++            'order_id' => $order->id,
++            'transaction_reference' => $reference,
++            'milestone_name' => 'dp_kickoff',
++            'amount' => $package->price,
++            'status' => 'pending',
++            'payment_url' => $xenditData['invoice_url'],
++            'raw_gateway_response' => $xenditData,
++        ]);
++
++        // 5. Arahkan pembeli ke halaman pembayaran resmi Xendit (invoice_url).
++        return redirect()->away($xenditData['invoice_url']);
++    }
++
++    /**
++     * Halaman terima kasih setelah redirect sukses dari Xendit.
++     */
++    public function success(string $orderNumber)
++    {
++        $order = Order::where('order_number', $orderNumber)->firstOrFail();
++
++        return view('pages.packages.success', compact('order'));
++    }
++}
+diff --git a/app/Livewire/Navbar.php b/app/Livewire/Navbar.php
+index 41dfeb7..9bc0410 100644
+--- a/app/Livewire/Navbar.php
++++ b/app/Livewire/Navbar.php
+@@ -14,6 +14,7 @@ class Navbar extends Component
+     public array $navLinks = [
+         ['label' => 'Beranda', 'href' => '/'],
+         ['label' => 'Layanan', 'href' => '/#layanan'],
++        ['label' => 'Paket UMKM', 'href' => '/paket'],
+         ['label' => 'Portofolio', 'href' => '/#portofolio'],
+         ['label' => 'Tentang Kami', 'href' => '/tentang-kami'],
+     ];
+diff --git a/app/Models/Order.php b/app/Models/Order.php
+index 3f4d5db..a35a9a9 100644
+--- a/app/Models/Order.php
++++ b/app/Models/Order.php
+@@ -17,6 +17,10 @@ class Order extends Model
+         'order_number',
+         'user_id',
+         'service_id',
++        'package_id',
++        'guest_name',
++        'guest_email',
++        'guest_phone',
+         'project_name',
+         'project_brief',
+         'total_amount',
+@@ -69,6 +73,14 @@ public function service(): BelongsTo
+         return $this->belongsTo(Service::class);
+     }
+ 
++    /**
++     * Get the package for this order (fixed-price public checkout).
++     */
++    public function package(): BelongsTo
++    {
++        return $this->belongsTo(Package::class);
++    }
++
+     /**
+      * Get the transactions for this order.
+      */
+diff --git a/app/Models/Package.php b/app/Models/Package.php
+new file mode 100644
+index 0000000..e504016
+--- /dev/null
++++ b/app/Models/Package.php
+@@ -0,0 +1,71 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Models;
++
++use Illuminate\Database\Eloquent\Factories\HasFactory;
++use Illuminate\Database\Eloquent\Model;
++use Illuminate\Database\Eloquent\Relations\HasMany;
++use Illuminate\Support\Str;
++
++class Package extends Model
++{
++    use HasFactory;
++
++    protected $fillable = [
++        'slug',
++        'name',
++        'tagline',
++        'description',
++        'price',
++        'strike_price',
++        'features',
++        'is_featured',
++        'is_active',
++        'sort_order',
++    ];
++
++    protected function casts(): array
++    {
++        return [
++            'price' => 'integer',
++            'strike_price' => 'integer',
++            'features' => 'array',
++            'is_featured' => 'boolean',
++            'is_active' => 'boolean',
++            'sort_order' => 'integer',
++        ];
++    }
++
++    protected static function boot(): void
++    {
++        parent::boot();
++
++        static::creating(function (Package $package): void {
++            if (empty($package->slug)) {
++                $package->slug = Str::slug($package->name);
++            }
++        });
++    }
++
++    public function orders(): HasMany
++    {
++        return $this->hasMany(Order::class);
++    }
++
++    public function scopeActive($query)
++    {
++        return $query->where('is_active', true);
++    }
++
++    public function getFormattedPriceAttribute(): string
++    {
++        return 'Rp ' . number_format($this->price, 0, ',', '.');
++    }
++
++    public function getFormattedStrikePriceAttribute(): ?string
++    {
++        return $this->strike_price ? 'Rp ' . number_format($this->strike_price, 0, ',', '.') : null;
++    }
++}
+diff --git a/database/migrations/2026_07_20_000001_create_packages_table.php b/database/migrations/2026_07_20_000001_create_packages_table.php
+new file mode 100644
+index 0000000..6914e41
+--- /dev/null
++++ b/database/migrations/2026_07_20_000001_create_packages_table.php
+@@ -0,0 +1,36 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Tabel packages: paket harga tetap (mis. website UMKM) yang bisa
++     * dibeli langsung oleh pengunjung publik tanpa login, untuk memenuhi
++     * kebutuhan "produk/jasa + harga + checkout" pada verifikasi PG.
++     */
++    public function up(): void
++    {
++        Schema::create('packages', function (Blueprint $table) {
++            $table->id();
++            $table->string('slug')->unique();
++            $table->string('name');
++            $table->string('tagline')->nullable();
++            $table->text('description')->nullable();
++            $table->unsignedBigInteger('price');
++            $table->unsignedBigInteger('strike_price')->nullable(); // harga coret, opsional
++            $table->json('features')->nullable(); // list fitur/isi paket
++            $table->boolean('is_featured')->default(false); // badge "Paling Laris"
++            $table->boolean('is_active')->default(true);
++            $table->unsignedInteger('sort_order')->default(0);
++            $table->timestamps();
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('packages');
++    }
++};
+diff --git a/database/migrations/2026_07_20_000002_add_guest_checkout_fields_to_orders_table.php b/database/migrations/2026_07_20_000002_add_guest_checkout_fields_to_orders_table.php
+new file mode 100644
+index 0000000..b7deebd
+--- /dev/null
++++ b/database/migrations/2026_07_20_000002_add_guest_checkout_fields_to_orders_table.php
+@@ -0,0 +1,34 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Tambah dukungan checkout paket publik. user_id & service_id TETAP
++     * wajib diisi (tidak diubah nullable, supaya tidak butuh doctrine/dbal
++     * dan tidak mengubah relasi lama) — untuk order dari checkout paket,
++     * kita auto-provision User (akun klien ringan) dan pakai Service
++     * "Paket Website UMKM" sebagai service_id-nya. Kolom guest_* di sini
++     * hanya untuk menyimpan data kontak asli yang diisi di form checkout.
++     */
++    public function up(): void
++    {
++        Schema::table('orders', function (Blueprint $table) {
++            $table->foreignId('package_id')->nullable()->after('service_id')->constrained()->nullOnDelete();
++            $table->string('guest_name')->nullable()->after('package_id');
++            $table->string('guest_email')->nullable()->after('guest_name');
++            $table->string('guest_phone')->nullable()->after('guest_email');
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::table('orders', function (Blueprint $table) {
++            $table->dropForeign(['package_id']);
++            $table->dropColumn(['package_id', 'guest_name', 'guest_email', 'guest_phone']);
++        });
++    }
++};
+diff --git a/database/seeders/DatabaseSeeder.php b/database/seeders/DatabaseSeeder.php
+index d52f740..eb318be 100644
+--- a/database/seeders/DatabaseSeeder.php
++++ b/database/seeders/DatabaseSeeder.php
+@@ -222,5 +222,10 @@ public function run(): void
+         foreach ($leads as $lead) {
+             Lead::create($lead);
+         }
++
++        // ============================
++        // Paket Website UMKM (checkout publik)
++        // ============================
++        $this->call(PackageSeeder::class);
+     }
+ }
+diff --git a/database/seeders/PackageSeeder.php b/database/seeders/PackageSeeder.php
+new file mode 100644
+index 0000000..0deba25
+--- /dev/null
++++ b/database/seeders/PackageSeeder.php
+@@ -0,0 +1,71 @@
++<?php
++
++namespace Database\Seeders;
++
++use App\Models\Package;
++use Illuminate\Database\Seeder;
++
++class PackageSeeder extends Seeder
++{
++    /**
++     * 3 paket website UMKM harga tetap. Sesuaikan nama, isi, dan harga
++     * sesuai penawaran Logikraf yang sebenarnya sebelum go-live.
++     */
++    public function run(): void
++    {
++        $packages = [
++            [
++                'name' => 'Starter',
++                'slug' => 'starter',
++                'tagline' => 'Landing page 1 halaman untuk usaha yang baru mulai online',
++                'price' => 1500000,
++                'features' => [
++                    '1 halaman (profil usaha, produk/jasa, kontak)',
++                    'Desain responsif (mobile & desktop)',
++                    'Tombol WhatsApp langsung',
++                    '2x revisi desain',
++                    'Selesai dalam 5 hari kerja',
++                ],
++                'is_featured' => false,
++                'sort_order' => 1,
++            ],
++            [
++                'name' => 'Bisnis',
++                'slug' => 'bisnis',
++                'tagline' => 'Company profile lengkap untuk usaha yang mau tampil lebih profesional',
++                'price' => 3500000,
++                'strike_price' => 4500000,
++                'features' => [
++                    'Hingga 5 halaman (beranda, tentang, layanan/produk, galeri, kontak)',
++                    'Desain custom sesuai brand',
++                    'Katalog produk/jasa dengan foto',
++                    'Optimasi SEO dasar',
++                    '3x revisi desain',
++                    'Selesai dalam 10 hari kerja',
++                ],
++                'is_featured' => true,
++                'sort_order' => 2,
++            ],
++            [
++                'name' => 'Pro',
++                'slug' => 'pro',
++                'tagline' => 'Website + panel admin sederhana untuk kelola konten sendiri',
++                'price' => 7500000,
++                'features' => [
++                    'Semua fitur paket Bisnis',
++                    'Panel admin untuk update konten & produk mandiri',
++                    'Form pemesanan/booking online',
++                    'Integrasi WhatsApp & Google Maps',
++                    'Pendampingan setup domain & hosting',
++                    'Selesai dalam 20 hari kerja',
++                ],
++                'is_featured' => false,
++                'sort_order' => 3,
++            ],
++        ];
++
++        foreach ($packages as $package) {
++            Package::updateOrCreate(['slug' => $package['slug']], $package);
++        }
++    }
++}
+diff --git a/resources/views/pages/packages/index.blade.php b/resources/views/pages/packages/index.blade.php
+new file mode 100644
+index 0000000..2db8297
+--- /dev/null
++++ b/resources/views/pages/packages/index.blade.php
+@@ -0,0 +1,120 @@
++<x-layouts.app title="Paket Website UMKM | Logika Kreatif Indonesia">
++    <div class="pt-32 pb-20 bg-canvas-light min-h-screen" x-data="{ selected: null }">
++        <div class="container-narrow">
++
++            <!-- Header -->
++            <div class="text-center max-w-2xl mx-auto mb-16">
++                <span class="badge-primary mb-4">Paket Website UMKM</span>
++                <h1 class="text-4xl font-display font-bold text-txt-main mb-4">Harga Tetap, Proses Cepat</h1>
++                <p class="text-txt-muted text-sm leading-relaxed">
++                    Website siap pakai untuk usaha kecil-menengah. Pilih paket, isi data, bayar aman lewat Xendit —
++                    tim kami langsung mulai kerjakan.
++                </p>
++            </div>
++
++            @if(session('checkout_error'))
++                <div class="max-w-2xl mx-auto mb-10 p-4 bg-status-danger/10 text-status-danger rounded-lg border border-status-danger/20 text-sm font-medium">
++                    {{ session('checkout_error') }}
++                </div>
++            @endif
++
++            @if($errors->any())
++                <div class="max-w-2xl mx-auto mb-10 p-4 bg-status-danger/10 text-status-danger rounded-lg border border-status-danger/20 text-sm font-medium">
++                    <ul class="list-disc pl-5 space-y-1">
++                        @foreach($errors->all() as $error)
++                            <li>{{ $error }}</li>
++                        @endforeach
++                    </ul>
++                </div>
++            @endif
++
++            <!-- Package Cards -->
++            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-20">
++                @forelse($packages as $package)
++                    <div class="relative card-hover p-8 flex flex-col {{ $package->is_featured ? 'border-2 border-brand-primary shadow-lg' : '' }}">
++                        @if($package->is_featured)
++                            <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-primary text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full">
++                                Paling Laris
++                            </span>
++                        @endif
++
++                        <h3 class="font-display text-xl font-bold text-txt-main mb-1">{{ $package->name }}</h3>
++                        @if($package->tagline)
++                            <p class="text-sm text-txt-muted mb-6">{{ $package->tagline }}</p>
++                        @endif
++
++                        <div class="mb-6">
++                            @if($package->strike_price)
++                                <span class="text-sm text-txt-muted line-through mr-2">{{ $package->formatted_strike_price }}</span>
++                            @endif
++                            <div class="font-display text-3xl font-bold text-txt-main">{{ $package->formatted_price }}</div>
++                        </div>
++
++                        @if($package->features)
++                            <ul class="space-y-3 mb-8 flex-1">
++                                @foreach($package->features as $feature)
++                                    <li class="flex items-start gap-2 text-sm text-txt-muted">
++                                        <svg class="w-5 h-5 text-status-success shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
++                                        <span>{{ $feature }}</span>
++                                    </li>
++                                @endforeach
++                            </ul>
++                        @endif
++
++                        <button
++                            type="button"
++                            @click="selected = {{ $package->id }}; $nextTick(() => $refs['form-{{ $package->id }}'].scrollIntoView({ behavior: 'smooth', block: 'center' }))"
++                            :class="selected === {{ $package->id }} ? 'bg-brand-primary text-white' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'"
++                            class="w-full font-semibold py-3 rounded-xl transition-colors">
++                            Pesan Paket Ini
++                        </button>
++                    </div>
++                @empty
++                    <p class="text-center text-txt-muted col-span-3">Paket belum tersedia saat ini.</p>
++                @endforelse
++            </div>
++
++            <!-- Inline Checkout Form (per package, toggled by selection) -->
++            @foreach($packages as $package)
++                <div x-show="selected === {{ $package->id }}" x-cloak x-ref="form-{{ $package->id }}"
++                    x-transition
++                    class="max-w-xl mx-auto bg-white rounded-3xl p-8 md:p-12 border border-border-minimal shadow-sm mb-10">
++                    <h3 class="font-display font-bold text-2xl text-txt-main mb-2">Pesan: {{ $package->name }}</h3>
++                    <p class="text-sm text-txt-muted mb-8">Total pembayaran <strong>{{ $package->formatted_price }}</strong>. Anda akan diarahkan ke halaman pembayaran resmi Xendit.</p>
++
++                    <form action="{{ route('packages.checkout', $package->slug) }}" method="POST" class="space-y-5">
++                        @csrf
++                        <div>
++                            <label class="block text-sm font-semibold text-txt-main mb-2">Nama Lengkap / Nama Usaha</label>
++                            <input type="text" name="guest_name" value="{{ old('guest_name') }}" required
++                                class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main"
++                                placeholder="Toko Berkah Jaya">
++                        </div>
++                        <div>
++                            <label class="block text-sm font-semibold text-txt-main mb-2">Email</label>
++                            <input type="email" name="guest_email" value="{{ old('guest_email') }}" required
++                                class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main"
++                                placeholder="usaha@email.com">
++                        </div>
++                        <div>
++                            <label class="block text-sm font-semibold text-txt-main mb-2">Nomor WhatsApp</label>
++                            <input type="text" name="guest_phone" value="{{ old('guest_phone') }}" required
++                                class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main"
++                                placeholder="0812xxxxxxx">
++                        </div>
++                        <div>
++                            <label class="block text-sm font-semibold text-txt-main mb-2">Catatan Proyek (opsional)</label>
++                            <textarea name="project_brief" rows="3"
++                                class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none"
++                                placeholder="Ceritakan sedikit tentang usaha Anda...">{{ old('project_brief') }}</textarea>
++                        </div>
++                        <button type="submit" class="w-full bg-brand-primary text-white font-semibold py-3 rounded-xl hover:bg-brand-primary/90 transition-colors shadow-lg shadow-brand-primary/30">
++                            Lanjut ke Pembayaran
++                        </button>
++                    </form>
++                </div>
++            @endforeach
++
++        </div>
++    </div>
++</x-layouts.app>
+diff --git a/resources/views/pages/packages/success.blade.php b/resources/views/pages/packages/success.blade.php
+new file mode 100644
+index 0000000..6dbbaf1
+--- /dev/null
++++ b/resources/views/pages/packages/success.blade.php
+@@ -0,0 +1,17 @@
++<x-layouts.app title="Pesanan Diterima | Logika Kreatif Indonesia">
++    <div class="pt-32 pb-20 bg-canvas-light min-h-screen">
++        <div class="container-narrow max-w-xl mx-auto text-center">
++            <div class="w-16 h-16 bg-status-success/10 text-status-success rounded-full flex items-center justify-center mx-auto mb-6">
++                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
++            </div>
++            <h1 class="font-display text-3xl font-bold text-txt-main mb-4">Terima Kasih!</h1>
++            <p class="text-txt-muted text-sm leading-relaxed mb-2">
++                Pesanan <strong>{{ $order->order_number }}</strong> untuk paket <strong>{{ $order->package->name ?? $order->project_name }}</strong> sudah kami terima.
++            </p>
++            <p class="text-txt-muted text-sm leading-relaxed mb-8">
++                Tim kami akan menghubungi Anda melalui email atau WhatsApp yang didaftarkan untuk memulai proses pengerjaan.
++            </p>
++            <a href="{{ route('home') }}" class="btn-primary inline-block">Kembali ke Beranda</a>
++        </div>
++    </div>
++</x-layouts.app>
+diff --git a/routes/web.php b/routes/web.php
+index 9e2323b..04d4768 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -21,6 +21,13 @@
+ Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
+ Route::view('/kontak', 'pages.contact')->name('contact');
+ 
++// Paket UMKM: produk harga tetap + checkout publik (tanpa login) via Xendit Invoice.
++Route::controller(App\Http\Controllers\PackageController::class)->group(function () {
++    Route::get('/paket', 'index')->name('packages.index');
++    Route::post('/paket/{package:slug}/checkout', 'checkout')->name('packages.checkout');
++    Route::get('/paket/sukses/{orderNumber}', 'success')->name('packages.success');
++});
++
+ Route::get('/layanan/{slug}', function ($slug) {
+     $services = [
+         'software-development' => [
