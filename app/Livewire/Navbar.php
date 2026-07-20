@@ -14,6 +14,7 @@ class Navbar extends Component
     public array $navLinks = [
         ['label' => 'Beranda', 'href' => '/'],
         ['label' => 'Layanan', 'href' => '/#layanan'],
+        ['label' => 'Paket UMKM', 'href' => '/paket'],
         ['label' => 'Portofolio', 'href' => '/#portofolio'],
         ['label' => 'Tentang Kami', 'href' => '/tentang-kami'],
     ];

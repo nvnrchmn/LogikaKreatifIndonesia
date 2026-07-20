@@ -17,6 +17,10 @@ class Order extends Model
         'order_number',
         'user_id',
         'service_id',
+        'package_id',
+        'guest_name',
+        'guest_email',
+        'guest_phone',
         'project_name',
         'project_brief',
         'total_amount',
@@ -67,6 +71,14 @@ class Order extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Get the package for this order (fixed-price public checkout).
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(Package::class);
     }
 
     /**

@@ -222,5 +222,10 @@ class DatabaseSeeder extends Seeder
         foreach ($leads as $lead) {
             Lead::create($lead);
         }
+
+        // ============================
+        // Paket Website UMKM (checkout publik)
+        // ============================
+        $this->call(PackageSeeder::class);
     }
 }
