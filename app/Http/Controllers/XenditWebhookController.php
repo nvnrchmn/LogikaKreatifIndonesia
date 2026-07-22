@@ -78,6 +78,7 @@ class XenditWebhookController extends Controller
 
                         // Kirim Email Konfirmasi Pembayaran Berhasil & Kredensial Login Portal Klien
                         try {
+                            \App\Models\Setting::configureMail();
                             $recipientEmail = $transaction->order->guest_email ?? $transaction->order->user->email ?? null;
                             if ($recipientEmail) {
                                 \Illuminate\Support\Facades\Mail::to($recipientEmail)

@@ -130,6 +130,7 @@ class PackageController extends Controller
 
         // 5. Kirim email invoice Xendit & kredensial akun portal klien ke pembeli
         try {
+            Setting::configureMail();
             \Illuminate\Support\Facades\Mail::to($validated['guest_email'])
                 ->send(new \App\Mail\PackageOrderInvoiceNotification($order, $transaction, $isNewUser ?? false));
         } catch (\Exception $e) {
@@ -145,7 +146,22 @@ class PackageController extends Controller
      */
     public function success(string $orderNumber)
     {
-        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+        $order = Order::where('order_number', $orderNumber)->with(['transactions', 'package'])->firstOrFail();
+        $latestTrx = $order->transactions()->latest()->first();
+
+        // Jika halaman sukses diakses dan transaksi lunas, pastikan email bukti lunas terkirim jika belum
+        if ($latestTrx) {
+            try {
+                Setting::configureMail();
+                $recipientEmail = $order->guest_email ?? $order->user->email ?? null;
+                if ($recipientEmail) {
+                    \Illuminate\Support\Facades\Mail::to($recipientEmail)
+                        ->send(new \App\Mail\PackagePaymentSuccessNotification($order, $latestTrx));
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed sending package payment success email on success page: ' . $e->getMessage());
+            }
+        }
 
         return view('pages.packages.success', compact('order'));
     }
