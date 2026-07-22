@@ -151,6 +151,11 @@
             </div>
 
             <!-- Business Verification Info Card (Address & Contact Info required by Xendit) -->
+            @php
+                $companyEmail = \App\Models\Setting::get('company_email', 'hello@logikraf.id');
+                $companyPhone = \App\Models\Setting::get('company_phone', '+62 811-1234-5678');
+                $companyAddress = \App\Models\Setting::get('company_address', 'Gedung Inovasi Lt. 3, Jl. Jend. Sudirman No. 123, Jakarta Selatan, 12190');
+            @endphp
             <div class="max-w-2xl mx-auto bg-canvas-dark rounded-3xl p-8 text-white shadow-lg border border-brand-primary/30">
                 <h4 class="font-display font-bold text-xl text-white mb-2">Informasi Bisnis & Kontak Resmi</h4>
                 <p class="text-xs text-txt-light/70 mb-6">Berikut detail entitas bisnis sesuai pendaftaran di Xendit Payment Gateway:</p>
@@ -165,15 +170,15 @@
                     </div>
                     <div>
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Email Layanan & Support</span>
-                        <p class="text-txt-light/90">hello@logikraf.id</p>
+                        <p class="text-txt-light/90">{{ $companyEmail }}</p>
                     </div>
                     <div>
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Telepon & WhatsApp Kontak</span>
-                        <p class="text-txt-light/90">+62 811-1234-5678</p>
+                        <p class="text-txt-light/90">{{ $companyPhone }}</p>
                     </div>
                     <div class="md:col-span-2 border-t border-white/10 pt-4 mt-2">
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Alamat Kantor Fisik</span>
-                        <p class="text-txt-light/90 leading-relaxed">Gedung Inovasi Lt. 3, Jl. Jend. Sudirman No. 123, Jakarta Selatan, DKI Jakarta 12190, Indonesia</p>
+                        <p class="text-txt-light/90 leading-relaxed">{!! nl2br(e($companyAddress)) !!}</p>
                     </div>
                 </div>
             </div>
