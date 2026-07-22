@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', App\Livewire\Admin\Dashboard::class)->name('dashboard');
         Route::get('/services', App\Livewire\Admin\Services\Index::class)->name('services.index');
+        Route::get('/packages', App\Livewire\Admin\Packages\Index::class)->name('packages.index');
         Route::get('/portfolios', App\Livewire\Admin\Portfolios\Index::class)->name('portfolios.index');
         Route::get('/leads', App\Livewire\Admin\Leads\Index::class)->name('leads.index');
         Route::get('/orders', App\Livewire\Admin\Orders\Index::class)->name('orders.index');
