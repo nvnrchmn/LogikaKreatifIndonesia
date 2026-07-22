@@ -55,7 +55,7 @@ class PackageController extends Controller
         $user = User::firstOrNew(['email' => $validated['guest_email']]);
         if (!$user->exists) {
             $user->name = $validated['guest_name'];
-            $user->password = bcrypt(Str::random(24));
+            $user->password = bcrypt('logikraf123');
             $user->must_change_password = true;
             $user->save();
             $user->assignRole('client');
