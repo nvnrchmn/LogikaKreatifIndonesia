@@ -158,7 +158,7 @@
             @endphp
             <div class="max-w-2xl mx-auto bg-canvas-dark rounded-3xl p-8 text-white shadow-lg border border-brand-primary/30">
                 <h4 class="font-display font-bold text-xl text-white mb-2">Informasi Bisnis & Kontak Resmi</h4>
-                <p class="text-xs text-txt-light/70 mb-6">Berikut detail entitas bisnis sesuai pendaftaran di Xendit Payment Gateway:</p>
+                <p class="text-xs text-txt-light/70 mb-6">Berikut detail entitas bisnis sesuai pendaftaran resmi di Xendit Payment Gateway:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                     <div>
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Nama Usaha / Perusahaan</span>
@@ -167,6 +167,11 @@
                     <div>
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Mata Uang Transaksi</span>
                         <strong class="text-white text-base">IDR (Rupiah)</strong>
+                    </div>
+                    <div class="md:col-span-2 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Deskripsi Kegiatan Usaha (Business Activity)</span>
+                        <p class="text-white font-medium italic text-sm">"Micro-scale business engaged in computer programming and other computer-related activities."</p>
+                        <span class="text-txt-light/60 text-xs mt-1 block">(Layanan Pemrograman Komputer & Solusi Teknologi Informasi)</span>
                     </div>
                     <div>
                         <span class="text-txt-light/50 text-xs block mb-1 uppercase tracking-wider">Email Layanan & Support</span>
