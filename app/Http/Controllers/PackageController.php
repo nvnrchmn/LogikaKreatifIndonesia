@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -58,6 +59,11 @@ class PackageController extends Controller
             $user->must_change_password = true;
             $user->save();
             $user->assignRole('client');
+        }
+
+        // Login-kan otomatis jika pengunjung belum terautentikasi (mencapai portal tanpa 403)
+        if (!Auth::check()) {
+            Auth::login($user);
         }
 
         // 2. Service generik untuk grup "Paket Website UMKM" (dibuat sekali,

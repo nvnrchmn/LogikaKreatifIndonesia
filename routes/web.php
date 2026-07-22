@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Client Routes
-    Route::middleware(['role:client', 'force_password'])->prefix('client')->name('client.')->group(function () {
+    Route::middleware(['role:admin|client', 'force_password'])->prefix('client')->name('client.')->group(function () {
         Route::get('/force-password-reset', App\Livewire\Client\ForcePasswordReset::class)->name('force_password_reset')->withoutMiddleware('force_password');
         Route::get('/dashboard', App\Livewire\Client\Dashboard\Index::class)->name('dashboard');
         Route::get('/orders', App\Livewire\Client\Orders\Index::class)->name('orders.index');
