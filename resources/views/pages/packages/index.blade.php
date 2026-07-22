@@ -1,5 +1,5 @@
 <x-layouts.app title="Katalog Paket & Checkout Layanan | Logika Kreatif Indonesia">
-    <div class="pt-28 pb-24 bg-canvas-light min-h-screen relative overflow-hidden" x-data="{ selected: 1 }">
+    <div class="pt-36 sm:pt-40 pb-24 bg-canvas-light min-h-screen relative overflow-hidden" x-data="{ selected: 1 }">
         
         <!-- Decorative Glow Background Elements -->
         <div class="absolute top-10 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-tr from-brand-primary/15 via-blue-500/10 to-purple-500/5 blur-3xl pointer-events-none rounded-full"></div>
@@ -7,7 +7,7 @@
         <div class="container-narrow relative z-10">
 
             <!-- Hero Header -->
-            <div class="text-center max-w-3xl mx-auto mb-16 px-4">
+            <div class="text-center max-w-3xl mx-auto mb-14 px-4">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-xs font-semibold uppercase tracking-wider mb-6 shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
                     <span>Storefront & Checkout Resmi Logikraf</span>
