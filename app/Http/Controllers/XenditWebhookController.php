@@ -75,6 +75,17 @@ class XenditWebhookController extends Controller
                     
                     if ($transaction->order) {
                         $transaction->order->updateMilestoneStatus();
+
+                        // Kirim Email Konfirmasi Pembayaran Berhasil & Kredensial Login Portal Klien
+                        try {
+                            $recipientEmail = $transaction->order->guest_email ?? $transaction->order->user->email ?? null;
+                            if ($recipientEmail) {
+                                \Illuminate\Support\Facades\Mail::to($recipientEmail)
+                                    ->send(new \App\Mail\PackagePaymentSuccessNotification($transaction->order, $transaction));
+                            }
+                        } catch (\Exception $e) {
+                            Log::error('Failed sending payment success email via webhook: ' . $e->getMessage());
+                        }
                     }
                 }
             } elseif ($status === 'EXPIRED') {
