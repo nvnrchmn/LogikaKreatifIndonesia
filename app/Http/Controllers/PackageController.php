@@ -118,7 +118,7 @@ class PackageController extends Controller
 
         $xenditData = $response->json();
 
-        Transaction::create([
+        $transaction = Transaction::create([
             'order_id' => $order->id,
             'transaction_reference' => $reference,
             'milestone_name' => 'dp_kickoff',
@@ -128,7 +128,15 @@ class PackageController extends Controller
             'raw_gateway_response' => $xenditData,
         ]);
 
-        // 5. Arahkan pembeli ke halaman pembayaran resmi Xendit (invoice_url).
+        // 5. Kirim email invoice Xendit & kredensial akun portal klien ke pembeli
+        try {
+            \Illuminate\Support\Facades\Mail::to($validated['guest_email'])
+                ->send(new \App\Mail\PackageOrderInvoiceNotification($order, $transaction, $isNewUser ?? false));
+        } catch (\Exception $e) {
+            Log::error('Failed sending package order invoice email: ' . $e->getMessage());
+        }
+
+        // 6. Arahkan pembeli ke halaman pembayaran resmi Xendit (invoice_url).
         return redirect()->away($xenditData['invoice_url']);
     }
 

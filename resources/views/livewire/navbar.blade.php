@@ -34,8 +34,13 @@
                         </a>
                     @endif
                 @else
-                    <a href="#konsultasi" class="btn-primary text-sm !py-2.5 !px-5">
-                        Mulai Proyek
+                    <a href="{{ route('login') }}"
+                        :class="scrolled ? 'text-txt-muted hover:text-brand-primary' : 'text-white/80 hover:text-white'"
+                        class="font-body text-sm font-medium transition-colors duration-200">
+                        Masuk
+                    </a>
+                    <a href="{{ route('packages.index') }}" class="btn-primary text-sm !py-2.5 !px-5">
+                        Pesan Paket
                     </a>
                 @endauth
             </div>
@@ -65,7 +70,7 @@
                         {{ $link['label'] }}
                     </a>
                 @endforeach
-                <div class="pt-2">
+                <div class="pt-2 space-y-2">
                     @auth
                         @if(auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}" class="btn-primary w-full text-center text-sm">
@@ -77,8 +82,11 @@
                             </a>
                         @endif
                     @else
-                        <a href="#konsultasi" class="btn-primary w-full text-center text-sm">
-                            Mulai Proyek
+                        <a href="{{ route('login') }}" class="block px-4 py-2.5 text-center text-txt-main hover:bg-gray-100 rounded-lg font-body text-sm font-medium">
+                            Masuk ke Portal Klien
+                        </a>
+                        <a href="{{ route('packages.index') }}" class="btn-primary w-full text-center text-sm">
+                            Pesan Paket
                         </a>
                     @endauth
                 </div>
