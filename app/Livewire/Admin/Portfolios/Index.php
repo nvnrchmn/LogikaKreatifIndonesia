@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -142,21 +143,48 @@ class Index extends Component
 
         Portfolio::updateOrCreate(['id' => $this->portfolioId], $data);
 
-        session()->flash('success', $this->portfolioId ? 'Portofolio berhasil diupdate.' : 'Portofolio berhasil ditambahkan.');
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => $this->portfolioId ? 'Portofolio berhasil diperbarui.' : 'Portofolio baru berhasil ditambahkan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
         
         $this->closeModal();
     }
 
+    #[On('deleteConfirmed')]
     public function delete(int $id)
     {
         $portfolio = Portfolio::findOrFail($id);
-        
-        if ($portfolio->thumbnail) {
-            Storage::disk('public')->delete($portfolio->thumbnail);
-        }
-        
+        // Note: Soft delete, so we don't delete the physical file yet, or we can leave it.
         $portfolio->delete();
-        session()->flash('success', 'Portofolio berhasil dihapus.');
+
+        $this->dispatch('swal:deleted', [
+            'text' => 'Portofolio berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $portfolio = Portfolio::withTrashed()->findOrFail($id);
+        $portfolio->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data portofolio berhasil dikembalikan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function closeModal()

@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Packages;
 
 use App\Models\Package;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -105,7 +106,7 @@ class Index extends Component
 
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
-            'text' => $this->packageId ? 'Paket layanan berhasil diperbarui.' : 'Paket layanan baru berhasil ditambahkan.',
+            'text' => $this->packageId ? 'Paket layanan berhasil diperbarui.' : 'Paket baru berhasil ditambahkan.',
             'icon' => 'success',
             'toast' => true,
             'position' => 'top-end',
@@ -148,28 +149,28 @@ class Index extends Component
         ]);
     }
 
+    #[On('deleteConfirmed')]
     public function delete(int $id): void
     {
         $package = Package::findOrFail($id);
-
-        if ($package->orders()->exists()) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text' => 'Paket layanan tidak dapat dihapus karena masih terkait dengan pesanan.',
-                'icon' => 'error',
-                'toast' => true,
-                'position' => 'top-end',
-                'showConfirmButton' => false,
-                'timer' => 3000
-            ]);
-            return;
-        }
-
         $package->delete();
 
-        $this->dispatch('swal', [
-            'title' => 'Terhapus!',
+        $this->dispatch('swal:deleted', [
             'text' => 'Paket layanan berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $package = Package::withTrashed()->findOrFail($id);
+        $package->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data paket layanan berhasil dikembalikan.',
             'icon' => 'success',
             'toast' => true,
             'position' => 'top-end',

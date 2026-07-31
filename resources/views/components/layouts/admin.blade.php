@@ -145,6 +145,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('livewire:initialized', () => {
+            // Global simple toast swal
             Livewire.on('swal', (event) => {
                 const data = event[0];
                 Swal.fire({
@@ -156,6 +157,46 @@
                     showConfirmButton: data.showConfirmButton ?? true,
                     timer: data.timer || null,
                     timerProgressBar: data.timer ? true : false,
+                });
+            });
+
+            // Swal confirm for deletion
+            Livewire.on('swal:confirm', (event) => {
+                const data = event[0];
+                Swal.fire({
+                    title: data.title || 'Apakah Anda Yakin?',
+                    text: data.text || 'Tindakan ini akan memindahkan data ke tempat sampah.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#9CA3AF',
+                    confirmButtonText: data.confirmText || 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch(data.action || 'deleteConfirmed', { id: data.id });
+                    }
+                });
+            });
+
+            // Swal deleted toast with Undo button
+            Livewire.on('swal:deleted', (event) => {
+                const data = event[0];
+                Swal.fire({
+                    title: 'Terhapus!',
+                    text: data.text || 'Data berhasil dihapus.',
+                    icon: 'success',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Undo',
+                    confirmButtonColor: '#0052FF',
+                    timer: 5000,
+                    timerProgressBar: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch(data.restoreAction || 'restore', { id: data.id });
+                    }
                 });
             });
         });

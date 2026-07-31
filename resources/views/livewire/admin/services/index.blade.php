@@ -46,7 +46,7 @@
                             </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 <button wire:click="edit({{ $service->id }})" class="text-brand-primary hover:underline text-sm font-medium">Edit</button>
-                                <button wire:click="delete({{ $service->id }})" wire:confirm="Yakin ingin menghapus layanan ini?" class="text-status-danger hover:underline text-sm font-medium">Hapus</button>
+                                <button wire:click="$dispatch('swal:confirm', { id: {{ $service->id }} })" class="text-status-danger hover:underline text-sm font-medium">Hapus</button>
                             </td>
                         </tr>
                     @empty

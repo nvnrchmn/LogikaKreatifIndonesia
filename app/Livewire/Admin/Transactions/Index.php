@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Transactions;
 
 use App\Models\Transaction;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,6 +26,7 @@ class Index extends Component
         $this->resetPage();
     }
 
+    #[On('markAsPaid')]
     public function markAsPaid(int $id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -55,9 +57,18 @@ class Index extends Component
             ]);
         }
 
-        session()->flash('success', 'Transaksi berhasil ditandai sebagai lunas.');
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => 'Transaksi berhasil ditandai sebagai lunas.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
+    #[On('markAsFailed')]
     public function markAsFailed(int $id)
     {
         $transaction = Transaction::findOrFail($id);
@@ -66,7 +77,45 @@ class Index extends Component
             'status' => 'expired',
         ]);
 
-        session()->flash('success', 'Transaksi ditandai gagal/expired.');
+        $this->dispatch('swal', [
+            'title' => 'Dibatalkan!',
+            'text' => 'Transaksi ditandai gagal/expired.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
+    }
+
+    #[On('deleteConfirmed')]
+    public function delete(int $id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $transaction->delete();
+
+        $this->dispatch('swal:deleted', [
+            'text' => 'Transaksi berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $transaction = Transaction::withTrashed()->findOrFail($id);
+        $transaction->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data transaksi berhasil dikembalikan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function render()

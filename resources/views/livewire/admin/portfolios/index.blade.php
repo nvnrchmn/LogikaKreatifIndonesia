@@ -55,7 +55,7 @@
                             </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 <button wire:click="edit({{ $portfolio->id }})" class="text-brand-primary hover:underline text-sm font-medium">Edit</button>
-                                <button wire:click="delete({{ $portfolio->id }})" wire:confirm="Yakin ingin menghapus portofolio ini?" class="text-status-danger hover:underline text-sm font-medium">Hapus</button>
+                                <button wire:click="$dispatch('swal:confirm', { id: {{ $portfolio->id }} })" class="text-status-danger hover:underline text-sm font-medium">Hapus</button>
                             </td>
                         </tr>
                     @empty

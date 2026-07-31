@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Leads;
 
 use App\Models\Lead;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -44,7 +45,15 @@ class Index extends Component
     {
         if ($this->viewingLead) {
             $this->viewingLead->update(['status' => $status]);
-            session()->flash('success', 'Status lead berhasil diperbarui.');
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text' => 'Status lead berhasil diperbarui.',
+                'icon' => 'success',
+                'toast' => true,
+                'position' => 'top-end',
+                'showConfirmButton' => false,
+                'timer' => 3000
+            ]);
             $this->closeModal();
         }
     }
@@ -55,10 +64,34 @@ class Index extends Component
         $this->viewingLead = null;
     }
 
+    #[On('deleteConfirmed')]
     public function delete(int $id)
     {
-        Lead::findOrFail($id)->delete();
-        session()->flash('success', 'Lead berhasil dihapus.');
+        $lead = Lead::findOrFail($id);
+        $lead->delete();
+
+        $this->dispatch('swal:deleted', [
+            'text' => 'Lead berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $lead = Lead::withTrashed()->findOrFail($id);
+        $lead->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data lead berhasil dikembalikan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function render()

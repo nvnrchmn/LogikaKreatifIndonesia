@@ -37,7 +37,15 @@ class Show extends Component
         $this->message = '';
         $this->ticket->load('replies.user');
         
-        session()->flash('success', 'Balasan berhasil dikirim.');
+        $this->dispatch('swal', [
+            'title' => 'Terkirim!',
+            'text' => 'Balasan berhasil dikirim.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function updateStatus($status)
@@ -47,7 +55,15 @@ class Show extends Component
                 'status' => $status,
                 'resolved_at' => $status === 'resolved' ? now() : null,
             ]);
-            session()->flash('success', 'Status tiket diperbarui.');
+            $this->dispatch('swal', [
+                'title' => 'Diperbarui!',
+                'text' => 'Status tiket diperbarui.',
+                'icon' => 'success',
+                'toast' => true,
+                'position' => 'top-end',
+                'showConfirmButton' => false,
+                'timer' => 3000
+            ]);
         }
     }
 

@@ -61,7 +61,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <button type="button" wire:click.stop="delete({{ $lead->id }})" wire:confirm="Hapus lead ini?" class="text-status-danger hover:underline text-xs font-medium">Hapus</button>
+                                <button type="button" wire:click.stop="$dispatch('swal:confirm', { id: {{ $lead->id }} })" class="text-status-danger hover:underline text-xs font-medium">Hapus</button>
                             </td>
                         </tr>
                     @empty

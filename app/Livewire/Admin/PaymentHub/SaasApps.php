@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\PaymentHub;
 use Livewire\Component;
 use App\Models\PaymentHub\SaasApplication;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 
 #[Layout('components.layouts.admin', ['title' => 'Aplikasi Terintegrasi'])]
@@ -37,7 +38,41 @@ class SaasApps extends Component
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
             'text' => 'SaaS Application berhasil ditambahkan. API Key otomatis di-generate.',
-            'icon' => 'success'
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
+    }
+
+    #[On('deleteConfirmed')]
+    public function delete(int $id)
+    {
+        $app = SaasApplication::findOrFail($id);
+        $app->delete();
+
+        $this->dispatch('swal:deleted', [
+            'text' => 'Aplikasi berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $app = SaasApplication::withTrashed()->findOrFail($id);
+        $app->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data aplikasi berhasil dikembalikan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
         ]);
     }
 

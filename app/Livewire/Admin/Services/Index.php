@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Services;
 
 use App\Models\Service;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -94,28 +95,28 @@ class Index extends Component
         $this->closeModal();
     }
 
+    #[On('deleteConfirmed')]
     public function delete(int $id)
     {
         $service = Service::findOrFail($id);
-
-        if ($service->orders()->exists()) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text' => 'Layanan tidak dapat dihapus karena masih terkait dengan pesanan.',
-                'icon' => 'error',
-                'toast' => true,
-                'position' => 'top-end',
-                'showConfirmButton' => false,
-                'timer' => 3000
-            ]);
-            return;
-        }
-
         $service->delete();
 
-        $this->dispatch('swal', [
-            'title' => 'Terhapus!',
+        $this->dispatch('swal:deleted', [
             'text' => 'Layanan berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $service = Service::withTrashed()->findOrFail($id);
+        $service->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data layanan berhasil dikembalikan.',
             'icon' => 'success',
             'toast' => true,
             'position' => 'top-end',

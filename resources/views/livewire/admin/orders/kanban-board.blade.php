@@ -46,7 +46,7 @@
                             <div class="text-xs text-txt-muted mb-3 line-clamp-2">{{ $task->description }}</div>
                         @endif
                         <div class="flex items-center justify-between mt-3 pt-3 border-t border-border-minimal">
-                            <button wire:click="deleteTask({{ $task->id }})" wire:confirm="Hapus tugas ini?" class="text-status-danger hover:underline text-[10px] font-medium">Hapus</button>
+                            <button wire:click="$dispatch('swal:confirm', { action: 'deleteTaskConfirmed', id: {{ $task->id }} })" class="text-status-danger hover:underline text-[10px] font-medium">Hapus</button>
                             <button wire:click="updateTaskStatus({{ $task->id }}, 'in_progress')" class="text-brand-primary hover:underline text-[10px] font-medium font-bold">Mulai Kerja &rarr;</button>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                         @endif
                         <div class="flex items-center justify-between mt-3 pt-3 border-t border-border-minimal">
                             <button wire:click="updateTaskStatus({{ $task->id }}, 'review')" class="text-txt-muted hover:underline text-[10px] font-medium">&larr; Batal Selesai</button>
-                            <button wire:click="deleteTask({{ $task->id }})" wire:confirm="Hapus tugas ini?" class="text-status-danger hover:underline text-[10px] font-medium">Hapus</button>
+                            <button wire:click="$dispatch('swal:confirm', { action: 'deleteTaskConfirmed', id: {{ $task->id }} })" class="text-status-danger hover:underline text-[10px] font-medium">Hapus</button>
                         </div>
                     </div>
                 @endforeach

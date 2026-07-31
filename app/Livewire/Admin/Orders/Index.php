@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -116,7 +117,15 @@ class Index extends Component
             }
         });
 
-        session()->flash('success', 'Order dan tagihan milestone berhasil dibuat. Jika Lead baru, akun Client dibuat otomatis (Password Default: logikraf123).');
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => 'Order dan tagihan milestone berhasil dibuat. Jika Lead baru, akun Client dibuat otomatis (Password Default: logikraf123).',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 5000
+        ]);
         $this->closeModal();
     }
 
@@ -136,6 +145,7 @@ class Index extends Component
         $this->resetForm();
     }
 
+    #[On('cancelOrderConfirmed')]
     public function cancelOrder(int $id)
     {
         $order = Order::findOrFail($id);
@@ -154,10 +164,50 @@ class Index extends Component
             'status' => 'expired'
         ]);
         
-        session()->flash('success', 'Proyek berhasil dibatalkan. Tagihan yang belum lunas otomatis dibatalkan.');
+        $this->dispatch('swal', [
+            'title' => 'Dibatalkan!',
+            'text' => 'Proyek berhasil dibatalkan. Tagihan yang belum lunas otomatis dibatalkan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
         if ($this->viewingOrder && $this->viewingOrder->id === $id) {
             $this->viewOrder($id);
         }
+    }
+
+    #[On('deleteConfirmed')]
+    public function delete(int $id)
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+
+        $this->dispatch('swal:deleted', [
+            'text' => 'Order proyek berhasil dihapus.',
+            'id' => $id,
+            'restoreAction' => 'restore'
+        ]);
+        
+        $this->closeViewModal();
+    }
+
+    #[On('restore')]
+    public function restore(int $id)
+    {
+        $order = Order::withTrashed()->findOrFail($id);
+        $order->restore();
+
+        $this->dispatch('swal', [
+            'title' => 'Di-undo!',
+            'text' => 'Data order proyek berhasil dikembalikan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     private function resetForm()

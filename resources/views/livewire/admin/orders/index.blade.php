@@ -164,11 +164,14 @@
                     </div>
                     <div class="flex items-center gap-3">
                         @if(!in_array($viewingOrder->status, ['completed', 'cancelled']))
-                            <button wire:click="cancelOrder({{ $viewingOrder->id }})" wire:confirm="Yakin ingin membatalkan order ini? Semua tagihan yang pending akan dibatalkan." class="text-status-danger text-sm font-semibold hover:underline">
+                            <button wire:click="$dispatch('swal:confirm', { action: 'cancelOrderConfirmed', id: {{ $viewingOrder->id }}, title: 'Batalkan Proyek?', text: 'Semua tagihan yang pending akan dibatalkan.', confirmText: 'Ya, Batalkan!' })" class="text-status-warning text-sm font-semibold hover:underline">
                                 Batalkan Proyek
                             </button>
                         @endif
-                        <button wire:click="closeViewModal" class="text-txt-muted hover:text-txt-main transition-colors">
+                        <button wire:click="$dispatch('swal:confirm', { id: {{ $viewingOrder->id }} })" class="text-status-danger text-sm font-semibold hover:underline ml-2">
+                            Hapus Proyek
+                        </button>
+                        <button wire:click="closeViewModal" class="text-txt-muted hover:text-txt-main transition-colors ml-4">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>

@@ -43,6 +43,7 @@
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Biaya Platform</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Sub-Akun</th>
                     <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider">Transaksi</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-txt-muted uppercase tracking-wider text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border-minimal">
@@ -76,6 +77,9 @@
                             <span class="inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                 {{ $app->transactions_count }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <button wire:click="$dispatch('swal:confirm', { id: {{ $app->id }} })" class="text-status-danger hover:underline text-xs font-medium">Hapus</button>
                         </td>
                     </tr>
                 @empty

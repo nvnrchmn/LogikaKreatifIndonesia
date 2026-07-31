@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Orders;
 
 use App\Models\Order;
 use App\Models\OrderTask;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class KanbanBoard extends Component
@@ -37,8 +38,15 @@ class KanbanBoard extends Component
         ]);
 
         $this->reset(['title', 'description']);
-        $this->dispatch('task-added');
-        session()->flash('success', 'Tugas berhasil ditambahkan.');
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => 'Tugas berhasil ditambahkan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function updateTaskStatus($taskId, $newStatus)
@@ -49,7 +57,8 @@ class KanbanBoard extends Component
         }
     }
 
-    public function deleteTask($taskId)
+    #[On('deleteTaskConfirmed')]
+    public function deleteTask(int $taskId)
     {
         OrderTask::where('order_id', $this->order->id)->findOrFail($taskId)->delete();
     }

@@ -53,9 +53,10 @@
                             </td>
                             <td class="px-6 py-4 text-right space-x-2">
                                 @if($trx->status === 'pending')
-                                    <button wire:click="markAsPaid({{ $trx->id }})" wire:confirm="Tandai lunas manual? Ini akan mengubah status order secara otomatis." class="text-status-success hover:underline text-xs font-medium">Set Lunas</button>
-                                    <button wire:click="markAsFailed({{ $trx->id }})" wire:confirm="Batalkan transaksi ini?" class="text-status-danger hover:underline text-xs font-medium">Set Gagal</button>
+                                    <button wire:click="$dispatch('swal:confirm', { action: 'markAsPaid', id: {{ $trx->id }}, title: 'Tandai Lunas?', text: 'Ini akan mengubah status order secara otomatis.', confirmText: 'Ya, Lunas!' })" class="text-status-success hover:underline text-xs font-medium">Set Lunas</button>
+                                    <button wire:click="$dispatch('swal:confirm', { action: 'markAsFailed', id: {{ $trx->id }}, title: 'Batalkan Transaksi?', text: 'Transaksi ini akan dibatalkan/expired.', confirmText: 'Ya, Batalkan!' })" class="text-status-warning hover:underline text-xs font-medium">Set Gagal</button>
                                 @endif
+                                <button wire:click="$dispatch('swal:confirm', { id: {{ $trx->id }} })" class="text-status-danger hover:underline text-xs font-medium ml-2">Hapus</button>
                             </td>
                         </tr>
                     @empty
