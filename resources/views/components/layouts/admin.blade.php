@@ -147,7 +147,7 @@
         document.addEventListener('livewire:initialized', () => {
             // Global simple toast swal
             Livewire.on('swal', (event) => {
-                const data = event[0];
+                const data = (Array.isArray(event) ? event[0] : (event.detail || event)) || {};
                 Swal.fire({
                     title: data.title,
                     text: data.text,
@@ -162,7 +162,7 @@
 
             // Swal confirm for deletion
             Livewire.on('swal:confirm', (event) => {
-                const data = event[0];
+                const data = (Array.isArray(event) ? event[0] : (event.detail || event)) || {};
                 Swal.fire({
                     title: data.title || 'Apakah Anda Yakin?',
                     text: data.text || 'Tindakan ini akan memindahkan data ke tempat sampah.',
@@ -181,7 +181,7 @@
 
             // Swal deleted toast with Undo button
             Livewire.on('swal:deleted', (event) => {
-                const data = event[0];
+                const data = (Array.isArray(event) ? event[0] : (event.detail || event)) || {};
                 Swal.fire({
                     title: 'Terhapus!',
                     text: data.text || 'Data berhasil dihapus.',
