@@ -81,15 +81,47 @@ class Index extends Component
 
         Service::updateOrCreate(['id' => $this->serviceId], $data);
 
-        session()->flash('success', $this->serviceId ? 'Layanan berhasil diupdate.' : 'Layanan berhasil ditambahkan.');
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => $this->serviceId ? 'Layanan berhasil diperbarui.' : 'Layanan baru berhasil ditambahkan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
         
         $this->closeModal();
     }
 
     public function delete(int $id)
     {
-        Service::findOrFail($id)->delete();
-        session()->flash('success', 'Layanan berhasil dihapus.');
+        $service = Service::findOrFail($id);
+
+        if ($service->orders()->exists()) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal!',
+                'text' => 'Layanan tidak dapat dihapus karena masih terkait dengan pesanan.',
+                'icon' => 'error',
+                'toast' => true,
+                'position' => 'top-end',
+                'showConfirmButton' => false,
+                'timer' => 3000
+            ]);
+            return;
+        }
+
+        $service->delete();
+
+        $this->dispatch('swal', [
+            'title' => 'Terhapus!',
+            'text' => 'Layanan berhasil dihapus.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
     }
 
     public function closeModal()

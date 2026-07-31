@@ -150,7 +150,22 @@ class Index extends Component
 
     public function delete(int $id): void
     {
-        Package::findOrFail($id)->delete();
+        $package = Package::findOrFail($id);
+
+        if ($package->orders()->exists()) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal!',
+                'text' => 'Paket layanan tidak dapat dihapus karena masih terkait dengan pesanan.',
+                'icon' => 'error',
+                'toast' => true,
+                'position' => 'top-end',
+                'showConfirmButton' => false,
+                'timer' => 3000
+            ]);
+            return;
+        }
+
+        $package->delete();
 
         $this->dispatch('swal', [
             'title' => 'Terhapus!',
