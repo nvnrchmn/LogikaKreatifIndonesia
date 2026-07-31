@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $admin = User::create([
             'name' => 'Admin Logikraf',
             'email' => 'admin@logikraf.id',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('1415221Novaa@@'),
         ]);
         $admin->assignRole('admin');
 
@@ -183,45 +183,45 @@ class DatabaseSeeder extends Seeder
         // ============================
         // Sample Leads
         // ============================
-        $leads = [
-            [
-                'name' => 'Budi Santoso',
-                'email' => 'budi@perusahaan.co.id',
-                'phone' => '081234567890',
-                'company' => 'PT. Maju Bersama Sejahtera',
-                'service_category' => 'software',
-                'project_description' => 'Kami membutuhkan sistem ERP terintegrasi untuk mengelola inventory, accounting, dan HR di 5 cabang kami yang tersebar di Jawa dan Bali.',
-                'estimated_pages' => '15-20 modul',
-                'target_launch' => 'Q1 2026',
-                'budget_range' => 'above_100m',
-            ],
-            [
-                'name' => 'Sari Dewi',
-                'email' => 'sari.dewi@startup.id',
-                'phone' => '087654321098',
-                'company' => 'FreshMart',
-                'service_category' => 'uiux',
-                'project_description' => 'Redesign UI/UX untuk aplikasi grocery delivery kami. Kami ingin meningkatkan conversion rate dan menurunkan bounce rate.',
-                'estimated_pages' => '30+ screen',
-                'target_launch' => '2 bulan',
-                'budget_range' => '25m_50m',
-            ],
-            [
-                'name' => 'Ahmad Fauzi',
-                'email' => 'ahmad.fauzi@gmail.com',
-                'phone' => '089876543210',
-                'company' => null,
-                'service_category' => 'marketing',
-                'project_description' => 'Saya memiliki bisnis catering rumahan yang ingin go digital. Butuh bantuan untuk social media marketing dan Google Ads.',
-                'estimated_pages' => '1 landing page',
-                'target_launch' => 'Secepatnya',
-                'budget_range' => 'under_10m',
-            ],
-        ];
+        // $leads = [
+        //     [
+        //         'name' => 'Budi Santoso',
+        //         'email' => 'budi@perusahaan.co.id',
+        //         'phone' => '081234567890',
+        //         'company' => 'PT. Maju Bersama Sejahtera',
+        //         'service_category' => 'software',
+        //         'project_description' => 'Kami membutuhkan sistem ERP terintegrasi untuk mengelola inventory, accounting, dan HR di 5 cabang kami yang tersebar di Jawa dan Bali.',
+        //         'estimated_pages' => '15-20 modul',
+        //         'target_launch' => 'Q1 2026',
+        //         'budget_range' => 'above_100m',
+        //     ],
+        //     [
+        //         'name' => 'Sari Dewi',
+        //         'email' => 'sari.dewi@startup.id',
+        //         'phone' => '087654321098',
+        //         'company' => 'FreshMart',
+        //         'service_category' => 'uiux',
+        //         'project_description' => 'Redesign UI/UX untuk aplikasi grocery delivery kami. Kami ingin meningkatkan conversion rate dan menurunkan bounce rate.',
+        //         'estimated_pages' => '30+ screen',
+        //         'target_launch' => '2 bulan',
+        //         'budget_range' => '25m_50m',
+        //     ],
+        //     [
+        //         'name' => 'Ahmad Fauzi',
+        //         'email' => 'ahmad.fauzi@gmail.com',
+        //         'phone' => '089876543210',
+        //         'company' => null,
+        //         'service_category' => 'marketing',
+        //         'project_description' => 'Saya memiliki bisnis catering rumahan yang ingin go digital. Butuh bantuan untuk social media marketing dan Google Ads.',
+        //         'estimated_pages' => '1 landing page',
+        //         'target_launch' => 'Secepatnya',
+        //         'budget_range' => 'under_10m',
+        //     ],
+        // ];
 
-        foreach ($leads as $lead) {
-            Lead::create($lead);
-        }
+        // foreach ($leads as $lead) {
+        //     Lead::create($lead);
+        // }
 
         // ============================
         // Paket Website UMKM (checkout publik)
