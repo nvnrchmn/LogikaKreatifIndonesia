@@ -1,14 +1,107 @@
-name: Deploy to Production
+name: Deploy Logikraf
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Deployment Webhook
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, intl, gd, curl, zip
+          tools: composer:v2
+
+      - name: Composer install (no dev)
+        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: NPM build
         run: |
-          curl -sS -L -X GET "https://logikraf.id/api/deploy/${{ secrets.DEPLOY_TOKEN }}" -H "Accept: application/json" -H "User-Agent: GitHubActions/1.0"
+          npm install --ignore-scripts
+          npm run build
+
+      - name: Remove local env + node_modules (not needed on VPS)
+        run: |
+          rm -f .env .env.example
+          rm -rf node_modules
+
+      - name: Upload to VPS (tmp)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: "49222"
+          source: "."
+          target: "/tmp/logikraf-upload"
+          overwrite: true
+          timeout: 180s
+          command_timeout: 10m
+          rm: true
+          exclude: "node_modules,.git"
+
+      - name: Link & finalize
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: "49222"
+          script: |
+            set -e
+            RELEASE=/var/www/releases/logikraf-${{ github.sha }}
+            CURRENT=/var/www/logikraf.id
+            PERSIST=/var/www/logikraf_persist
+
+            sudo mkdir -p $PERSIST/storage $PERSIST/env
+            [ -f $CURRENT/.env ] && sudo cp -n $CURRENT/.env $PERSIST/env/.env || true
+
+            sudo mkdir -p $RELEASE
+            sudo rm -rf $RELEASE/*
+            sudo cp -a /tmp/logikraf-upload/. $RELEASE/
+
+            sudo ln -sfn $PERSIST/env/.env $RELEASE/.env
+            sudo rm -rf $RELEASE/storage
+            sudo ln -sfn $PERSIST/storage $RELEASE/storage
+
+            cd $RELEASE
+            php artisan optimize
+            php artisan livewire:publish --assets --no-interaction 2>/dev/null || true
+            php artisan filament:assets --no-interaction 2>/dev/null || true
+
+            sudo rm -f $RELEASE/public/storage
+            sudo ln -sfn /var/www/logikraf_persist/storage/app/public $RELEASE/public/storage
+            php artisan storage:link --relative=false 2>/dev/null || true
+
+            sudo chown -R nvnrchmn:www $RELEASE
+            sudo chmod -R 755 $RELEASE
+            sudo chmod -R 775 $PERSIST/storage
+
+            sudo mkdir -p $RELEASE/storage/media-library/temp
+            sudo chown -R nvnrchmn:www $RELEASE/storage/media-library
+            sudo chmod -R 775 $RELEASE/storage/media-library
+
+            if [ -L "$CURRENT" ]; then
+              sudo rm "$CURRENT"
+            elif [ -d "$CURRENT" ]; then
+              sudo mv "$CURRENT" "$CURRENT.bak.$(date +%s)"
+            fi
+            sudo ln -sfn $RELEASE $CURRENT
+
+            # Keep only the 3 most recent releases
+            ls -dt /var/www/releases/logikraf-* | tail -n +4 | sudo xargs -r rm -rf
+
+            sudo systemctl restart php-fpm 2>/dev/null || sudo service php-fpm restart 2>/dev/null || true
+            echo "deploy done: $RELEASE"
