@@ -24,7 +24,7 @@
                     </a>
                 @endforeach
                 @auth
-                    @if(auth()->user()->role === 'admin')
+                    @if(auth()->check() && auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="btn-primary text-sm !py-2.5 !px-5">
                             Portal Admin
                         </a>
@@ -72,7 +72,7 @@
                 @endforeach
                 <div class="pt-2 space-y-2">
                     @auth
-                        @if(auth()->user()->role === 'admin')
+                        @if(auth()->check() && auth()->user()->role === 'admin')
                             <a href="{{ route('admin.dashboard') }}" class="btn-primary w-full text-center text-sm">
                                 Portal Admin
                             </a>

@@ -21,6 +21,10 @@ Route::view('/syarat-ketentuan', 'pages.terms')->name('terms');
 Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
 Route::view('/kontak', 'pages.contact')->name('contact');
 
+// Blog (frontend)
+Route::get('/blog', App\Livewire\Frontend\Blog\Index::class)->name('blog.index');
+Route::get('/blog/{post:slug}', App\Livewire\Frontend\Blog\Show::class)->name('blog.show');
+
 // Paket UMKM: produk harga tetap + checkout publik (tanpa login) via Xendit Invoice.
 Route::controller(App\Http\Controllers\PackageController::class)->group(function () {
     Route::get('/paket', 'index')->name('packages.index');
@@ -108,6 +112,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-hub/api-docs', \App\Livewire\Admin\PaymentHub\ApiDocs::class)->name('payment-hub.api-docs');
         Route::get('/payment-hub/disbursements', \App\Livewire\Admin\PaymentHub\Disbursements::class)->name('payment-hub.disbursements');
         Route::get('/payment-hub/tax-reports', App\Livewire\Admin\PaymentHub\TaxReports::class)->name('payment-hub.tax-reports');
+        Route::get('/blog', App\Livewire\Admin\Blog\Index::class)->name('blog.index');
+        Route::get('/blog/create', App\Livewire\Admin\Blog\Form::class)->name('blog.create');
+        Route::get('/blog/{post}/edit', App\Livewire\Admin\Blog\Form::class)->name('blog.edit');
     });
 
     // Client Routes
