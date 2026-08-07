@@ -23,6 +23,11 @@
                         {{ $link['label'] }}
                     </a>
                 @endforeach
+                <a href="{{ route('search') }}" aria-label="Cari"
+                    :class="scrolled ? 'text-txt-muted hover:text-brand-primary' : 'text-white/80 hover:text-white'"
+                    class="font-body text-sm font-medium transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </a>
                 @auth
                     @if(auth()->check() && auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="btn-primary text-sm !py-2.5 !px-5">

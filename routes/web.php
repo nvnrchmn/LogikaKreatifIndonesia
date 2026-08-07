@@ -21,6 +21,9 @@ Route::view('/syarat-ketentuan', 'pages.terms')->name('terms');
 Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
 Route::view('/kontak', 'pages.contact')->name('contact');
 
+// Search
+Route::get('/search', App\Http\Controllers\SearchController::class)->name('search');
+
 // Blog (frontend)
 Route::view('/blog', 'pages.blog')->name('blog.index');
 Route::get('/blog/{post:slug}', function (App\Models\Post $post) {
