@@ -18,7 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'force_password' => \App\Http\Middleware\ForcePasswordChange::class,
             'saas.auth' => \App\Http\Middleware\SaasApiAuth::class,
+            'log.visitor' => \App\Http\Middleware\LogVisitor::class,
         ]);
+        // Log visitor pada semua web route (middleware sudah skip admin/api/bot di dalam)
+        $middleware->appendToGroup('web', \App\Http\Middleware\LogVisitor::class);
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
             'api/*',
