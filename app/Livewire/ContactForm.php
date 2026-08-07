@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Models\Lead;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class ContactForm extends Component
@@ -44,13 +45,21 @@ class ContactForm extends Component
         $this->validate();
 
         try {
-            Lead::create([
+            $lead = Lead::create([
                 'name' => $this->name,
                 'email' => $this->email,
                 'service_category' => $this->mapCategory(),
                 'notes' => $this->message,
                 'status' => 'new',
             ]);
+
+            // Notify admin + client (fails silently if mail not configured)
+            try {
+                Mail::to('admin@logikraf.id')->send(new \App\Mail\NewLeadNotification($lead));
+                Mail::to($this->email)->send(new \App\Mail\ClientLeadNotification($lead));
+            } catch (\Exception $mailEx) {
+                Log::warning('Contact mail failed: ' . $mailEx->getMessage());
+            }
 
             $this->submitted = true;
             $this->reset(['name', 'email', 'category', 'message']);
