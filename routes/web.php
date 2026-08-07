@@ -130,6 +130,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/clients', App\Livewire\Admin\Clients\Index::class)->name('clients.index');
         Route::get('/clients/create', App\Livewire\Admin\Clients\Form::class)->name('clients.create');
         Route::get('/clients/{client}/edit', App\Livewire\Admin\Clients\Form::class)->name('clients.edit');
+        Route::get('/testimonials', App\Livewire\Admin\Testimonials\Index::class)->name('testimonials.index');
+        Route::get('/testimonials/create', App\Livewire\Admin\Testimonials\Form::class)->name('testimonials.create');
+        Route::get('/testimonials/{testimonial}/edit', App\Livewire\Admin\Testimonials\Form::class)->name('testimonials.edit');
         Route::get('/blog', App\Livewire\Admin\Blog\Index::class)->name('blog.index');
         Route::get('/blog/create', App\Livewire\Admin\Blog\Form::class)->name('blog.create');
         Route::get('/blog/{post}/edit', App\Livewire\Admin\Blog\Form::class)->name('blog.edit');
