@@ -25,12 +25,19 @@ class DatabaseSeeder extends Seeder
         // ============================
         // Admin User
         // ============================
-        $admin = User::create([
-            'name' => 'Admin Logikraf',
-            'email' => 'admin@logikraf.id',
-            'password' => bcrypt('1415221Novaa@@'),
-        ]);
-        $admin->assignRole('admin');
+        // Password diambil dari env ADMIN_PASSWORD (jangan hardcode di repo).
+        // Fallback ke default hanya untuk local dev.
+        $adminPassword = env('ADMIN_PASSWORD', 'AdminLogikraf!123');
+        if (User::where('email', 'admin@logikraf.id')->exists()) {
+            $admin = User::where('email', 'admin@logikraf.id')->first();
+        } else {
+            $admin = User::create([
+                'name' => 'Admin Logikraf',
+                'email' => 'admin@logikraf.id',
+                'password' => bcrypt($adminPassword),
+            ]);
+            $admin->assignRole('admin');
+        }
 
         // ============================
         // Services
