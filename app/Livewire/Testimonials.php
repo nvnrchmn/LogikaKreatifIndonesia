@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Livewire\Frontend;
+namespace App\Livewire;
 
 use App\Models\Testimonial;
 use Livewire\Component;
