@@ -22,8 +22,13 @@ Route::view('/kebijakan-privasi', 'pages.privacy')->name('privacy');
 Route::view('/kontak', 'pages.contact')->name('contact');
 
 // Blog (frontend)
-Route::get('/blog', App\Livewire\Frontend\Blog\Index::class)->name('blog.index');
-Route::get('/blog/{post:slug}', App\Livewire\Frontend\Blog\Show::class)->name('blog.show');
+Route::view('/blog', 'pages.blog')->name('blog.index');
+Route::get('/blog/{post:slug}', function (App\Models\Post $post) {
+    if (! $post->is_published) {
+        abort(404);
+    }
+    return view('pages.blog-show', ['post' => $post]);
+})->name('blog.show');
 
 // Paket UMKM: produk harga tetap + checkout publik (tanpa login) via Xendit Invoice.
 Route::controller(App\Http\Controllers\PackageController::class)->group(function () {
