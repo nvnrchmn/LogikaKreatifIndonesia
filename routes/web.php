@@ -30,9 +30,6 @@ Route::get('/blog/{post:slug}', function (App\Models\Post $post) {
     return view('pages.blog-show', ['post' => $post]);
 })->name('blog.show');
 
-\Livewire\Livewire::component('blog-index', App\Livewire\Frontend\Blog\Index::class);
-\Livewire\Livewire::component('blog-show', App\Livewire\Frontend\Blog\Show::class);
-
 // Paket UMKM: produk harga tetap + checkout publik (tanpa login) via Xendit Invoice.
 Route::controller(App\Http\Controllers\PackageController::class)->group(function () {
     Route::get('/paket', 'index')->name('packages.index');
