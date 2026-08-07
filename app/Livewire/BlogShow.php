@@ -7,7 +7,7 @@ namespace App\Livewire;
 use App\Models\Post;
 use Livewire\Component;
 
-class Show extends Component
+class BlogShow extends Component
 {
     public Post $post;
 

@@ -7,7 +7,7 @@ namespace App\Livewire;
 use App\Models\Post;
 use Livewire\Component;
 
-class Index extends Component
+class BlogIndex extends Component
 {
     public function render()
     {
