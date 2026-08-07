@@ -32,21 +32,26 @@ class LogVisitor
             && !str_contains($request->path(), '.');
 
         if ($isWebGet && $this->shouldLog($request)) {
-            $ua = (string) $request->userAgent();
-            $isBot = $this->isBot($ua);
+            try {
+                $ua = (string) $request->userAgent();
+                $isBot = $this->isBot($ua);
 
-            VisitorLog::create([
-                'ip' => $request->ip(),
-                'method' => $request->method(),
-                'path' => $request->path(),
-                'route_name' => $request->route()?->getName(),
-                'user_agent' => substr($ua, 0, 512),
-                'referer' => substr((string) $request->header('referer'), 0, 512),
-                'is_bot' => $isBot,
-                'user_id' => auth()->id(),
-                'user_type' => auth()->check() ? get_class(auth()->user()) : null,
-                'visited_at' => now(),
-            ]);
+                VisitorLog::create([
+                    'ip' => $request->ip(),
+                    'method' => $request->method(),
+                    'path' => $request->path(),
+                    'route_name' => $request->route()?->getName(),
+                    'user_agent' => substr($ua, 0, 512),
+                    'referer' => substr((string) $request->header('referer'), 0, 512),
+                    'is_bot' => $isBot,
+                    'user_id' => auth()->id(),
+                    'user_type' => auth()->check() ? get_class(auth()->user()) : null,
+                    'visited_at' => now(),
+                ]);
+            } catch (\Throwable $e) {
+                // Jangan biarkan logging gagal menghancurkan request
+                report($e);
+            }
         }
 
         return $next($request);
