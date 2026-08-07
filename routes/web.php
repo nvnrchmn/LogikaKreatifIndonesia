@@ -24,6 +24,9 @@ Route::view('/kontak', 'pages.contact')->name('contact');
 // Search
 Route::get('/search', App\Http\Controllers\SearchController::class)->name('search');
 
+// Sitemap (SEO)
+Route::get('/sitemap.xml', App\Http\Controllers\SitemapController::class)->name('sitemap');
+
 // Blog (frontend)
 Route::view('/blog', 'pages.blog')->name('blog.index');
 Route::get('/blog/{post:slug}', function (App\Models\Post $post) {
