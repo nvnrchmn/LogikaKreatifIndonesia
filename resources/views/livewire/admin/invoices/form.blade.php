@@ -92,7 +92,10 @@
             <textarea wire:model="notes" rows="3" class="w-full px-4 py-2.5 bg-white border border-border-minimal rounded-xl text-sm"></textarea>
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-end gap-3">
+            @if ($invoice && $invoice->exists)
+                <a href="{{ route('admin.invoices.pdf', $invoice) }}" target="_blank" class="btn-outline text-sm !py-3 !px-8">Download PDF</a>
+            @endif
             <button type="button" wire:click="save" class="btn-primary text-sm !py-3 !px-8">Simpan</button>
         </div>
     </div>
