@@ -60,33 +60,7 @@
                 <!-- Contact Form -->
                 <div class="bg-white rounded-3xl p-8 md:p-12 border border-border-minimal shadow-sm">
                     <h3 class="font-display font-bold text-2xl text-txt-main mb-6">Kirim Pesan</h3>
-                    <form action="#" method="POST" class="space-y-5">
-                        <!-- Dummy form for display -->
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Nama Lengkap</label>
-                            <input type="text" class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="John Doe" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Email</label>
-                            <input type="email" class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="john@example.com" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Kategori Pesan</label>
-                            <select class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
-                                <option>Proyek Agensi Baru</option>
-                                <option>Pertanyaan / Sales SaaS</option>
-                                <option>Dukungan Teknis (Support)</option>
-                                <option>Lainnya</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Pesan</label>
-                            <textarea rows="4" class="w-full px-4 py-3 bg-canvas-light border border-border-minimal rounded-xl text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Tuliskan pesan Anda di sini..." required></textarea>
-                        </div>
-                        <button type="button" class="w-full bg-brand-primary text-white font-semibold py-3 rounded-xl hover:bg-brand-primary/90 transition-colors shadow-lg shadow-brand-primary/30">
-                            Kirim Pesan Sekarang
-                        </button>
-                    </form>
+                    <livewire:contact-form />
                 </div>
             </div>
         </div>
