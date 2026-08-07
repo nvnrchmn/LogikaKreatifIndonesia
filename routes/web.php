@@ -124,6 +124,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-hub/disbursements', \App\Livewire\Admin\PaymentHub\Disbursements::class)->name('payment-hub.disbursements');
         Route::get('/payment-hub/tax-reports', App\Livewire\Admin\PaymentHub\TaxReports::class)->name('payment-hub.tax-reports');
         Route::get('/analytics', App\Livewire\Admin\Analytics\Index::class)->name('analytics.index');
+        Route::get('/invoices', App\Livewire\Admin\Invoices\Index::class)->name('invoices.index');
+        Route::get('/invoices/create', App\Livewire\Admin\Invoices\Form::class)->name('invoices.create');
+        Route::get('/invoices/{invoice}/edit', App\Livewire\Admin\Invoices\Form::class)->name('invoices.edit');
         Route::get('/blog', App\Livewire\Admin\Blog\Index::class)->name('blog.index');
         Route::get('/blog/create', App\Livewire\Admin\Blog\Form::class)->name('blog.create');
         Route::get('/blog/{post}/edit', App\Livewire\Admin\Blog\Form::class)->name('blog.edit');
