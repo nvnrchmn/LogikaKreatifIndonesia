@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'log.visitor' => \App\Http\Middleware\LogVisitor::class,
         ]);
         // Log visitor pada semua web route (middleware sudah skip admin/api/bot di dalam)
-        $middleware->appendToGroup('web', \App\Http\Middleware\LogVisitor::class);
+        // $middleware->appendToGroup('web', AppHttpMiddlewareogvisitor::class);
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
             'api/*',
