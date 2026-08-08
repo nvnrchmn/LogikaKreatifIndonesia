@@ -127,7 +127,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/invoices', App\Livewire\Admin\Invoices\Index::class)->name('invoices.index');
         Route::get('/invoices/create', App\Livewire\Admin\Invoices\Form::class)->name('invoices.create');
         Route::get('/invoices/{invoice}/edit', App\Livewire\Admin\Invoices\Form::class)->name('invoices.edit');
-        Route::get('/invoices/{invoice}/pdf', App\Http\Controllers\InvoiceController::class)->name('invoices.pdf');
+        Route::get('/invoices/{invoice}/pdf', [App\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
         Route::get('/clients', App\Livewire\Admin\Clients\Index::class)->name('clients.index');
         Route::get('/clients/create', App\Livewire\Admin\Clients\Form::class)->name('clients.create');
         Route::get('/clients/{client}/edit', App\Livewire\Admin\Clients\Form::class)->name('clients.edit');
