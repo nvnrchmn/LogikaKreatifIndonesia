@@ -18,4 +18,9 @@ class OrderTask extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function timeEntries()
+    {
+        return $this->hasMany(TimeEntry::class, 'order_task_id');
+    }
 }

@@ -106,6 +106,11 @@ class Order extends Model
         return $this->hasMany(OrderComment::class);
     }
 
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
     /**
      * Get formatted total amount as Rupiah.
      */
