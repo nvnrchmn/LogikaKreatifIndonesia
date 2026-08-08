@@ -36,6 +36,10 @@
                             <a href="{{ route('admin.invoices.edit', $inv) }}" class="text-brand-primary hover:underline">Edit</a>
                             <span class="text-gray-300 mx-1">|</span>
                             <a href="{{ route('admin.invoices.pdf', $inv) }}" class="text-brand-primary hover:underline" target="_blank">PDF</a>
+                            @if ($inv->type === 'quotation')
+                                <span class="text-gray-300 mx-1">|</span>
+                                <a href="{{ route('admin.invoices.convert', $inv) }}" class="text-brand-primary hover:underline" onclick="return confirm('Konversi quotation ini menjadi invoice?')">Jadikan Invoice</a>
+                            @endif
                         </td>
                     </tr>
                 @empty
