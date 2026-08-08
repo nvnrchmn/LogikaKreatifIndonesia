@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderTask;
 use App\Models\TimeEntry;
 use Livewire\Component;
+use Livewire\Attributes\Computed;
 
 class Index extends Component
 {
@@ -23,12 +24,14 @@ class Index extends Component
         $this->worked_date = now()->format('Y-m-d');
     }
 
-    public function getOrdersProperty()
+    #[Computed]
+    public function orders()
     {
         return Order::latest()->get();
     }
 
-    public function getTasksProperty()
+    #[Computed]
+    public function tasks()
     {
         if (!$this->order_id) {
             return collect();
@@ -36,14 +39,16 @@ class Index extends Component
         return OrderTask::where('order_id', $this->order_id)->get();
     }
 
-    public function getEntriesProperty()
+    #[Computed]
+    public function entries()
     {
         return TimeEntry::with(['order', 'task', 'user'])
             ->latest('worked_date')
             ->paginate(20);
     }
 
-    public function getTotalMinutesProperty()
+    #[Computed]
+    public function totalMinutes()
     {
         return TimeEntry::sum('minutes');
     }
