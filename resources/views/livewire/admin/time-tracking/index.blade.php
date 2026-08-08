@@ -24,7 +24,7 @@
                     <label class="block text-sm font-semibold text-txt-main mb-2">Order *</label>
                     <select wire:model.live="order_id" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-txt-main">
                         <option value="">-- Pilih Order --</option>
-                        @foreach ($this->orders as $o)
+                        @foreach ($orders as $o)
                             <option value="{{ $o->id }}">#{{ $o->id }} — {{ $o->project_name ?? ('Order '.$o->id) }}</option>
                         @endforeach
                     </select>
@@ -33,7 +33,7 @@
                     <label class="block text-sm font-semibold text-txt-main mb-2">Task (opsional)</label>
                     <select wire:model="order_task_id" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-txt-main">
                         <option value="">-- Umum (tanpa task) --</option>
-                        @foreach ($this->tasks as $t)
+                        @foreach ($tasks as $t)
                             <option value="{{ $t->id }}">{{ $t->title }}</option>
                         @endforeach
                     </select>
@@ -72,7 +72,7 @@
     <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm">
         <div class="flex items-center justify-between mb-4">
             <h3 class="font-display font-semibold text-lg text-txt-main">Riwayat Time Entry</h3>
-            <span class="text-sm text-txt-muted">Total: <strong class="text-txt-main">{{ intdiv($this->totalMinutes, 60) }}j {{ $this->totalMinutes % 60 }}m</strong></span>
+            <span class="text-sm text-txt-muted">Total: <strong class="text-txt-main">{{ intdiv($totalMinutes, 60) }}j {{ $totalMinutes % 60 }}m</strong></span>
         </div>
 
         <div class="overflow-x-auto">
@@ -88,7 +88,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border-minimal">
-                    @forelse ($this->entries as $e)
+                    @forelse ($entries as $e)
                         <tr>
                             <td class="p-3">{{ $e->worked_date?->format('d M Y') ?? '-' }}</td>
                             <td class="p-3">#{{ $e->order_id }}</td>
@@ -107,7 +107,7 @@
         </div>
 
         <div class="mt-4">
-            {{ $this->entries->links() }}
+            {{ $entries->links() }}
         </div>
     </div>
 </div>
