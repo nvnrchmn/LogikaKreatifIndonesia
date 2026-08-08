@@ -20,6 +20,12 @@ class Index extends Component
     public $companyPhone = '';
     public $companyAddress = '';
 
+    public $companyName = '';
+    public $companyNpwp = '';
+    public $companyBankName = '';
+    public $companyBankAccount = '';
+    public $companyBankHolder = '';
+
     public $mailHost = '';
     public $mailPort = '';
     public $mailUsername = '';
@@ -38,6 +44,12 @@ class Index extends Component
         $this->companyEmail = Setting::get('company_email', 'hello@logikraf.id');
         $this->companyPhone = Setting::get('company_phone', '+62 811-1234-5678');
         $this->companyAddress = Setting::get('company_address', 'Gedung Inovasi Lt. 3, Jl. Sudirman No. 123, Jakarta Selatan, 12190');
+
+        $this->companyName = Setting::get('company_name', 'PT. Logika Kreatif Indonesia');
+        $this->companyNpwp = Setting::get('company_npwp', '');
+        $this->companyBankName = Setting::get('company_bank_name', '');
+        $this->companyBankAccount = Setting::get('company_bank_account', '');
+        $this->companyBankHolder = Setting::get('company_bank_holder', '');
 
         $this->mailHost = Setting::get('mail_host', env('MAIL_HOST', '127.0.0.1'));
         $this->mailPort = Setting::get('mail_port', env('MAIL_PORT', '2525'));
@@ -75,6 +87,25 @@ class Index extends Component
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
             'text' => 'Kontak Perusahaan berhasil disimpan.',
+            'icon' => 'success',
+            'toast' => true,
+            'position' => 'top-end',
+            'showConfirmButton' => false,
+            'timer' => 3000
+        ]);
+    }
+
+    public function saveProfile()
+    {
+        Setting::set('company_name', $this->companyName);
+        Setting::set('company_npwp', $this->companyNpwp);
+        Setting::set('company_bank_name', $this->companyBankName);
+        Setting::set('company_bank_account', $this->companyBankAccount);
+        Setting::set('company_bank_holder', $this->companyBankHolder);
+
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text' => 'Profil Perusahaan berhasil disimpan.',
             'icon' => 'success',
             'toast' => true,
             'position' => 'top-end',

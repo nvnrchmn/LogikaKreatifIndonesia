@@ -100,6 +100,45 @@
         </div>
     </div>
         
+        <!-- Card Profil Perusahaan (Invoice) -->
+        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl mt-6">
+            <form wire:submit="saveProfile">
+                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Profil Perusahaan (Untuk Invoice)</h3>
+                <p class="text-xs text-txt-muted mb-6">Data ini akan tampil di header & informasi pembayaran pada PDF invoice/quotation.</p>
+
+                <div class="mb-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-txt-main mb-2">Nama Perusahaan</label>
+                        <input wire:model="companyName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="PT. Logika Kreatif Indonesia">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-txt-main mb-2">NPWP</label>
+                        <input wire:model="companyNpwp" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="01.234.567.8-901.000">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Nama Bank</label>
+                            <input wire:model="companyBankName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="BCA">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">No. Rekening</label>
+                            <input wire:model="companyBankAccount" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="1234567890">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-txt-main mb-2">Atas Nama</label>
+                            <input wire:model="companyBankHolder" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="Nova Nurachman">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-border-minimal">
+                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+                        Simpan Profil
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <!-- Card Pengaturan SMTP Email -->
         <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl mt-6">
             <form wire:submit="saveEmail">
