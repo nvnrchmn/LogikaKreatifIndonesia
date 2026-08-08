@@ -123,7 +123,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/payment-hub/api-docs', \App\Livewire\Admin\PaymentHub\ApiDocs::class)->name('payment-hub.api-docs');
         Route::get('/payment-hub/disbursements', \App\Livewire\Admin\PaymentHub\Disbursements::class)->name('payment-hub.disbursements');
         Route::get('/payment-hub/tax-reports', App\Livewire\Admin\PaymentHub\TaxReports::class)->name('payment-hub.tax-reports');
-        Route::get('/analytics', App\Livewire\Admin\Analytics\Index::class)->name('analytics.index');
+        Route::get('/reports/finance', App\Livewire\Admin\Reports\Finance::class)->name('reports.finance');
         Route::get('/invoices', App\Livewire\Admin\Invoices\Index::class)->name('invoices.index');
         Route::get('/invoices/create', App\Livewire\Admin\Invoices\Form::class)->name('invoices.create');
         Route::get('/invoices/{invoice}/edit', App\Livewire\Admin\Invoices\Form::class)->name('invoices.edit');
