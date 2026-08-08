@@ -89,7 +89,12 @@ class Index extends Component
 
     public function render()
     {
+        $this->loadData();
         return view('livewire.admin.time-tracking.index')
+            ->with('orders', $this->orders)
+            ->with('tasks', $this->tasks)
+            ->with('entries', $this->entries)
+            ->with('totalMinutes', $this->totalMinutes)
             ->layout('components.layouts.admin');
     }
 }
