@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\OrderTask;
 use App\Models\TimeEntry;
 use Livewire\Component;
-use Livewire\Attributes\Computed;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class Index extends Component
 {
@@ -19,38 +19,27 @@ class Index extends Component
     public int $minutes = 0;
     public string $worked_date = '';
 
+    public $orders;
+    public $tasks;
+    public ?LengthAwarePaginator $entries = null;
+    public int $totalMinutes = 0;
+
     public function mount(): void
     {
         $this->worked_date = now()->format('Y-m-d');
+        $this->loadData();
     }
 
-    #[Computed]
-    public function orders()
+    public function loadData(): void
     {
-        return Order::latest()->get();
-    }
-
-    #[Computed]
-    public function tasks()
-    {
-        if (!$this->order_id) {
-            return collect();
-        }
-        return OrderTask::where('order_id', $this->order_id)->get();
-    }
-
-    #[Computed]
-    public function entries()
-    {
-        return TimeEntry::with(['order', 'task', 'user'])
+        $this->orders = Order::latest()->get();
+        $this->tasks = $this->order_id
+            ? OrderTask::where('order_id', $this->order_id)->get()
+            : collect();
+        $this->entries = TimeEntry::with(['order', 'task', 'user'])
             ->latest('worked_date')
             ->paginate(20);
-    }
-
-    #[Computed]
-    public function totalMinutes()
-    {
-        return TimeEntry::sum('minutes');
+        $this->totalMinutes = TimeEntry::sum('minutes');
     }
 
     public function save(): void
@@ -80,13 +69,22 @@ class Index extends Component
 
         $this->reset(['description', 'hours', 'minutes', 'order_task_id']);
         $this->worked_date = now()->format('Y-m-d');
+        $this->loadData();
         session()->flash('success', 'Time entry tersimpan.');
     }
 
     public function deleteEntry(int $id): void
     {
         TimeEntry::where('id', $id)->delete();
+        $this->loadData();
         session()->flash('success', 'Time entry dihapus.');
+    }
+
+    public function updatedOrderId(): void
+    {
+        $this->tasks = $this->order_id
+            ? OrderTask::where('order_id', $this->order_id)->get()
+            : collect();
     }
 
     public function render()
