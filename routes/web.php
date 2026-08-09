@@ -115,6 +115,7 @@ Route::middleware('auth')->group(function () {
         \Livewire\Livewire::component('admin.orders.show', 'components.admin.orders.show');
         Route::get('/orders/{order}', function (\App\Models\Order $order) { return view('components.admin.orders.show', ['order' => $order]); })->name('orders.show');
         Route::get('/transactions', App\Livewire\Admin\Transactions\Index::class)->name('transactions.index');
+        Route::get('/reports/finance', App\Livewire\Admin\Reports\Finance::class)->name('reports.finance');
         Route::get('/tickets', App\Livewire\Admin\Tickets\Index::class)->name('tickets.index');
         Route::get('/tickets/{ticket}', App\Livewire\Admin\Tickets\Show::class)->name('tickets.show');
         Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings.index');
