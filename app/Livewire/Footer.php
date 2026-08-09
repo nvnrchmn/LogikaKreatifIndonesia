@@ -18,6 +18,7 @@ class Footer extends Component
     public array $quickLinks = [
         ['label' => 'Beranda', 'href' => '/'],
         ['label' => 'Layanan', 'href' => '/#layanan'],
+        ['label' => 'Blog', 'href' => '/blog'],
         ['label' => 'Portofolio', 'href' => '/#portofolio'],
         ['label' => 'Konsultasi', 'href' => '/kontak'],
     ];

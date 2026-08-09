@@ -16,6 +16,7 @@ class Navbar extends Component
         ['label' => 'Layanan', 'href' => '/#layanan'],
         ['label' => 'Paket UMKM', 'href' => '/paket'],
         ['label' => 'Portofolio', 'href' => '/#portofolio'],
+        ['label' => 'Blog', 'href' => '/blog'],
         ['label' => 'Tentang Kami', 'href' => '/tentang-kami'],
     ];
 
