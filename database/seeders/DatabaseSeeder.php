@@ -234,8 +234,29 @@ class DatabaseSeeder extends Seeder
         // Paket Website UMKM (checkout publik)
         // ============================
         // ============================
+        // SuperAdmin User
+        // ============================
+        if (User::where('email', 'superadmin@logikraf.id')->exists()) {
+            $super = User::where('email', 'superadmin@logikraf.id')->first();
+        } else {
+            $super = User::create([
+                'name' => 'Super Admin Logikraf',
+                'email' => 'superadmin@logikraf.id',
+                'password' => bcrypt($adminPassword),
+            ]);
+        }
+        if (! $super->hasRole('admin')) {
+            $super->assignRole('admin');
+        }
+
+        // ============================
         // Demo Blog Post (for UI testing)
         // ============================
         $this->call(PostSeeder::class);
+
+        // ============================
+        // UMKM Packages
+        // ============================
+        $this->call(PackageSeeder::class);
     }
 }
