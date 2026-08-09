@@ -9,7 +9,7 @@
             @forelse ($posts as $post)
                 <a href="{{ route('blog.show', $post) }}" class="card overflow-hidden hover:shadow-lg transition-shadow group">
                     @if ($post->featured_image)
-                        <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     @else
                         <div class="w-full h-48 bg-gradient-to-br from-brand-primary/20 to-brand-accent/20"></div>
                     @endif

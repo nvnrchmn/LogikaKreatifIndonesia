@@ -33,8 +33,18 @@
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-txt-main mb-2">Gambar (URL)</label>
-            <input wire:model="featured_image" class="form-input w-full" placeholder="https://...">
+            <label class="block text-sm font-semibold text-txt-main mb-2">Gambar Unggulan</label>
+            <input type="file" wire:model="featured_image" accept="image/*" class="form-input w-full">
+            @if ($featured_image)
+                <div class="mt-2 text-xs text-txt-muted">
+                    @if ($featured_image instanceof \Illuminate\Http\UploadedFile)
+                        File dipilih: {{ $featured_image->getClientOriginalName() }}
+                    @else
+                        <img src="{{ $featured_image }}" class="w-32 h-20 object-cover rounded border mt-1">
+                    @endif
+                </div>
+            @endif
+            @error('featured_image') <span class="text-status-danger text-xs mt-1">{{ $message }}</span> @enderror
         </div>
 
         <label class="flex items-center gap-2">

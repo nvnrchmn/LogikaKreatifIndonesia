@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Blog;
 
 use App\Models\Post;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class Form extends Component
@@ -14,7 +16,7 @@ class Form extends Component
     public string $slug = '';
     public string $excerpt = '';
     public string $body = '';
-    public string $featured_image = '';
+    public $featured_image = null; // UploadedFile | string(url lama) | null
     public bool $is_published = false;
 
     public function mount(?Post $post = null): void
@@ -37,9 +39,17 @@ class Form extends Component
             'slug' => 'required|string|max:255|unique:posts,slug' . ($this->post?->id ? ',' . $this->post->id : ''),
             'excerpt' => 'nullable|string|max:500',
             'body' => 'required|string',
-            'featured_image' => 'nullable|string|max:500',
+            'featured_image' => 'nullable',
             'is_published' => 'boolean',
         ];
+    }
+
+    public function updatedFeaturedImage($value)
+    {
+        // validate manual karena rule di atas nullable (terima file atau string)
+        if ($value instanceof UploadedFile) {
+            $this->validateOnly('featured_image', ['featured_image' => 'image|max:5120']);
+        }
     }
 
     public function updatedTitle($value)
@@ -52,6 +62,21 @@ class Form extends Component
     public function save()
     {
         $data = $this->validate();
+
+        // Handle featured image upload to S3 (replace if new file uploaded)
+        if ($this->featured_image instanceof UploadedFile) {
+            if ($this->post && $this->post->exists && $this->post->featured_image) {
+                Storage::disk('s3')->delete($this->post->featured_image);
+            }
+            $path = 'logikraf/blog/' . Str::uuid() . '.' . $this->featured_image->getClientOriginalExtension();
+            Storage::disk('s3')->put($path, file_get_contents($this->featured_image->getRealPath()));
+            $data['featured_image'] = $path;
+        }
+        // jika bukan file (string URL lama / kosong) -> biarkan apa adanya
+        elseif (!is_string($this->featured_image)) {
+            unset($data['featured_image']);
+        }
+
         $data['published_at'] = $this->is_published ? now() : null;
 
         if ($this->post && $this->post->exists) {

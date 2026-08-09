@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
@@ -37,5 +38,18 @@ class Post extends Model
         return $query->where('is_published', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
+    }
+
+    public function getFeaturedImageUrlAttribute(): ?string
+    {
+        if (!$this->featured_image) {
+            return null;
+        }
+        // sudah S3 key (mengandung slash) -> buat URL
+        if (str_contains($this->featured_image, '/')) {
+            return Storage::disk('s3')->url($this->featured_image);
+        }
+        // legacy: URL eksternal lama
+        return $this->featured_image;
     }
 }

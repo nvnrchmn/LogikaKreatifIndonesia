@@ -3,7 +3,7 @@
         <a href="{{ route('blog.index') }}" class="text-txt-muted text-sm mb-8 inline-block hover:text-brand-primary transition-colors">&larr; Kembali ke Blog</a>
 
         @if ($post->featured_image)
-            <img src="{{ $post->featured_image }}" alt="{{ $post->title }}" class="w-full h-72 object-cover rounded-3xl mb-8 shadow-sm">
+            <img src="{{ $post->featured_image_url }}" alt="{{ $post->title }}" class="w-full h-72 object-cover rounded-3xl mb-8 shadow-sm">
         @endif
 
         <div class="flex items-center gap-3 mb-4">
@@ -52,7 +52,7 @@
                 @foreach ($related as $r)
                     <a href="{{ route('blog.show', $r) }}" class="card overflow-hidden hover:shadow-lg transition-shadow group">
                         @if ($r->featured_image)
-                            <img src="{{ $r->featured_image }}" alt="{{ $r->title }}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <img src="{{ $r->featured_image_url }}" alt="{{ $r->title }}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300">
                         @else
                             <div class="w-full h-40 bg-gradient-to-br from-brand-primary/20 to-brand-accent/20"></div>
                         @endif
