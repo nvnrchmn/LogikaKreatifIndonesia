@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'software',
                 'description' => 'Kami membangun aplikasi web dan mobile yang robust, scalable, dan aman menggunakan teknologi terkini. Dari sistem ERP perusahaan hingga platform e-commerce, tim developer kami siap mewujudkan solusi teknologi yang tepat untuk kebutuhan bisnis Anda.',
                 'short_description' => 'Aplikasi web & mobile yang robust, scalable, dan aman menggunakan teknologi terkini seperti Laravel, React, dan Flutter.',
-                'base_price' => 25000000,
+                'base_price' => 7500000,
                 'sort_order' => 1,
             ],
             [
@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'uiux',
                 'description' => 'Desain antarmuka yang tidak hanya indah secara visual, tetapi juga intuitif dan mudah digunakan. Kami menerapkan metodologi design thinking dan user research untuk memastikan setiap piksel memiliki tujuan dan setiap interaksi terasa natural.',
                 'short_description' => 'Desain antarmuka yang indah dan intuitif dengan metodologi design thinking dan user research yang mendalam.',
-                'base_price' => 15000000,
+                'base_price' => 3500000,
                 'sort_order' => 2,
             ],
             [
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'marketing',
                 'description' => 'Strategi pemasaran digital terintegrasi yang mencakup SEO, SEM, Social Media Marketing, dan Content Marketing. Kami membantu brand Anda menjangkau audiens yang tepat, meningkatkan visibilitas online, dan mengkonversi traffic menjadi pelanggan loyal.',
                 'short_description' => 'Strategi pemasaran digital terintegrasi: SEO, SEM, Social Media, dan Content Marketing untuk pertumbuhan bisnis.',
-                'base_price' => 8000000,
+                'base_price' => 1500000,
                 'sort_order' => 3,
             ],
             [
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
                 'category' => 'branding',
                 'description' => 'Membangun identitas brand yang kuat dan konsisten melalui desain logo, brand guideline, packaging, dan materi komunikasi visual. Kami membantu bisnis Anda tampil profesional dan memorable di benak konsumen.',
                 'short_description' => 'Identitas brand yang kuat dan konsisten: logo, brand guideline, packaging, dan visual communication.',
-                'base_price' => 12000000,
+                'base_price' => 2500000,
                 'sort_order' => 4,
             ],
         ];
