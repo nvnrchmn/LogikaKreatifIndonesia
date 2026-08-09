@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Portfolio extends Model
@@ -90,7 +91,7 @@ class Portfolio extends Model
     public function getThumbnailUrlAttribute(): ?string
     {
         return $this->thumbnail
-            ? asset('storage/' . $this->thumbnail)
+            ? Storage::disk('s3')->url($this->thumbnail)
             : null;
     }
 }

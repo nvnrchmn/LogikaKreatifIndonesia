@@ -130,14 +130,14 @@ class Index extends Component
             // Encode to webp
             $encoded = $image->toWebp(quality: 80);
             
-            $filename = 'portfolios/' . Str::uuid() . '.webp';
-            Storage::disk('public')->put($filename, $encoded->toString());
+            $filename = 'logikraf/portfolios/' . Str::uuid() . '.webp';
+            Storage::disk('s3')->put($filename, $encoded->toString());
             
             $data['thumbnail'] = $filename;
 
             // Delete old thumbnail if exists
             if ($this->existing_thumbnail) {
-                Storage::disk('public')->delete($this->existing_thumbnail);
+                Storage::disk('s3')->delete($this->existing_thumbnail);
             }
         }
 
