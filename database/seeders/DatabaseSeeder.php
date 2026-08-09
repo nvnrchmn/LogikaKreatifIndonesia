@@ -233,6 +233,9 @@ class DatabaseSeeder extends Seeder
         // ============================
         // Paket Website UMKM (checkout publik)
         // ============================
-        $this->call(PackageSeeder::class);
+        // ============================
+        // Demo Blog Post (for UI testing)
+        // ============================
+        $this->call(PostSeeder::class);
     }
 }
