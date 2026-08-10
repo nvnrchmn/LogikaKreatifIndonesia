@@ -21,11 +21,11 @@
                     <p class="text-xs text-txt-muted mb-3">Pilih *gateway* yang akan digunakan oleh klien saat melakukan pembayaran *invoice*. Anda bisa menggunakan mode Sandbox (bawaan) untuk simulasi.</p>
                     <div class="space-y-3">
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'xendit' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
-                            <input wire:model.live="paymentGateway" type="radio" name="paymentGateway" value="xendit" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
+                            <input wire:model.live="paymentGateway" wire:click="$set('paymentGateway', 'xendit')" type="radio" name="paymentGateway" value="xendit" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
                             <span class="font-medium text-txt-main">Xendit (Invoice URL)</span>
                         </label>
                         <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'midtrans' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
-                            <input wire:model.live="paymentGateway" type="radio" name="paymentGateway" value="midtrans" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
+                            <input wire:model.live="paymentGateway" wire:click="$set('paymentGateway', 'midtrans')" type="radio" name="paymentGateway" value="midtrans" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
                             <span class="font-medium text-txt-main">Midtrans (Snap Popup)</span>
                         </label>
                     </div>

@@ -59,6 +59,11 @@ class Index extends Component
         $this->mailFromAddress = Setting::get('mail_from_address', env('MAIL_FROM_ADDRESS', 'hello@logikraf.id'));
     }
 
+    public function updatedPaymentGateway($value)
+    {
+        $this->paymentGateway = $value;
+    }
+
     public function savePayment()
     {
         Setting::set('payment_gateway_driver', $this->paymentGateway);
