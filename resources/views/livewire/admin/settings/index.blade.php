@@ -57,7 +57,7 @@
             </div>
 
             <div class="mt-6 pt-4 border-t border-border-minimal">
-                <button type="button" wire:click="savePayment" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                <button type="button" wire:click="savePayment" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full">
                     <span wire:loading.remove wire:target="savePayment">Simpan Payment Gateway</span>
                     <span wire:loading wire:target="savePayment">Menyimpan...</span>
                 </button>
@@ -84,7 +84,7 @@
                     <textarea wire:model="companyAddress" rows="2" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Gedung Inovasi Lt. 3..."></textarea>
                 </div>
                 <div class="md:col-span-2 pt-2">
-                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full">
                         <span wire:loading.remove wire:target="saveContact">Simpan Kontak</span>
                         <span wire:loading wire:target="saveContact">Menyimpan...</span>
                     </button>
@@ -121,7 +121,7 @@
                 </div>
                 <div></div>
                 <div class="md:col-span-3 pt-2">
-                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full">
                         <span wire:loading.remove wire:target="saveProfile">Simpan Profil</span>
                         <span wire:loading wire:target="saveProfile">Menyimpan...</span>
                     </button>
@@ -167,7 +167,7 @@
                     @if(isset($errors) && $errors->has('mailFromAddress')) <p class="text-status-danger text-xs mt-1">{{ $errors->first('mailFromAddress') }}</p> @endif
                 </div>
                 <div class="md:col-span-2 pt-2">
-                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full">
                         <span wire:loading.remove wire:target="saveEmail">Simpan Pengaturan Email</span>
                         <span wire:loading wire:target="saveEmail">Menyimpan...</span>
                     </button>
