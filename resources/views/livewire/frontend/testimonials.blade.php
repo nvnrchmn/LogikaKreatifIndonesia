@@ -1,3 +1,4 @@
+<div>
 @if ($testimonials->isNotEmpty())
 <section class="py-20 bg-canvas-light">
     <div class="container-narrow">
@@ -24,3 +25,4 @@
     </div>
 </section>
 @endif
+</div>
