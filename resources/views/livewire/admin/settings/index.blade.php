@@ -53,7 +53,7 @@
 
                 </div>
                 <!-- Submit Button -->
-                <div class="flex justify-end pt-4 border-t border-border-minimal">
+                <div class="flex justify-end mt-8 pt-4 border-t border-border-minimal">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
                         Simpan Payment Gateway
                     </button>
