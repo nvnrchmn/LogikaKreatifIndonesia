@@ -146,7 +146,10 @@
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        document.addEventListener('livewire:initialized', () => {
+        // Catatan: Livewire v4 sudah me-fire 'livewire:initialized' sebelum script inline
+        // dieksekusi (script ini berada setelah @livewireScripts), jadi listener di-attach
+        // langsung tanpa menunggu event tersebut.
+        if (window.Livewire) {
             // Global simple toast swal
             Livewire.on('swal', (event) => {
                 const data = (Array.isArray(event) ? event[0] : (event.detail || event)) || {};
@@ -201,7 +204,7 @@
                     }
                 });
             });
-        });
+        }
     </script>
 </body>
 </html>
