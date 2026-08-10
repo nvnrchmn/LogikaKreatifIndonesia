@@ -66,6 +66,13 @@ class Index extends Component
 
     public function savePayment()
     {
+        $this->validate([
+            'midtransServerKey' => 'nullable|string',
+            'midtransClientKey' => 'nullable|string',
+            'xenditSecretKey' => 'nullable|string',
+            'xenditPublicKey' => 'nullable|string',
+        ]);
+
         Setting::set('payment_gateway_driver', $this->paymentGateway);
         Setting::set('midtrans_server_key', $this->midtransServerKey);
         Setting::set('midtrans_client_key', $this->midtransClientKey);
@@ -85,6 +92,12 @@ class Index extends Component
 
     public function saveContact()
     {
+        $this->validate([
+            'companyEmail' => 'required|email',
+            'companyPhone' => 'nullable|string',
+            'companyAddress' => 'nullable|string',
+        ]);
+
         Setting::set('company_email', $this->companyEmail);
         Setting::set('company_phone', $this->companyPhone);
         Setting::set('company_address', $this->companyAddress);
@@ -121,6 +134,13 @@ class Index extends Component
 
     public function saveEmail()
     {
+        $this->validate([
+            'mailHost' => 'nullable|string',
+            'mailPort' => 'nullable|numeric',
+            'mailUsername' => 'nullable|email',
+            'mailFromAddress' => 'required|email',
+        ]);
+
         Setting::set('mail_host', $this->mailHost);
         Setting::set('mail_port', $this->mailPort);
         Setting::set('mail_username', $this->mailUsername);

@@ -57,8 +57,9 @@
             </div>
 
             <div class="mt-6 pt-4 border-t border-border-minimal">
-                <button type="button" wire:click="savePayment" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
-                    Simpan Payment Gateway
+                <button type="button" wire:click="savePayment" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                    <span wire:loading.remove wire:target="savePayment">Simpan Payment Gateway</span>
+                    <span wire:loading wire:target="savePayment">Menyimpan...</span>
                 </button>
             </div>
         </section>
@@ -71,7 +72,8 @@
             <form wire:submit="saveContact" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-txt-main mb-2">Email Perusahaan</label>
-                    <input wire:model="companyEmail" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
+                    <input wire:model="companyEmail" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main {{ optional($errors)->has('companyEmail') ? 'border-status-danger' : '' }}" placeholder="hello@logikraf.id">
+                    @if(isset($errors) && $errors->has('companyEmail')) <p class="text-status-danger text-xs mt-1">{{ $errors->first('companyEmail') }}</p> @endif
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-txt-main mb-2">Nomor Telepon / WhatsApp</label>
@@ -81,9 +83,10 @@
                     <label class="block text-sm font-semibold text-txt-main mb-2">Alamat Kantor</label>
                     <textarea wire:model="companyAddress" rows="2" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Gedung Inovasi Lt. 3..."></textarea>
                 </div>
-                <div class="md:col-span-2 flex justify-end pt-2">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
-                        Simpan Kontak
+                <div class="md:col-span-2 pt-2">
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                        <span wire:loading.remove wire:target="saveContact">Simpan Kontak</span>
+                        <span wire:loading wire:target="saveContact">Menyimpan...</span>
                     </button>
                 </div>
             </form>
@@ -118,8 +121,9 @@
                 </div>
                 <div></div>
                 <div class="md:col-span-3 pt-2">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
-                        Simpan Profil
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                        <span wire:loading.remove wire:target="saveProfile">Simpan Profil</span>
+                        <span wire:loading wire:target="saveProfile">Menyimpan...</span>
                     </button>
                 </div>
             </form>
@@ -138,7 +142,8 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-txt-main mb-2">Mail Port</label>
-                    <input wire:model="mailPort" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="587">
+                    <input wire:model="mailPort" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main {{ optional($errors)->has('mailPort') ? 'border-status-danger' : '' }}" placeholder="587">
+                    @if(isset($errors) && $errors->has('mailPort')) <p class="text-status-danger text-xs mt-1">{{ $errors->first('mailPort') }}</p> @endif
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-txt-main mb-2">Mail Username (Email)</label>
@@ -158,11 +163,13 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-txt-main mb-2">Email Pengirim (From Address)</label>
-                    <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
+                    <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main {{ optional($errors)->has('mailFromAddress') ? 'border-status-danger' : '' }}" placeholder="hello@logikraf.id">
+                    @if(isset($errors) && $errors->has('mailFromAddress')) <p class="text-status-danger text-xs mt-1">{{ $errors->first('mailFromAddress') }}</p> @endif
                 </div>
                 <div class="md:col-span-2 pt-2">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
-                        Simpan Pengaturan Email
+                    <button type="submit" wire:loading.attr="disabled" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
+                        <span wire:loading.remove wire:target="saveEmail">Simpan Pengaturan Email</span>
+                        <span wire:loading wire:target="saveEmail">Menyimpan...</span>
                     </button>
                 </div>
             </form>
