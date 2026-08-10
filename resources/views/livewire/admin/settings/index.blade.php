@@ -10,7 +10,7 @@
         </div>
     @endif
 
-    <div class="space-y-6">
+    <div class="space-y-8">
         <!-- Card Payment Gateway -->
         <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
             <form wire:submit="savePayment" x-data="{ gateway: '{{ $paymentGateway }}' }">
