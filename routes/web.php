@@ -118,7 +118,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/finance', App\Livewire\Admin\Reports\Finance::class)->name('reports.finance');
         Route::get('/tickets', App\Livewire\Admin\Tickets\Index::class)->name('tickets.index');
         Route::get('/tickets/{ticket}', App\Livewire\Admin\Tickets\Show::class)->name('tickets.show');
-        Route::get('/settings', App\Livewire\Admin\Settings\Index::class)->name('settings.index');
+        Route::get('/settings', [\App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update');
         Route::get('/payment-hub/saas-apps', App\Livewire\Admin\PaymentHub\SaasApps::class)->name('payment-hub.saas-apps');
         Route::get('/payment-hub/transactions', App\Livewire\Admin\PaymentHub\Transactions::class)->name('payment-hub.transactions');
         Route::get('/payment-hub/api-docs', \App\Livewire\Admin\PaymentHub\ApiDocs::class)->name('payment-hub.api-docs');
