@@ -13,23 +13,21 @@
     <div class="space-y-6">
         <!-- Card Payment Gateway -->
         <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
-            <form wire:submit="savePayment">
+            <form wire:submit="savePayment" x-data="{ gateway: '{{ $paymentGateway }}' }">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Payment Gateway</h3>
                 
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-txt-main mb-2">Vendor Payment Gateway Aktif</label>
                     <p class="text-xs text-txt-muted mb-3">Pilih *gateway* yang akan digunakan oleh klien saat melakukan pembayaran *invoice*. Anda bisa menggunakan mode Sandbox (bawaan) untuk simulasi.</p>
-                    <select wire:model.live="paymentGateway" wire:change="$refresh" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
+                    <select x-model="gateway" @change="$wire.set('paymentGateway', gateway)" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
                         <option value="xendit">Xendit (Invoice URL)</option>
                         <option value="midtrans">Midtrans (Snap Popup)</option>
                     </select>
                 </div>
 
-                <div wire:key="cred-{{ $paymentGateway }}">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2 mt-8">Kredensial API</h3>
 
-                @if($paymentGateway === 'xendit')
-                <div class="mb-6 space-y-4 animate-scale-in" wire:key="xendit-cred">
+                <div class="mb-6 space-y-4 animate-scale-in" x-show="gateway === 'xendit'" style="display: {{ $paymentGateway === 'xendit' ? 'block' : 'none' }};">
                         <div>
                             <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Secret Key</label>
                             <input wire:model="xenditSecretKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_development_...">
@@ -40,10 +38,8 @@
                         </div>
                         <p class="text-xs text-txt-muted mt-2">Dapatkan dari dashboard Xendit pada menu Settings > API Keys.</p>
                     </div>
-                @endif
 
-                @if($paymentGateway === 'midtrans')
-                <div class="mb-6 space-y-4 animate-scale-in" wire:key="midtrans-cred">
+                <div class="mb-6 space-y-4 animate-scale-in" x-show="gateway === 'midtrans'" style="display: {{ $paymentGateway === 'midtrans' ? 'block' : 'none' }};">
                         <div>
                             <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Server Key</label>
                             <input wire:model="midtransServerKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-server-...">
@@ -54,7 +50,6 @@
                         </div>
                         <p class="text-xs text-txt-muted mt-2">Dapatkan dari dashboard Midtrans pada menu Settings > Access Keys.</p>
                     </div>
-                @endif
 
                 </div>
                 <!-- Submit Button -->
@@ -84,8 +79,6 @@
                         <label class="block text-sm font-semibold text-txt-main mb-2">Alamat Kantor</label>
                         <textarea wire:model="companyAddress" rows="2" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Gedung Inovasi Lt. 3..."></textarea>
                     </div>
-                </div>
-
                 <!-- Submit Button -->
                 <div class="flex justify-end pt-4 border-t border-border-minimal">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
@@ -174,8 +167,6 @@
                             <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
                         </div>
                     </div>
-                </div>
-
                 <!-- Submit Button -->
                 <div class="flex justify-end pt-4 border-t border-border-minimal">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
