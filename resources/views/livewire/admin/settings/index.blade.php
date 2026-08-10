@@ -1,4 +1,5 @@
-<div>
+<div class="max-w-5xl">
+    {{-- Page header --}}
     <div class="mb-6">
         <h1 class="font-display text-2xl font-bold text-txt-main">Pengaturan Global</h1>
         <p class="text-txt-muted text-sm mt-1">Kelola preferensi dan pengaturan sistem utama.</p>
@@ -10,169 +11,162 @@
         </div>
     @endif
 
-    <div class="space-y-8">
-        <!-- Card Payment Gateway -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
-            <form wire:submit="savePayment" x-data="{ gateway: '{{ $paymentGateway }}' }">
-                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Payment Gateway</h3>
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-txt-main mb-2">Vendor Payment Gateway Aktif</label>
-                    <p class="text-xs text-txt-muted mb-3">Pilih *gateway* yang akan digunakan oleh klien saat melakukan pembayaran *invoice*. Anda bisa menggunakan mode Sandbox (bawaan) untuk simulasi.</p>
-                    <select x-model="gateway" @change="$wire.set('paymentGateway', gateway)" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
-                        <option value="xendit">Xendit (Invoice URL)</option>
-                        <option value="midtrans">Midtrans (Snap Popup)</option>
-                    </select>
+    {{-- Single card container: semua section di dalam 1 card, tombol di footer --}}
+    <div class="bg-white rounded-xl border border-border-minimal shadow-sm divide-y divide-border-minimal">
+
+        {{-- ============ PAYMENT GATEWAY ============ --}}
+        <section class="p-6" x-data="{ gateway: '{{ $paymentGateway }}' }">
+            <header class="mb-4">
+                <h3 class="font-display font-semibold text-lg text-txt-main">Payment Gateway</h3>
+                <p class="text-xs text-txt-muted mt-1">Pilih gateway untuk invoice klien. Mode Sandbox tersedia untuk simulasi.</p>
+            </header>
+
+            <div class="mb-6 max-w-md">
+                <label class="block text-sm font-semibold text-txt-main mb-2">Vendor Payment Gateway Aktif</label>
+                <select x-model="gateway" @change="$wire.set('paymentGateway', gateway)"
+                        class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
+                    <option value="xendit">Xendit (Invoice URL)</option>
+                    <option value="midtrans">Midtrans (Snap Popup)</option>
+                </select>
+            </div>
+
+            <h4 class="font-display font-semibold text-txt-main mb-3 text-sm uppercase tracking-wide text-txt-muted">Kredensial API</h4>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-show="gateway === 'xendit'" style="display: {{ $paymentGateway === 'xendit' ? 'grid' : 'none' }};">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Secret Key</label>
+                    <input wire:model="xenditSecretKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_development_...">
                 </div>
-
-                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2 mt-8">Kredensial API</h3>
-
-                <div class="mb-6 space-y-4 animate-scale-in" x-show="gateway === 'xendit'" style="display: {{ $paymentGateway === 'xendit' ? 'block' : 'none' }};">
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Secret Key</label>
-                            <input wire:model="xenditSecretKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_development_...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Public Key</label>
-                            <input wire:model="xenditPublicKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_public_development_...">
-                        </div>
-                        <p class="text-xs text-txt-muted mt-2">Dapatkan dari dashboard Xendit pada menu Settings > API Keys.</p>
-                    </div>
-
-                <div class="mb-6 space-y-4 animate-scale-in" x-show="gateway === 'midtrans'" style="display: {{ $paymentGateway === 'midtrans' ? 'block' : 'none' }};">
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Server Key</label>
-                            <input wire:model="midtransServerKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-server-...">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Client Key</label>
-                            <input wire:model="midtransClientKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-client-...">
-                        </div>
-                        <p class="text-xs text-txt-muted mt-2">Dapatkan dari dashboard Midtrans pada menu Settings > Access Keys.</p>
-                    </div>
-
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Public Key</label>
+                    <input wire:model="xenditPublicKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_public_development_...">
                 </div>
-                <!-- Submit Button -->
-                <div class="flex justify-end mt-8 pt-4 border-t border-border-minimal">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
-                        Simpan Payment Gateway
-                    </button>
-                </div>
-            </form>
-        </div>
+                <p class="text-xs text-txt-muted md:col-span-2">Dapatkan dari dashboard Xendit pada menu Settings &gt; API Keys.</p>
+            </div>
 
-        <!-- Card Kontak Logikraf -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
-            <form wire:submit="saveContact">
-                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Kontak Logikraf</h3>
-                
-                <div class="mb-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Email Perusahaan</label>
-                        <input wire:model="companyEmail" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Nomor Telepon / WhatsApp</label>
-                        <input wire:model="companyPhone" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="+62 811-1234-5678">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Alamat Kantor</label>
-                        <textarea wire:model="companyAddress" rows="2" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Gedung Inovasi Lt. 3..."></textarea>
-                    </div>
-                <!-- Submit Button -->
-                <div class="flex justify-end pt-4 border-t border-border-minimal">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" x-show="gateway === 'midtrans'" style="display: {{ $paymentGateway === 'midtrans' ? 'grid' : 'none' }};">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Server Key</label>
+                    <input wire:model="midtransServerKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-server-...">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Client Key</label>
+                    <input wire:model="midtransClientKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-client-...">
+                </div>
+                <p class="text-xs text-txt-muted md:col-span-2">Dapatkan dari dashboard Midtrans pada menu Settings &gt; Access Keys.</p>
+            </div>
+
+            <div class="flex justify-end mt-6 pt-4 border-t border-border-minimal">
+                <button type="button" wire:click="savePayment" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+                    Simpan Payment Gateway
+                </button>
+            </div>
+        </section>
+
+        {{-- ============ KONTAK ============ --}}
+        <section class="p-6">
+            <header class="mb-4">
+                <h3 class="font-display font-semibold text-lg text-txt-main">Kontak Logikraf</h3>
+            </header>
+            <form wire:submit="saveContact" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Email Perusahaan</label>
+                    <input wire:model="companyEmail" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Nomor Telepon / WhatsApp</label>
+                    <input wire:model="companyPhone" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="+62 811-1234-5678">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Alamat Kantor</label>
+                    <textarea wire:model="companyAddress" rows="2" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main resize-none" placeholder="Gedung Inovasi Lt. 3..."></textarea>
+                </div>
+                <div class="md:col-span-2 flex justify-end pt-2">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
                         Simpan Kontak
                     </button>
                 </div>
             </form>
-        </div>
-        
-        <!-- Card Profil Perusahaan (Invoice) -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
-            <form wire:submit="saveProfile">
-                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Profil Perusahaan (Untuk Invoice)</h3>
-                <p class="text-xs text-txt-muted mb-6">Data ini akan tampil di header & informasi pembayaran pada PDF invoice/quotation.</p>
+        </section>
 
-                <div class="mb-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Nama Perusahaan</label>
-                        <input wire:model="companyName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="PT. Logika Kreatif Indonesia">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">NPWP</label>
-                        <input wire:model="companyNpwp" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="01.234.567.8-901.000">
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Nama Bank</label>
-                            <input wire:model="companyBankName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="BCA">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">No. Rekening</label>
-                            <input wire:model="companyBankAccount" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="1234567890">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Atas Nama</label>
-                            <input wire:model="companyBankHolder" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="Nova Nurachman">
-                        </div>
-                    </div>
+        {{-- ============ PROFIL PERUSAHAAN ============ --}}
+        <section class="p-6">
+            <header class="mb-4">
+                <h3 class="font-display font-semibold text-lg text-txt-main">Profil Perusahaan (Untuk Invoice)</h3>
+                <p class="text-xs text-txt-muted mt-1">Data ini tampil di header &amp; informasi pembayaran pada PDF invoice/quotation.</p>
+            </header>
+            <form wire:submit="saveProfile" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Nama Perusahaan</label>
+                    <input wire:model="companyName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="PT. Logika Kreatif Indonesia">
                 </div>
-
-                <div class="flex justify-end pt-4 border-t border-border-minimal">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">NPWP</label>
+                    <input wire:model="companyNpwp" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="01.234.567.8-901.000">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Nama Bank</label>
+                    <input wire:model="companyBankName" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="BCA">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">No. Rekening</label>
+                    <input wire:model="companyBankAccount" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="1234567890">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Atas Nama</label>
+                    <input wire:model="companyBankHolder" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="Nova Nurachman">
+                </div>
+                <div></div>
+                <div class="md:col-span-3 flex justify-end pt-2">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
                         Simpan Profil
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
 
-        <!-- Card Pengaturan SMTP Email -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
-            <form wire:submit="saveEmail">
-                <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Pengaturan SMTP Email</h3>
-                <p class="text-xs text-txt-muted mb-6">Konfigurasi *server* email yang digunakan untuk mengirim notifikasi kepada klien.</p>
-                
-                <div class="mb-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Host</label>
-                            <input wire:model="mailHost" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="smtp.gmail.com">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Port</label>
-                            <input wire:model="mailPort" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="587">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Mail Username (Email)</label>
-                        <input wire:model="mailUsername" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="email@domain.com">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-txt-main mb-2">Mail Password (App Password)</label>
-                        <input wire:model="mailPassword" type="password" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="********">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Mail Encryption</label>
-                            <select wire:model="mailEncryption" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
-                                <option value="tls">TLS</option>
-                                <option value="ssl">SSL</option>
-                                <option value="">None</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-txt-main mb-2">Email Pengirim (From Address)</label>
-                            <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
-                        </div>
-                    </div>
-                <!-- Submit Button -->
-                <div class="flex justify-end pt-4 border-t border-border-minimal">
+        {{-- ============ SMTP EMAIL ============ --}}
+        <section class="p-6">
+            <header class="mb-4">
+                <h3 class="font-display font-semibold text-lg text-txt-main">Pengaturan SMTP Email</h3>
+                <p class="text-xs text-txt-muted mt-1">Konfigurasi server email untuk notifikasi klien.</p>
+            </header>
+            <form wire:submit="saveEmail" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Mail Host</label>
+                    <input wire:model="mailHost" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="smtp.gmail.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Mail Port</label>
+                    <input wire:model="mailPort" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="587">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Mail Username (Email)</label>
+                    <input wire:model="mailUsername" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="email@domain.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Mail Password (App Password)</label>
+                    <input wire:model="mailPassword" type="password" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="********">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Mail Encryption</label>
+                    <select wire:model="mailEncryption" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
+                        <option value="tls">TLS</option>
+                        <option value="ssl">SSL</option>
+                        <option value="">None</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-txt-main mb-2">Email Pengirim (From Address)</label>
+                    <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
+                </div>
+                <div class="md:col-span-2 flex justify-end pt-2">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
                         Simpan Pengaturan Email
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
+
     </div>
 </div>
