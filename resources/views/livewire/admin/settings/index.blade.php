@@ -19,22 +19,17 @@
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-txt-main mb-2">Vendor Payment Gateway Aktif</label>
                     <p class="text-xs text-txt-muted mb-3">Pilih *gateway* yang akan digunakan oleh klien saat melakukan pembayaran *invoice*. Anda bisa menggunakan mode Sandbox (bawaan) untuk simulasi.</p>
-                    <div class="space-y-3">
-                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'xendit' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
-                            <input wire:model.live="paymentGateway" wire:click="$set('paymentGateway', 'xendit')" type="radio" name="paymentGateway" value="xendit" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
-                            <span class="font-medium text-txt-main">Xendit (Invoice URL)</span>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'midtrans' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
-                            <input wire:model.live="paymentGateway" wire:click="$set('paymentGateway', 'midtrans')" type="radio" name="paymentGateway" value="midtrans" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
-                            <span class="font-medium text-txt-main">Midtrans (Snap Popup)</span>
-                        </label>
-                    </div>
+                    <select wire:model.live="paymentGateway" wire:change="$refresh" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main">
+                        <option value="xendit">Xendit (Invoice URL)</option>
+                        <option value="midtrans">Midtrans (Snap Popup)</option>
+                    </select>
                 </div>
 
+                <div wire:key="cred-{{ $paymentGateway }}">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2 mt-8">Kredensial API</h3>
 
                 @if($paymentGateway === 'xendit')
-                    <div class="mb-6 space-y-4 animate-scale-in">
+                <div class="mb-6 space-y-4 animate-scale-in" wire:key="xendit-cred">
                         <div>
                             <label class="block text-sm font-semibold text-txt-main mb-2">Xendit Secret Key</label>
                             <input wire:model="xenditSecretKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="xnd_development_...">
@@ -48,7 +43,7 @@
                 @endif
 
                 @if($paymentGateway === 'midtrans')
-                    <div class="mb-6 space-y-4 animate-scale-in">
+                <div class="mb-6 space-y-4 animate-scale-in" wire:key="midtrans-cred">
                         <div>
                             <label class="block text-sm font-semibold text-txt-main mb-2">Midtrans Server Key</label>
                             <input wire:model="midtransServerKey" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="SB-Mid-server-...">
@@ -61,6 +56,7 @@
                     </div>
                 @endif
 
+                </div>
                 <!-- Submit Button -->
                 <div class="flex justify-end pt-4 border-t border-border-minimal">
                     <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
