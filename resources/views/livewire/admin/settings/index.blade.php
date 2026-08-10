@@ -20,12 +20,16 @@
                     <label class="block text-sm font-semibold text-txt-main mb-2">Vendor Payment Gateway Aktif</label>
                     <p class="text-xs text-txt-muted mb-3">Pilih *gateway* yang akan digunakan oleh klien saat melakukan pembayaran *invoice*. Anda bisa menggunakan mode Sandbox (bawaan) untuk simulasi.</p>
                     <div class="space-y-3">
-                        <label class="flex items-center gap-3 p-3 border border-border-minimal rounded-lg cursor-pointer hover:bg-canvas-light transition-colors">
-                            <input wire:model.live="paymentGateway" type="radio" value="xendit" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
+                        <label wire:click="$set('paymentGateway', 'xendit')" class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'xendit' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
+                            <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center {{ $paymentGateway === 'xendit' ? 'border-brand-primary' : 'border-border-minimal' }}">
+                                @if($paymentGateway === 'xendit')<span class="w-2 h-2 rounded-full bg-brand-primary"></span>@endif
+                            </span>
                             <span class="font-medium text-txt-main">Xendit (Invoice URL)</span>
                         </label>
-                        <label class="flex items-center gap-3 p-3 border border-border-minimal rounded-lg cursor-pointer hover:bg-canvas-light transition-colors">
-                            <input wire:model.live="paymentGateway" type="radio" value="midtrans" class="w-4 h-4 text-brand-primary focus:ring-brand-primary border-border-minimal">
+                        <label wire:click="$set('paymentGateway', 'midtrans')" class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors {{ $paymentGateway === 'midtrans' ? 'border-brand-primary bg-brand-primary/5' : 'border-border-minimal hover:bg-canvas-light' }}">
+                            <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center {{ $paymentGateway === 'midtrans' ? 'border-brand-primary' : 'border-border-minimal' }}">
+                                @if($paymentGateway === 'midtrans')<span class="w-2 h-2 rounded-full bg-brand-primary"></span>@endif
+                            </span>
                             <span class="font-medium text-txt-main">Midtrans (Snap Popup)</span>
                         </label>
                     </div>
