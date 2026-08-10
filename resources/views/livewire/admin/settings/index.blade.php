@@ -87,10 +87,9 @@
                 </div>
             </form>
         </div>
-    </div>
         
         <!-- Card Profil Perusahaan (Invoice) -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl mt-6">
+        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
             <form wire:submit="saveProfile">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Profil Perusahaan (Untuk Invoice)</h3>
                 <p class="text-xs text-txt-muted mb-6">Data ini akan tampil di header & informasi pembayaran pada PDF invoice/quotation.</p>
@@ -129,7 +128,7 @@
         </div>
 
         <!-- Card Pengaturan SMTP Email -->
-        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl mt-6">
+        <div class="bg-white p-6 rounded-xl border border-border-minimal shadow-sm max-w-3xl">
             <form wire:submit="saveEmail">
                 <h3 class="font-display font-semibold text-lg text-txt-main mb-4 border-b border-border-minimal pb-2">Pengaturan SMTP Email</h3>
                 <p class="text-xs text-txt-muted mb-6">Konfigurasi *server* email yang digunakan untuk mengirim notifikasi kepada klien.</p>
