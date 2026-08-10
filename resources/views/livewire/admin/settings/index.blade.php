@@ -56,8 +56,8 @@
                 <p class="text-xs text-txt-muted md:col-span-2">Dapatkan dari dashboard Midtrans pada menu Settings &gt; Access Keys.</p>
             </div>
 
-            <div class="flex justify-end mt-6 pt-4 border-t border-border-minimal">
-                <button type="button" wire:click="savePayment" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+            <div class="mt-6 pt-4 border-t border-border-minimal">
+                <button type="button" wire:click="savePayment" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
                     Simpan Payment Gateway
                 </button>
             </div>
@@ -117,8 +117,8 @@
                     <input wire:model="companyBankHolder" type="text" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="Nova Nurachman">
                 </div>
                 <div></div>
-                <div class="md:col-span-3 flex justify-end pt-2">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+                <div class="md:col-span-3 pt-2">
+                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
                         Simpan Profil
                     </button>
                 </div>
@@ -160,8 +160,8 @@
                     <label class="block text-sm font-semibold text-txt-main mb-2">Email Pengirim (From Address)</label>
                     <input wire:model="mailFromAddress" type="email" class="w-full px-4 py-2 bg-canvas-light border border-border-minimal rounded-lg text-sm focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all text-txt-main" placeholder="hello@logikraf.id">
                 </div>
-                <div class="md:col-span-2 flex justify-end pt-2">
-                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors">
+                <div class="md:col-span-2 pt-2">
+                    <button type="submit" class="btn bg-brand-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-primary/90 transition-colors w-full md:w-auto">
                         Simpan Pengaturan Email
                     </button>
                 </div>
