@@ -12,10 +12,18 @@
     @endif
 
     {{-- Single card container: semua section di dalam 1 card, tombol di footer --}}
-    <div class="bg-white rounded-xl border border-border-minimal shadow-sm divide-y divide-border-minimal">
+    <div class="bg-white rounded-xl border border-border-minimal shadow-sm" x-data="{ tab: 'payment', gateway: '{{ $paymentGateway }}' }">
+
+        {{-- Tab navigation --}}
+        <div class="flex border-b border-border-minimal overflow-x-auto">
+            <button type="button" @click="tab = 'payment'" :class="tab === 'payment' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-txt-muted hover:text-txt-main'" class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap">Payment Gateway</button>
+            <button type="button" @click="tab = 'kontak'" :class="tab === 'kontak' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-txt-muted hover:text-txt-main'" class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap">Kontak Logikraf</button>
+            <button type="button" @click="tab = 'profil'" :class="tab === 'profil' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-txt-muted hover:text-txt-main'" class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap">Profil Perusahaan</button>
+            <button type="button" @click="tab = 'smtp'" :class="tab === 'smtp' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-txt-muted hover:text-txt-main'" class="px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap">SMTP Email</button>
+        </div>
 
         {{-- ============ PAYMENT GATEWAY ============ --}}
-        <section class="p-6" x-data="{ gateway: '{{ $paymentGateway }}' }">
+        <section class="p-6" x-show="tab === 'payment'">
             <header class="mb-4">
                 <h3 class="font-display font-semibold text-lg text-txt-main">Payment Gateway</h3>
                 <p class="text-xs text-txt-muted mt-1">Pilih gateway untuk invoice klien. Mode Sandbox tersedia untuk simulasi.</p>
@@ -65,7 +73,7 @@
         </section>
 
         {{-- ============ KONTAK ============ --}}
-        <section class="p-6">
+        <section class="p-6" x-show="tab === 'kontak'">
             <header class="mb-4">
                 <h3 class="font-display font-semibold text-lg text-txt-main">Kontak Logikraf</h3>
             </header>
@@ -93,7 +101,7 @@
         </section>
 
         {{-- ============ PROFIL PERUSAHAAN ============ --}}
-        <section class="p-6">
+        <section class="p-6" x-show="tab === 'profil'">
             <header class="mb-4">
                 <h3 class="font-display font-semibold text-lg text-txt-main">Profil Perusahaan (Untuk Invoice)</h3>
                 <p class="text-xs text-txt-muted mt-1">Data ini tampil di header &amp; informasi pembayaran pada PDF invoice/quotation.</p>
@@ -130,7 +138,7 @@
         </section>
 
         {{-- ============ SMTP EMAIL ============ --}}
-        <section class="p-6">
+        <section class="p-6" x-show="tab === 'smtp'">
             <header class="mb-4">
                 <h3 class="font-display font-semibold text-lg text-txt-main">Pengaturan SMTP Email</h3>
                 <p class="text-xs text-txt-muted mt-1">Konfigurasi server email untuk notifikasi klien.</p>
