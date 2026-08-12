@@ -49,11 +49,27 @@ export default function PaymentHubPage() {
           <h2 className="font-display font-bold text-text-main mb-4">Buat Invoice {g.name}</h2>
 
           {g.id === 'midtrans' ? (
-            <p className="text-sm text-text-muted">
-              {g.policies
-                ? `${g.name} terhubung. Snap.js aktif saat server key dikonfigurasi.`
-                : `${g.name} terhubung.`}
-            </p>
+            <form onSubmit={e => submit(e, g.id)} className="grid gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-1">
+                <label className="label">Order ID</label>
+                <input className="form-input" placeholder="LK-001" required value={form.external_id} onChange={e => set('external_id', e.target.value)} />
+              </div>
+              <div className="sm:col-span-1">
+                <label className="label">Amount (IDR)</label>
+                <input className="form-input" type="number" min="1" placeholder="100000" required value={form.amount} onChange={e => set('amount', e.target.value)} />
+              </div>
+              <div className="sm:col-span-1">
+                <label className="label">Payer Email</label>
+                <input className="form-input" type="email" placeholder="client@email.com" required value={form.payer_email} onChange={e => set('payer_email', e.target.value)} />
+              </div>
+              <div className="sm:col-span-1">
+                <label className="label">Deskripsi</label>
+                <input className="form-input" placeholder="Pembayaran milestone 1" value={form.description} onChange={e => set('description', e.target.value)} />
+              </div>
+              <button disabled={loading} className="btn-primary sm:col-span-2">
+                {loading && activeId === g.id ? 'Memproses...' : 'Buat Invoice'}
+              </button>
+            </form>
           ) : (
             <form onSubmit={e => submit(e, g.id)} className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-1">
