@@ -31,7 +31,7 @@ export default function TenantPaymentAccountsPage() {
   }, [])
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto admin-page">
         <div>
           <h1 className="text-2xl font-display font-extrabold text-text-main">Merchant Account</h1>
           <p className="text-text-muted text-sm mt-0.5">

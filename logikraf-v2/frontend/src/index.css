@@ -68,6 +68,15 @@
   .input-error { @apply border-status-danger ring-2 ring-status-danger/20; }
   .gradient-dark-bottom { background: linear-gradient(to bottom, transparent, var(--color-canvas-dark)); }
   .gradient-radial-hero { background: radial-gradient(ellipse at center, rgba(0, 82, 255, 0.15) 0%, transparent 70%); }
+
+  /* Compact admin content: better readability (Nielsen #8 minimalist, #1 visibility) */
+  .admin-page { @apply space-y-5; }
+  .admin-page h1 { @apply text-xl font-bold text-text-main; }
+  .admin-prose { @apply text-sm leading-relaxed text-text-muted; }
+  .admin-prose strong { @apply text-text-main font-semibold; }
+  .table-compact th { @apply px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-text-muted; }
+  .table-compact td { @apply px-3 py-2 text-sm text-text-main align-middle; }
+  .stat-card { @apply bg-white rounded-xl border border-border-minimal shadow-sm p-4; }
 }
 
 @layer utilities {
@@ -75,9 +84,11 @@
   .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
   .animate-slide-in-left { animation: slideInLeft 0.6s ease-out forwards; }
   .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+  .animate-slide-in-right { animation: slideInRight 0.28s ease-out forwards; }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
