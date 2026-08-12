@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PublicLayout from '../../components/layout/PublicLayout'
 
 interface Package {
@@ -13,6 +14,8 @@ interface Package {
 }
 
 export default function PackagesPage() {
+  const [searchParams] = useSearchParams()
+  const paid = searchParams.get('status') === 'success'
   const [items, setItems] = useState<Package[]>([])
   const [gateways, setGateways] = useState<{id:string;name:string}[]>([])
   const [selected, setSelected] = useState<number | null>(null)
@@ -96,6 +99,12 @@ export default function PackagesPage() {
               Pilih paket layanan yang sesuai dengan skala bisnis Anda. Pembayaran aman dan terverifikasi secara otomatis.
             </p>
           </div>
+
+          {paid && (
+            <div className="mb-8 p-4 rounded-2xl bg-status-success/10 border border-status-success/30 text-status-success text-sm font-medium text-center">
+              Pembayaran berhasil! Tim kami akan segera menghubungi Anda. Terima kasih.
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-20">
             {items.map(p => (

@@ -156,12 +156,15 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 				"name":     orDefault(in.Description, "Logikraf Package"),
 			},
 		},
-		"customer_details": map[string]any{
-			"first_name": orDefault(in.FirstName, "Customer"),
-			"email":      orDefault(in.Email, "customer@example.com"),
-			"phone":      in.Phone,
+			"customer_details": map[string]any{
+				"first_name": orDefault(in.FirstName, "Customer"),
+				"email":      orDefault(in.Email, "customer@example.com"),
+				"phone":      in.Phone,
+			},
+			"callbacks": map[string]any{
+				"finish_redirect_url": "https://" + c.Host() + "/paket?status=success",
 		},
-	})
+		})
 
 	req, err := http.NewRequest(http.MethodPost, baseURL+"/snap/v1/transactions", bytes.NewReader(body))
 	if err != nil {
