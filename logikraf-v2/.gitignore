@@ -1,5 +1,6 @@
 # Build artifacts
 /bin/
+/server
 /frontend-dist/
 /frontend/dist/
 
