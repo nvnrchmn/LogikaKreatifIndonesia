@@ -161,6 +161,7 @@ func main() {
 	admin.Get("/payment-reconciliation", handler.GetReconciliation)
 	admin.Post("/payment-transactions/:id/refund", handler.RefundPaymentTransaction)
 	admin.Get("/transactions/:id", handler.GetTransactionByID)
+	admin.Get("/transactions", handler.GetTransactions)
 	admin.Post("/transactions", handler.CreateTransaction)
 	admin.Put("/transactions/:id", handler.UpdateTransaction)
 	admin.Delete("/transactions/:id", handler.DeleteTransaction)
