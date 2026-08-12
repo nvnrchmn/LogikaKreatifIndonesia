@@ -1,0 +1,116 @@
+package handler
+
+import (
+	"bytes"
+	"fmt"
+
+	"github.com/go-pdf/fpdf"
+	"github.com/logikraf/logikraf-v2/internal/domain/model"
+
+	"github.com/gofiber/fiber/v3"
+)
+
+func GetInvoices(c fiber.Ctx) error {
+	var items []model.Invoice
+	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	return c.JSON(items)
+}
+
+func CreateInvoice(c fiber.Ctx) error {
+	var input model.Invoice
+	if err := c.Bind().JSON(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
+	}
+	if input.InvoiceNumber == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "invoice_number required"})
+	}
+	if input.Status == "" {
+		input.Status = "draft"
+	}
+	if input.Type == "" {
+		input.Type = "invoice"
+	}
+	if err := model.DB.Create(&input).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	return c.Status(201).JSON(input)
+}
+
+func UpdateInvoice(c fiber.Ctx) error {
+	id := c.Params("id")
+	var input model.Invoice
+	if err := c.Bind().JSON(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
+	}
+	var inv model.Invoice
+	if err := model.DB.First(&inv, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+	inv.InvoiceNumber = input.InvoiceNumber
+	inv.Type = input.Type
+	inv.Status = input.Status
+	inv.Total = input.Total
+	inv.OrderID = input.OrderID
+	inv.IssueDate = input.IssueDate
+	inv.DueDate = input.DueDate
+	model.DB.Save(&inv)
+	return c.JSON(inv)
+}
+
+func DeleteInvoice(c fiber.Ctx) error {
+	id := c.Params("id")
+	if err := model.DB.Delete(&model.Invoice{}, id).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	return c.SendStatus(204)
+}
+
+// DownloadInvoicePDF renders a single invoice as a PDF nota.
+func DownloadInvoicePDF(c fiber.Ctx) error {
+	var inv model.Invoice
+	if err := model.DB.First(&inv, c.Params("id")).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 16)
+	pdf.Cell(0, 10, "INVOICE "+inv.InvoiceNumber)
+	pdf.Ln(14)
+
+	pdf.SetFont("Arial", "", 11)
+	for _, row := range [][2]string{
+		{"Nomor", inv.InvoiceNumber},
+		{"Tipe", inv.Type},
+		{"Status", inv.Status},
+	} {
+		pdf.Cell(40, 7, row[0])
+		pdf.Cell(0, 7, ": "+row[1])
+		pdf.Ln(7)
+	}
+	if inv.IssueDate != nil {
+		pdf.Cell(40, 7, "Tanggal")
+		pdf.Cell(0, 7, ": "+inv.IssueDate.Format("2006-01-02"))
+		pdf.Ln(7)
+	}
+	if inv.DueDate != nil {
+		pdf.Cell(40, 7, "Jatuh Tempo")
+		pdf.Cell(0, 7, ": "+inv.DueDate.Format("2006-01-02"))
+		pdf.Ln(7)
+	}
+	pdf.Ln(4)
+	pdf.SetFont("Arial", "B", 12)
+	pdf.Cell(40, 8, "TOTAL")
+	pdf.Cell(0, 8, fmt.Sprintf(": Rp %d", inv.Total))
+
+	// ponytail: single-page nota; paginate when line items are added
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	c.Set("Content-Type", "application/pdf")
+	c.Set("Content-Disposition", `attachment; filename="invoice-`+inv.InvoiceNumber+`.pdf"`)
+	return c.Send(buf.Bytes())
+}
