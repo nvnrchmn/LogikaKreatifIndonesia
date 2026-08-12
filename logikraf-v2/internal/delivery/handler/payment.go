@@ -308,6 +308,7 @@ func XenditWebhook(c fiber.Ctx) error {
 			pt.SettledAt = &now
 			model.DB.Save(&pt)
 		}
+		notifySBDigital(ref, "SETTLED")
 	}
 	return c.JSON(fiber.Map{"status": "ok"})
 }
@@ -363,7 +364,32 @@ func MidtransWebhook(c fiber.Ctx) error {
 	}
 	// legacy generic ledger (kept for backward compat with old orders)
 	upsertTransaction(p.OrderID, "midtrans", status, 0)
+	if status == "settled" {
+		notifySBDigital(p.OrderID, "SETTLED")
+	}
 	return c.JSON(fiber.Map{"status": "ok"})
+}
+
+// notifySBDigital forwards a settled payment back to the SB Digital SaaS webhook
+// so its invoices/subscriptions get marked paid. ponytail: single tenant target
+// via settings; fan-out to multiple SaaS apps if more tenants onboard.
+func notifySBDigital(externalID, status string) {
+	url := setting("sbdigital_webhook_url", "logikraf")
+	secret := setting("sbdigital_webhook_secret", "logikraf")
+	if url == "" {
+		return
+	}
+	body, _ := json.Marshal(map[string]string{"external_id": externalID, "status": status})
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if secret != "" {
+		req.Header.Set("X-Logikraf-Signature", secret)
+	}
+	client := &http.Client{Timeout: 10 * time.Second}
+	client.Do(req) // ponytail: fire-and-forget; SB Digital retries on its side
 }
 
 // ForcePasswordReset resets a user's password to the onboarding default.

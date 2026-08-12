@@ -53,7 +53,8 @@ export default function PaymentLedgerPage() {
         ) : rows.length === 0 ? (
           <div className="p-6 text-text-muted text-sm">Belum ada transaksi.</div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
             <thead className="bg-bg-soft text-text-muted">
               <tr>
                 <th className="text-left font-medium px-4 py-3">Order</th>
@@ -89,6 +90,7 @@ export default function PaymentLedgerPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
