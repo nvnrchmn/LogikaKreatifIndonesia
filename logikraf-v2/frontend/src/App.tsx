@@ -69,7 +69,6 @@ export default function App() {
       }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
-        <Route path="time-tracking" element={<AdminResourcePage />} />
         <Route path="reports" element={<AdminReportsPage />} />
         <Route path="payment-hub" element={<AdminPaymentHubPage />} />
         <Route path="merchant-accounts" element={<AdminTenantPaymentAccountsPage />} />

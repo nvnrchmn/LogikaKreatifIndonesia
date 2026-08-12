@@ -233,21 +233,4 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       { name: 'status', label: 'Status', type: 'select', options: [{ value: 'pending', label: 'Pending' }, { value: 'paid', label: 'Paid' }, { value: 'failed', label: 'Failed' }, { value: 'refunded', label: 'Refunded' }] },
     ],
   },
-  'time-tracking': {
-    resource: 'time-tracking', title: 'Time Tracking', endpoint: '/api/order-tasks',
-    emptyRow: 'Belum ada task.',
-    columns: [
-      { id: 'order_id', label: 'Order' },
-      { id: 'title', label: 'Judul' },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || '-' },
-      { id: 'position', label: 'Posisi', render: (r: any) => r.position || 0 },
-    ],
-    formFields: [
-      { name: 'order_id', label: 'Order ID', type: 'number', required: true },
-      { name: 'title', label: 'Judul', required: true },
-      { name: 'description', label: 'Deskripsi', type: 'textarea', rows: 3 },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'todo', label: 'To Do' }, { value: 'in_progress', label: 'In Progress' }, { value: 'done', label: 'Done' }, { value: 'blocked', label: 'Blocked' }] },
-      { name: 'position', label: 'Posisi', type: 'number' },
-    ],
-  },
 }

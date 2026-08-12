@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	if err := db.AutoMigrate(&model.Transaction{}, &model.OrderTask{}, &model.Order{}, &model.Invoice{}); err != nil {
+	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}); err != nil {
 		panic(err)
 	}
 	model.DB = db
