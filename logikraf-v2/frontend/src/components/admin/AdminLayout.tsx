@@ -97,8 +97,8 @@ export default function AdminLayout() {
       )}
 
       {/* Sidebar desktop */}
-      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-60' : 'w-16'}`}>
-        <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10">
+      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-60' : 'w-16'} h-screen sticky top-0`}>
+        <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 shrink-0">
           <img src="/logo.png" alt="Logikraf" className="h-8 w-auto object-contain shrink-0" />
           {sidebarOpen && <span className="text-white font-display font-extrabold text-base tracking-tight">LOGIKRAF</span>}
         </div>
@@ -148,12 +148,12 @@ export default function AdminLayout() {
 
       {/* Sidebar mobile */}
       {mobileOpen && (
-        <div className="fixed inset-y-0 left-0 z-50 w-60 bg-canvas-dark border-r border-white/10 lg:hidden">
-          <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10">
+        <div className="fixed inset-y-0 left-0 z-50 w-60 bg-canvas-dark border-r border-white/10 lg:hidden h-screen flex flex-col">
+          <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 shrink-0">
             <img src="/logo.png" alt="Logikraf" className="h-8 w-auto object-contain shrink-0" />
             <span className="text-white font-display font-extrabold text-base tracking-tight">LOGIKRAF</span>
           </div>
-          <nav className="py-2 px-2 overflow-y-auto space-y-1">
+          <nav className="flex-1 py-2 px-2 overflow-y-auto space-y-1">
             {navSections.map(section => {
               const isCollapsed = collapsed[section.title]
               return (

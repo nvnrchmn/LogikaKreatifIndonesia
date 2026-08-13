@@ -30,6 +30,16 @@ const gatewayDefs = [
       { key: 'xendit_fee_flat', label: 'Fee Flat Xendit (Rp)', type: 'number' },
     ],
   },
+  {
+    id: 'ipaymu', name: 'iPaymu', color: 'bg-emerald-500',
+    keys: [
+      { key: 'ipaymu_master_va', label: 'Master VA iPaymu' },
+      { key: 'ipaymu_master_key', label: 'Master API Key iPaymu' },
+      { key: 'ipaymu_env', label: 'Environment', type: 'select', options: ['sandbox', 'production'] },
+      { key: 'ipaymu_fee_percent', label: 'Fee iPaymu (%)', type: 'number' },
+      { key: 'ipaymu_fee_flat', label: 'Fee Flat iPaymu (Rp)', type: 'number' },
+    ],
+  },
 ]
 
 export default function AdminSettingsPage() {
@@ -39,6 +49,7 @@ export default function AdminSettingsPage() {
   const [form, setForm] = useState({ key: '', value: '', label: '' })
 
   const [gateways, setGateways] = useState<string[]>([])
+  const [toast, setToast] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -60,15 +71,30 @@ export default function AdminSettingsPage() {
 
   useEffect(() => { load() }, [])
 
+  const flash = (type: 'ok' | 'err', msg: string) => {
+    setToast({ type, msg })
+    setTimeout(() => setToast(null), 3000)
+  }
+
   const toggleGateway = async (id: string, on: boolean) => {
     const next = on ? [...gateways, id] : gateways.filter(g => g !== id)
     setGateways(next)
-    await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
+    try {
+      await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
+      flash('ok', `Gateway ${id} ${on ? 'diaktifkan' : 'dinonaktifkan'}`)
+    } catch {
+      flash('err', 'Gagal menyimpan status gateway')
+    }
   }
 
   const saveKey = async (key: string, value: string) => {
     if (value === '') return
-    await apiPut(`/api/settings/${encodeURIComponent(key)}`, { value })
+    try {
+      await apiPut(`/api/settings/${encodeURIComponent(key)}`, { value })
+      flash('ok', `${key} tersimpan`)
+    } catch {
+      flash('err', `Gagal menyimpan ${key}`)
+    }
     load()
   }
 
@@ -80,9 +106,8 @@ export default function AdminSettingsPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editKey) return
-    await apiPut(`/api/settings/${encodeURIComponent(editKey)}`, { value: form.value })
+    await saveKey(editKey, form.value)
     setEditKey(null)
-    load()
   }
 
   return (
@@ -91,6 +116,12 @@ export default function AdminSettingsPage() {
         <h1 className="text-2xl font-display font-extrabold text-text-main">Pengaturan</h1>
         <p className="text-text-muted text-sm mt-0.5">Kelola profil bisnis dan payment gateway.</p>
       </div>
+
+      {toast && (
+        <div className={`p-3 rounded-xl text-sm font-medium ${toast.type === 'ok' ? 'bg-status-success/10 border border-status-success/30 text-status-success' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+          {toast.msg}
+        </div>
+      )}
 
       {/* Company profile */}
       <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6">
@@ -190,6 +221,26 @@ export default function AdminSettingsPage() {
             )
           })}
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={async () => {
+            const pending: Promise<void>[] = []
+            gatewayDefs.filter(g => gateways.includes(g.id)).forEach(g =>
+              g.keys.forEach(k => {
+                const v = items[k.key]
+                if (v) pending.push(saveKey(k.key, v))
+              })
+            )
+            await Promise.all(pending)
+            flash('ok', 'Semua pengaturan gateway tersimpan')
+          }}
+          className="btn-primary"
+        >
+          Simpan Perubahan
+        </button>
       </div>
 
       {editKey && (

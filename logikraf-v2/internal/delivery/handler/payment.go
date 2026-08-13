@@ -2,6 +2,8 @@ package handler
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
 	"crypto/sha512"
 	"crypto/subtle"
 	"encoding/base64"
@@ -390,6 +392,158 @@ func notifySBDigital(externalID, status string) {
 	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	client.Do(req) // ponytail: fire-and-forget; SB Digital retries on its side
+}
+
+// ipaymuSign builds the iPaymu v2 request signature:
+// HMAC-SHA256("POST:"+va+":"+sha256(body)+":"+key, key).
+func ipaymuSign(va, body, key string) string {
+	hb := sha256.Sum256([]byte(body))
+	bodyHash := hex.EncodeToString(hb[:])
+	str := "POST:" + va + ":" + bodyHash + ":" + key
+	mac := hmac.New(sha256.New, []byte(key))
+	mac.Write([]byte(str))
+	return hex.EncodeToString(mac.Sum(nil))
+}
+
+// CreateIpaymuPayment creates a direct iPaymu checkout (Logikraf receives 100%
+// of the client payment — no split, since this is Logikraf's own revenue) and
+// returns the redirect URL the frontend opens to complete payment.
+func CreateIpaymuPayment(c fiber.Ctx) error {
+	tenant := tenantOf(c)
+	va := setting("ipaymu_master_va", tenant)
+	key := setting("ipaymu_master_key", tenant)
+	if va == "" || key == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "ipaymu not configured"})
+	}
+	env := setting("ipaymu_env", tenant)
+	base := "https://my.ipaymu.com"
+	if env == "sandbox" {
+		base = "https://sandbox.ipaymu.com"
+	}
+
+	var in struct {
+		OrderID     string `json:"order_id"`
+		Amount      uint   `json:"amount"`
+		FirstName   string `json:"first_name"`
+		Email       string `json:"email"`
+		Phone       string `json:"phone"`
+		Description string `json:"description"`
+	}
+	if err := c.Bind().JSON(&in); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
+	}
+	if in.Amount == 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "amount required"})
+	}
+	if in.OrderID == "" {
+		in.OrderID = "LK-" + time.Now().Format("20060102150405") + "-" + randSuffix()
+	}
+
+	amountStr := strconv.Itoa(int(in.Amount))
+	bodyMap := map[string]any{
+		"product":     []string{orDefault(in.Description, "Logikraf Package")},
+		"qty":         []string{"1"},
+		"price":       []string{amountStr},
+		"description": []string{orDefault(in.Description, "Logikraf Package")},
+		"returnUrl":   "https://" + c.Host() + "/paket?status=success",
+		"cancelUrl":   "https://" + c.Host() + "/paket",
+		"notifyUrl":   "https://" + c.Host() + "/api/webhooks/ipaymu",
+		"referenceId": in.OrderID,
+		"buyerName":   in.FirstName,
+		"buyerEmail":  in.Email,
+		"buyerPhone":  in.Phone,
+	}
+	bodyBytes, _ := json.Marshal(bodyMap)
+	sig := ipaymuSign(va, string(bodyBytes), key)
+
+	req, err := http.NewRequest(http.MethodPost, base+"/api/v2/payment", bytes.NewReader(bodyBytes))
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("va", va)
+	req.Header.Set("signature", sig)
+
+	resp, err := (&http.Client{Timeout: 20 * time.Second}).Do(req)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "ipaymu unreachable"})
+	}
+	defer resp.Body.Close()
+	raw, _ := io.ReadAll(resp.Body)
+	var out map[string]any
+	if json.Unmarshal(raw, &out) != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "bad ipaymu response"})
+	}
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		var acc model.TenantPaymentAccount
+		model.DB.Where("tenant_id = ? AND provider = ?", tenant, "ipaymu").FirstOrCreate(&acc, model.TenantPaymentAccount{TenantID: tenant, Provider: "ipaymu"})
+		acc.Status = "ACTIVE"
+		model.DB.Save(&acc)
+		gross := in.Amount
+		providerFee := calcFee(gross, setting("ipaymu_fee_percent", tenant), setting("ipaymu_fee_flat", tenant))
+		platformFee := calcFee(gross, setting("platform_fee_percent", tenant), "")
+		pt := model.PaymentTransaction{
+			TenantID:         tenant,
+			PaymentAccountID: acc.ID,
+			InvoiceRef:       in.Description,
+			Provider:         "ipaymu",
+			OrderID:          in.OrderID,
+			GrossAmount:      gross,
+			ProviderFee:      providerFee,
+			PlatformFee:      platformFee,
+			NetAmount:        gross - providerFee - platformFee,
+			Status:           "pending",
+		}
+		if d, ok := out["Data"].(map[string]any); ok {
+			if sid, ok := d["SessionID"].(string); ok {
+				pt.ProviderTxID = sid
+			}
+		}
+		model.DB.Create(&pt)
+	}
+	return c.Status(resp.StatusCode).JSON(out)
+}
+
+// IpaymuWebhook verifies the iPaymu callback signature (HMAC-SHA256 over the
+// raw body using the master VA as secret) and settles the matching transaction.
+func IpaymuWebhook(c fiber.Ctx) error {
+	body := c.Body()
+	va := c.Get("va")
+	if va == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "missing va"})
+	}
+	var s model.Setting
+	if err := model.DB.Where("`key` = ? AND value = ?", "ipaymu_master_va", va).First(&s).Error; err != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "unauthorized"})
+	}
+	tenant := s.Tenant
+	key := setting("ipaymu_master_key", tenant)
+	mac := hmac.New(sha256.New, []byte(key))
+	mac.Write(body)
+	expected := hex.EncodeToString(mac.Sum(nil))
+	if subtle.ConstantTimeCompare([]byte(expected), []byte(c.Get("signature"))) != 1 {
+		return c.Status(401).JSON(fiber.Map{"error": "bad signature"})
+	}
+
+	var p struct {
+		Status      string `json:"status"`
+		ReferenceID string `json:"reference_id"`
+		TrxID       string `json:"trx_id"`
+	}
+	c.Bind().JSON(&p)
+
+	if p.Status == "berhasil" && p.ReferenceID != "" {
+		now := time.Now()
+		var pt model.PaymentTransaction
+		if err := model.DB.Where("order_id = ? AND tenant_id = ?", p.ReferenceID, tenant).First(&pt).Error; err == nil {
+			pt.Status = "settled"
+			pt.SettledAt = &now
+			model.DB.Save(&pt)
+		}
+		model.DB.Model(&model.Order{}).Where("order_number = ?", p.ReferenceID).Update("status", "paid")
+		notifySBDigital(p.ReferenceID, "SETTLED")
+	}
+	return c.JSON(fiber.Map{"status": "ok"})
 }
 
 // ForcePasswordReset resets a user's password to the onboarding default.

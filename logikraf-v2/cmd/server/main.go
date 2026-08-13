@@ -109,8 +109,10 @@ func main() {
 	api.Get("/payment-gateways", handler.GetPaymentGateways)
 	api.Post("/payment/xendit/invoice", handler.CreateXenditInvoice)
 	api.Post("/payment/midtrans/snap", handler.CreateMidtransSnap)
+	api.Post("/payment/ipaymu/snap", handler.CreateIpaymuPayment)
 	api.Post("/webhooks/xendit", handler.XenditWebhook)
 	api.Post("/webhooks/midtrans", handler.MidtransWebhook)
+	api.Post("/webhooks/ipaymu", handler.IpaymuWebhook)
 	app.Get("/sitemap.xml", handler.GetSitemap)
 
 	// Admin API - protected
