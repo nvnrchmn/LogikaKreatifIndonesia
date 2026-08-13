@@ -29,6 +29,7 @@ function ResourceList({ cfg }: { cfg: any }) {
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [toast, setToast] = useState('')
+  const [q, setQ] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -46,6 +47,13 @@ function ResourceList({ cfg }: { cfg: any }) {
     catch { setError('Gagal menghapus') }
   }
 
+  const filtered = Array.isArray(items)
+    ? items.filter((it: any) => cfg.columns.some((c: ColumnDef) => {
+        const v = c.render ? c.render(it) : it[c.id]
+        return String(v ?? '').toLowerCase().includes(q.trim().toLowerCase())
+      }))
+    : []
+
   return (
     <div className="max-w-6xl mx-auto admin-page">
       <nav className="flex items-center gap-2 text-sm text-text-muted mb-4">
@@ -59,25 +67,42 @@ function ResourceList({ cfg }: { cfg: any }) {
       {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
       {toast && <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{toast}</div>}
 
+      {/* Filter bar — Nielsen #6: find rows fast without leaving the page */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+        <div className="relative flex-1 max-w-sm">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" /></svg>
+          </span>
+          <input
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            placeholder={`Cari ${cfg.title.toLowerCase()}...`}
+            className="form-input pl-9"
+            aria-label={`Cari ${cfg.title}`}
+          />
+        </div>
+        <span className="text-sm text-text-muted shrink-0">{filtered.length} data</span>
+      </div>
+
       {/* Desktop table */}
       <div className="hidden md:block bg-white rounded-2xl border border-border-minimal shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm table-compact">
-            <thead><tr className="border-b border-border-minimal">
+            <thead><tr className="border-b border-border-minimal bg-canvas-overlay/60 sticky top-0 z-10">
               {cfg.columns.map((c: ColumnDef) => <th key={c.id}>{c.label}</th>)}
               <th className="text-right">Aksi</th>
             </tr></thead>
             <tbody>
               {loading ? Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="border-b border-border-minimal">{cfg.columns.map((_: any, ci: number) => <td key={ci}><div className="w-full h-4 bg-gray-100 rounded animate-pulse" /></td>)}<td /></tr>
-              )) : items.length === 0 ? (
+              )) : filtered.length === 0 ? (
                 <tr><td colSpan={cfg.columns.length + 1} className="px-3 py-12">
                   <div className="flex flex-col items-center text-center gap-2">
-                    <p className="text-text-main font-medium">{cfg.emptyRow}</p>
-                    <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>
+                    <p className="text-text-main font-medium">{q ? 'Tidak ada hasil.' : cfg.emptyRow}</p>
+                    {!q && <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>}
                   </div>
                 </td></tr>
-              ) : items.map((item: any) => (
+              ) : filtered.map((item: any) => (
                 <tr key={item.id} className="border-b border-border-minimal hover:bg-canvas-light transition-colors">
                   {cfg.columns.map((c: ColumnDef) => <td key={c.id}>{c.render ? c.render(item) : item[c.id]}</td>)}
                   <td className="text-right whitespace-nowrap">
@@ -94,13 +119,13 @@ function ResourceList({ cfg }: { cfg: any }) {
       {/* Mobile cards — no horizontal scroll */}
       <div className="md:hidden space-y-3">
         {loading ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />) :
-          items.length === 0 ? (
+          filtered.length === 0 ? (
             <div className="flex flex-col items-center text-center gap-2 py-12">
-              <p className="text-text-main font-medium">{cfg.emptyRow}</p>
-              <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>
+              <p className="text-text-main font-medium">{q ? 'Tidak ada hasil.' : cfg.emptyRow}</p>
+              {!q && <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>}
             </div>
           ) :
-          items.map((item: any) => (
+          filtered.map((item: any) => (
             <div key={item.id} className="bg-white rounded-2xl border border-border-minimal shadow-sm p-4">
               {cfg.columns.filter((c: ColumnDef) => c.id !== 'id').map((c: ColumnDef) => (
                 <div key={c.id} className="flex justify-between gap-3 py-1 text-sm">
@@ -184,7 +209,7 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
       <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6">
         <h1 className="text-xl font-display font-bold text-text-main mb-6">{id ? 'Edit' : 'Tambah'} {cfg.title}</h1>
         {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
-        <form onSubmit={submit} className="space-y-5">
+        <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-5">
           {cfg.formFields.map((f: FieldDef) => (
             <div key={f.name}>
               <label className="label">{f.label}</label>
@@ -200,7 +225,7 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
               {fieldErrors[f.name] && <p className="text-red-600 text-xs mt-1">{fieldErrors[f.name]}</p>}
             </div>
           ))}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-2 md:col-span-2">
             <button type="submit" disabled={busy} className="btn-primary disabled:opacity-50">{busy ? 'Menyimpan...' : 'Simpan'}</button>
             <button type="button" onClick={onDone} className="btn-secondary">Batal</button>
           </div>
