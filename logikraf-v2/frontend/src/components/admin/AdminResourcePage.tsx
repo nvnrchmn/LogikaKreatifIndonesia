@@ -28,6 +28,7 @@ function ResourceList({ cfg }: { cfg: any }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [toast, setToast] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -38,7 +39,10 @@ function ResourceList({ cfg }: { cfg: any }) {
   useEffect(() => { load() }, [cfg.endpoint])
 
   const handleDelete = async (id: number) => {
-    try { await fetch(`${cfg.endpoint}/${id}`, { method: 'DELETE', headers: auth() }); setDeleteId(null); load() }
+    try {
+      await fetch(`${cfg.endpoint}/${id}`, { method: 'DELETE', headers: auth() })
+      setDeleteId(null); setToast('Berhasil dihapus'); setTimeout(() => setToast(''), 2500); load()
+    }
     catch { setError('Gagal menghapus') }
   }
 
@@ -49,10 +53,11 @@ function ResourceList({ cfg }: { cfg: any }) {
       </nav>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-display font-bold text-text-main">{cfg.title}</h1>
-        <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4">Tambah</button>
+        <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform">Tambah</button>
       </div>
 
       {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
+      {toast && <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{toast}</div>}
 
       {/* Desktop table */}
       <div className="hidden md:block bg-white rounded-2xl border border-border-minimal shadow-sm overflow-hidden">
@@ -66,13 +71,18 @@ function ResourceList({ cfg }: { cfg: any }) {
               {loading ? Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className="border-b border-border-minimal">{cfg.columns.map((_: any, ci: number) => <td key={ci}><div className="w-full h-4 bg-gray-100 rounded animate-pulse" /></td>)}<td /></tr>
               )) : items.length === 0 ? (
-                <tr><td colSpan={cfg.columns.length + 1} className="px-3 py-8 text-center text-text-muted">{cfg.emptyRow}</td></tr>
+                <tr><td colSpan={cfg.columns.length + 1} className="px-3 py-12">
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <p className="text-text-main font-medium">{cfg.emptyRow}</p>
+                    <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>
+                  </div>
+                </td></tr>
               ) : items.map((item: any) => (
                 <tr key={item.id} className="border-b border-border-minimal hover:bg-canvas-light transition-colors">
                   {cfg.columns.map((c: ColumnDef) => <td key={c.id}>{c.render ? c.render(item) : item[c.id]}</td>)}
                   <td className="text-right whitespace-nowrap">
-                    <button onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)} className="text-brand-primary hover:text-brand-primary/80 font-medium text-sm mr-3">Edit</button>
-                    <button onClick={() => setDeleteId(item.id)} className="text-red-600 hover:text-red-700 font-medium text-sm">Hapus</button>
+                    <button onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)} className="text-brand-primary hover:text-brand-primary/80 font-medium text-sm mr-3 active:scale-[0.98] transition-transform">Edit</button>
+                    <button onClick={() => setDeleteId(item.id)} className="text-red-600 hover:text-red-700 font-medium text-sm active:scale-[0.98] transition-transform">Hapus</button>
                   </td>
                 </tr>
               ))}
@@ -84,7 +94,12 @@ function ResourceList({ cfg }: { cfg: any }) {
       {/* Mobile cards — no horizontal scroll */}
       <div className="md:hidden space-y-3">
         {loading ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />) :
-          items.length === 0 ? <div className="text-center text-text-muted text-sm py-8">{cfg.emptyRow}</div> :
+          items.length === 0 ? (
+            <div className="flex flex-col items-center text-center gap-2 py-12">
+              <p className="text-text-main font-medium">{cfg.emptyRow}</p>
+              <button onClick={() => navigate(`/admin/${cfg.resource}/new`)} className="btn-primary text-sm py-2 px-4 active:scale-[0.98] transition-transform mt-1">Tambah {cfg.title}</button>
+            </div>
+          ) :
           items.map((item: any) => (
             <div key={item.id} className="bg-white rounded-2xl border border-border-minimal shadow-sm p-4">
               {cfg.columns.filter((c: ColumnDef) => c.id !== 'id').map((c: ColumnDef) => (
@@ -94,8 +109,8 @@ function ResourceList({ cfg }: { cfg: any }) {
                 </div>
               ))}
               <div className="flex gap-3 pt-3 mt-2 border-t border-border-minimal">
-                <button onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)} className="text-brand-primary font-medium text-sm">Edit</button>
-                <button onClick={() => setDeleteId(item.id)} className="text-red-600 font-medium text-sm">Hapus</button>
+                <button onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)} className="text-brand-primary font-medium text-sm active:scale-[0.98] transition-transform">Edit</button>
+                <button onClick={() => setDeleteId(item.id)} className="text-red-600 font-medium text-sm active:scale-[0.98] transition-transform">Hapus</button>
               </div>
             </div>
           ))}
@@ -108,7 +123,7 @@ function ResourceList({ cfg }: { cfg: any }) {
             <p className="text-text-muted text-sm mb-6">Apakah Anda yakin? Tindakan ini tidak bisa dibatalkan.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteId(null)} className="btn-secondary flex-1">Batal</button>
-              <button onClick={() => handleDelete(deleteId)} className="bg-red-600 text-white font-semibold py-2.5 px-4 rounded-xl hover:bg-red-700 flex-1">Hapus</button>
+              <button onClick={() => handleDelete(deleteId)} className="bg-red-600 text-white font-semibold py-2.5 px-4 rounded-xl hover:bg-red-700 flex-1 active:scale-[0.98] transition-transform">Hapus</button>
             </div>
           </div>
         </div>
