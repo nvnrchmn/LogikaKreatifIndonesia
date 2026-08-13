@@ -67,79 +67,94 @@ function HelpIcon() { return <svg className="w-5 h-5" fill="none" stroke="curren
 function SettingsIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> }
 function MenuIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg> }
 function LogoutIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg> }
+function SearchIcon() { return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" /></svg> }
+function ChevronDownIcon() { return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6 6-6" /></svg> }
 function OpenInNewIcon() { return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-4.5 0l3-3m0 0l3 3m-3-3v6" /></svg> }
+
+const adminName = localStorage.getItem('name') || 'Admin'
+const adminEmail = localStorage.getItem('email') || 'admin@logikraf.id'
+
+function SidebarContent({ sidebarOpen, collapsed, toggleSection, query, onNavigate }: {
+  sidebarOpen: boolean
+  collapsed: Record<string, boolean>
+  toggleSection: (t: string) => void
+  query: string
+  onNavigate: () => void
+}) {
+  const q = query.trim().toLowerCase()
+  return (
+    <nav className="flex-1 py-3 px-3 overflow-y-auto space-y-2">
+      {navSections.map(section => {
+        const items = q ? section.items.filter(i => i.label.toLowerCase().includes(q)) : section.items
+        if (q && items.length === 0) return null
+        const isCollapsed = collapsed[section.title]
+        return (
+          <div key={section.title}>
+            {sidebarOpen && (
+              <button
+                onClick={() => toggleSection(section.title)}
+                className="w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-text-light/40 hover:text-text-light/70 transition-colors"
+              >
+                <span>{section.title}</span>
+                <svg className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 9l6 6 6-6" /></svg>
+              </button>
+            )}
+            {(!isCollapsed || !sidebarOpen) && (
+              <div className="space-y-1">
+                {items.map(item => {
+                  const Icon = item.icon
+                  return (
+                    <NavLink key={item.label} to={item.path} className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${isActive ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/25' : 'text-text-light/70 hover:bg-white/5 hover:text-white'}`} title={!sidebarOpen ? item.label : undefined} onClick={onNavigate}>
+                      <span className="shrink-0"><Icon /></span>
+                      {sidebarOpen && <span className="truncate">{item.label}</span>}
+                    </NavLink>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </nav>
+  )
+}
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  const [query, setQuery] = useState('')
   const location = useLocation()
 
   const toggleSection = (t: string) => setCollapsed(c => ({ ...c, [t]: !c[t] }))
-
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('role')
-    localStorage.removeItem('name')
+    localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('name'); localStorage.removeItem('email')
     window.location.href = '/admin/login'
   }
 
-  // Flatten for active-title lookup
   const allItems = navSections.flatMap(s => s.items)
   const activeNav = allItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))
   const pageTitle = activeNav?.label ?? 'Admin'
 
   return (
     <div className="min-h-screen bg-canvas-overlay">
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
-      )}
+      {mobileOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       {/* Sidebar desktop */}
-      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-60' : 'w-16'} h-screen sticky top-0`}>
-        <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 shrink-0">
+      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-64' : 'w-16'} h-screen sticky top-0`}>
+        <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 shrink-0">
           <img src="/logo.png" alt="Logikraf" className="h-8 w-auto object-contain shrink-0" />
           {sidebarOpen && <span className="text-white font-display font-extrabold text-base tracking-tight">LOGIKRAF</span>}
         </div>
-        <nav className="flex-1 py-2 px-2 overflow-y-auto space-y-1">
-          {navSections.map(section => {
-            const isCollapsed = collapsed[section.title]
-            return (
-              <div key={section.title}>
-                <button
-                  onClick={() => toggleSection(section.title)}
-                  className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-light/40 hover:text-text-light/70 transition-colors"
-                >
-                  {sidebarOpen && <span>{section.title}</span>}
-                  {sidebarOpen && (
-                    <svg className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 9l6 6 6-6" /></svg>
-                  )}
-                </button>
-                {(!isCollapsed || !sidebarOpen) && (
-                  <div className="space-y-0.5">
-                    {section.items.map(item => {
-                      const Icon = item.icon
-                      return (
-                        <NavLink key={item.label} to={item.path} className={({ isActive }) => `flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors ${isActive ? 'bg-brand-primary text-white' : 'text-text-light/70 hover:bg-white/5 hover:text-white'}`} title={!sidebarOpen ? item.label : undefined}>
-                          <span className="shrink-0"><Icon /></span>
-                          {sidebarOpen && <span className="truncate">{item.label}</span>}
-                        </NavLink>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </nav>
-        <div className="p-2 border-t border-white/10">
-          <div className="flex items-center gap-2 px-2 py-1.5">
-            <div className="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-xs font-bold shrink-0">A</div>
+        <SidebarContent sidebarOpen={sidebarOpen} collapsed={collapsed} toggleSection={toggleSection} query={query} onNavigate={() => {}} />
+        <div className="p-3 border-t border-white/10">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-white/5">
+            <div className="w-9 h-9 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold shrink-0">A</div>
             {sidebarOpen && (
               <div className="overflow-hidden">
-                <div className="text-white text-sm font-semibold leading-tight">Admin</div>
-                <div className="text-text-light/50 text-xs leading-tight">admin@logikraf.id</div>
+                <div className="text-white text-sm font-semibold leading-tight truncate">{adminName}</div>
+                <div className="text-text-light/50 text-xs leading-tight truncate">{adminEmail}</div>
               </div>
             )}
           </div>
@@ -148,54 +163,72 @@ export default function AdminLayout() {
 
       {/* Sidebar mobile */}
       {mobileOpen && (
-        <div className="fixed inset-y-0 left-0 z-50 w-60 bg-canvas-dark border-r border-white/10 lg:hidden h-screen flex flex-col">
-          <div className="h-14 flex items-center gap-3 px-4 border-b border-white/10 shrink-0">
+        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-canvas-dark border-r border-white/10 lg:hidden h-screen flex flex-col">
+          <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 shrink-0">
             <img src="/logo.png" alt="Logikraf" className="h-8 w-auto object-contain shrink-0" />
             <span className="text-white font-display font-extrabold text-base tracking-tight">LOGIKRAF</span>
           </div>
-          <nav className="flex-1 py-2 px-2 overflow-y-auto space-y-1">
-            {navSections.map(section => {
-              const isCollapsed = collapsed[section.title]
-              return (
-                <div key={section.title}>
-                  <button
-                    onClick={() => toggleSection(section.title)}
-                    className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-light/40 hover:text-text-light/70"
-                  >
-                    <span>{section.title}</span>
-                    <svg className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 9l6 6 6-6" /></svg>
-                  </button>
-                  {!isCollapsed && (
-                    <div className="space-y-0.5">
-                      {section.items.map(item => {
-                        const Icon = item.icon
-                        return (
-                          <NavLink key={item.label} to={item.path} onClick={() => setMobileOpen(false)} className={({ isActive }) => `flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors ${isActive ? 'bg-brand-primary text-white' : 'text-text-light/70 hover:bg-white/5 hover:text-white'}`}>
-                            <span className="shrink-0"><Icon /></span>
-                            <span className="truncate">{item.label}</span>
-                          </NavLink>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </nav>
+          <SidebarContent sidebarOpen query={query} collapsed={collapsed} toggleSection={toggleSection} onNavigate={() => setMobileOpen(false)} />
         </div>
       )}
 
       {/* Main */}
-      <div className={`transition-all duration-200 ${sidebarOpen ? 'lg:ml-60' : 'lg:ml-16'}`}>
-        <header className="sticky top-0 z-30 bg-white border-b border-border-minimal h-14 flex items-center justify-between px-4 lg:px-6">
+      <div className={`transition-all duration-200 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
+        <header className="sticky top-0 z-30 bg-white border-b border-border-minimal h-16 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100" onClick={() => setMobileOpen(true)} aria-label="Menu"><MenuIcon /></button>
             <button className="hidden lg:flex p-2 -ml-2 rounded-lg hover:bg-gray-100" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle sidebar"><MenuIcon /></button>
-            <h2 className="font-display font-bold text-text-main text-base capitalize">{pageTitle}</h2>
+            <div>
+              <h2 className="font-display font-bold text-text-main text-base leading-tight capitalize">{pageTitle}</h2>
+              <p className="text-[11px] text-text-muted leading-tight">Logikraf Admin Panel</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
+            {/* Live nav filter — Nielsen #6 recognition: find any module fast */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-canvas-light border border-border-minimal focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all">
+              <span className="text-text-muted"><SearchIcon /></span>
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Cari modul..."
+                className="bg-transparent text-sm text-text-main placeholder:text-text-muted/60 outline-none w-40"
+                aria-label="Cari modul"
+              />
+            </div>
             <a href="/" target="_blank" rel="noreferrer" className="p-2 rounded-lg hover:bg-gray-100 text-text-muted" title="Lihat Website"><OpenInNewIcon /></a>
-            <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-gray-100 text-text-muted" title="Logout"><LogoutIcon /></button>
+
+            {/* User dropdown — Nielsen #1: always show who is logged in */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(o => !o)}
+                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-haspopup="menu"
+                aria-expanded={userMenuOpen}
+              >
+                <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold">A</div>
+                <span className="hidden sm:block text-sm font-semibold text-text-main">{adminName}</span>
+                <ChevronDownIcon />
+              </button>
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-56 z-40 bg-white rounded-xl border border-border-minimal shadow-lg p-2" role="menu">
+                    <div className="px-3 py-2 border-b border-border-minimal">
+                      <p className="text-sm font-semibold text-text-main truncate">{adminName}</p>
+                      <p className="text-xs text-text-muted truncate">{adminEmail}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-3 py-2 mt-1 rounded-lg text-sm font-medium text-status-danger hover:bg-status-danger/10 transition-colors"
+                      role="menuitem"
+                    >
+                      <LogoutIcon /> Keluar
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
         <main className="p-4 lg:p-6">
