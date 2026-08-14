@@ -231,7 +231,7 @@ export default function AdminLayout() {
       {mobileOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       {/* Sidebar desktop */}
-      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-64' : 'w-16'} h-screen sticky top-0`}>
+      <aside className={`hidden lg:flex flex-col bg-canvas-dark border-r border-white/10 transition-all duration-200 ${sidebarOpen ? 'w-64' : 'w-16'} h-screen fixed inset-y-0 left-0 z-30`}>
         <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 shrink-0">
           <img src="/logo.png" alt="Logikraf" className="h-8 w-auto object-contain shrink-0" />
           {sidebarOpen && <span className="text-white font-display font-extrabold text-base tracking-tight">LOGIKRAF</span>}
@@ -262,7 +262,7 @@ export default function AdminLayout() {
       )}
 
       {/* Main */}
-      <div className={`transition-all duration-200 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
+      <div className={`min-h-screen transition-all duration-200 ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'}`}>
         <header className="sticky top-0 z-30 bg-white border-b border-border-minimal h-16 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100" onClick={() => setMobileOpen(true)} aria-label="Menu"><MenuIcon /></button>

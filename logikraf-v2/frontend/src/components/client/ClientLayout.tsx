@@ -31,7 +31,7 @@ export default function ClientLayout() {
     <div className="min-h-screen bg-canvas-overlay">
       {mobileOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
-      <aside className="hidden lg:flex flex-col w-60 bg-canvas-dark border-r border-white/10">
+      <aside className="hidden lg:flex flex-col w-60 bg-canvas-dark border-r border-white/10 h-screen fixed inset-y-0 left-0 z-30">
         <div className="h-16 flex items-center gap-3 px-4 border-b border-white/10">
           <img src="/logo.png" alt="Logikraf" className="h-9 w-auto object-contain shrink-0" />
           <div>
@@ -87,7 +87,7 @@ export default function ClientLayout() {
         </div>
       )}
 
-      <div className="lg:ml-60">
+      <div className="min-h-screen lg:pl-60">
         <header className="sticky top-0 z-30 bg-white border-b border-border-minimal h-16 flex items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100" onClick={() => setMobileOpen(true)} aria-label="Menu"><MenuIcon /></button>
