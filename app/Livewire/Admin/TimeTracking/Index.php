@@ -7,11 +7,14 @@ namespace App\Livewire\Admin\TimeTracking;
 use App\Models\Order;
 use App\Models\OrderTask;
 use App\Models\TimeEntry;
+use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination;
+
     public ?int $order_id = null;
     public ?int $order_task_id = null;
     public string $description = '';
@@ -21,8 +24,9 @@ class Index extends Component
 
     public $orders;
     public $tasks;
-    public ?LengthAwarePaginator $entries = null;
     public int $totalMinutes = 0;
+
+    protected $queryString = ['order_id', 'worked_date'];
 
     public function mount(): void
     {
@@ -36,10 +40,13 @@ class Index extends Component
         $this->tasks = $this->order_id
             ? OrderTask::where('order_id', $this->order_id)->get()
             : collect();
-        $this->entries = TimeEntry::with(['order', 'task', 'user'])
-            ->latest('worked_date')
-            ->paginate(20);
         $this->totalMinutes = TimeEntry::sum('minutes');
+    }
+
+    #[On('refreshTimeTracking')]
+    public function refreshTimeTracking(): void
+    {
+        $this->loadData();
     }
 
     public function save(): void
@@ -89,11 +96,16 @@ class Index extends Component
 
     public function render()
     {
-        $this->loadData();
+        $entries = TimeEntry::with(['order', 'task', 'user'])
+            ->when($this->order_id, fn($q) => $q->where('order_id', $this->order_id))
+            ->when($this->worked_date, fn($q) => $q->where('worked_date', $this->worked_date))
+            ->latest('worked_date')
+            ->paginate(20);
+
         return view('livewire.admin.time-tracking.index')
             ->with('orders', $this->orders)
             ->with('tasks', $this->tasks)
-            ->with('entries', $this->entries)
+            ->with('entries', $entries)
             ->with('totalMinutes', $this->totalMinutes)
             ->layout('components.layouts.admin');
     }
