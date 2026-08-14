@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -10,7 +11,12 @@ import (
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 )
 
-var jwtSecret = []byte("change-me")
+func getJWTSecret() []byte {
+	if s := os.Getenv("JWT_SECRET"); s != "" {
+		return []byte(s)
+	}
+	return []byte("change-me-secret-key-in-production")
+}
 
 type LoginRequest struct {
 	Email    string `json:"email"`
@@ -43,7 +49,7 @@ func GenerateToken(userID uint, role, tenant string) (string, error) {
 		},
 	}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return t.SignedString(jwtSecret)
+	return t.SignedString(getJWTSecret())
 }
 
 func AuthMiddleware() fiber.Handler {
@@ -59,7 +65,7 @@ func AuthMiddleware() fiber.Handler {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fiber.ErrUnauthorized
 			}
-			return jwtSecret, nil
+			return getJWTSecret(), nil
 		})
 		if err != nil || !token.Valid {
 			return c.Status(401).JSON(fiber.Map{"error": "unauthorized"})

@@ -1,0 +1,737 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1786718271.5380683,
+    "ast_hash": "d9564b7a2fa13d1764803662ec654cac",
+    "semantic_hash": ""
+  },
+  "add_soft_deletes.php": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "934fe1539c550fded46670cc2596249c",
+    "semantic_hash": ""
+  },
+  "deploy.sh": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "6b278c8b0c9c6ede6ae039abad51c9dd",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/cmd/server/main.go": {
+    "mtime": 1786718866.3451407,
+    "ast_hash": "6c8c24f3ffff42b22d94345c29d6df06",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/.oxlintrc.json": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "029f4905006c1fffd96bc863e2d98d3e",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/package.json": {
+    "mtime": 1786718841.974219,
+    "ast_hash": "028685d0221434d7301c4a8e30161b00",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/App.tsx": {
+    "mtime": 1786718271.5875144,
+    "ast_hash": "503d4e345136f4e0c79f19fdd9bedd84",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/admin/AdminLayout.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "afd0a7111610301be0e0096a6e69c818",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/admin/AdminResourcePage.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "8417c7827f0fe59fb0ad9cdfcb3ed834",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/admin/crudConfigs.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "3d741b2896defbd02a4a88b117842ac1",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/client/ClientLayout.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "ae1d87d2ebb0049240c210bd5aeb644b",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/layout/Footer.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "754759b955bd7889cb449997dbff6369",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/layout/Navbar.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "1263c1216f7014b69861e3e6e59e5368",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/layout/PublicLayout.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "71382a55c59b0c35a95fff6fe9c99ddb",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/public/HeroSection.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "bd7bfa5f912792d23e6bc87581ee36a8",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/public/PortfolioGallery.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "a3e62fb7c75875378984fc53aa30e81d",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/public/ProjectBriefForm.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "9ab873228564c8b838bb2e4f5e9c4cf6",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/public/ServiceShowcase.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "e92249f9c9769e16b83b44fe13e0d504",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/components/public/TestimonialsSection.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "53eeae4221402ecb894a98fc23acfa90",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/contexts/AuthContext.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "b1e977dfdb2cdddc0b43248b4d4ef5d2",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/hooks/usePageMeta.ts": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "d3c98e5cae2d0c3edeb3f0628dba4bae",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/lib/api.ts": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "8cdaae833670f52c2c909a03d01343dc",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/main.tsx": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "1bd5c5e0dc325762dcc673fae0df459a",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/AdminDashboardPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "5121f7b9de4663ee4b055a8ebbdb1b20",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/AdminLoginPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "d1556cb75e86fd0cdd839ed043a018fa",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Businesses/BusinessesPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "f99d806302ce57d5a65dae42d137a00c",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Invoices/InvoicesPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "ec3cdcd77f6bd1ac536555b8689f72d6",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Orders/OrdersPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "ff5c7bc925f2202cbf47a3108a2d37a1",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/PaymentHubPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "183b6d91fe5cf27113dac1274be6e5c5",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/PaymentLedgerPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "3e7f457b165b16c01ce47df0bc2c081d",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/ReconciliationPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "74545c3ccf9b3726354b86abc533db62",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/ReportsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "d3f76d67b5de5f43c9cca5c404eb34fc",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Services/ServicesPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "e5aedc75d78aa002c2d2ba10a6ac5083",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/SettingsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "8b3dbe62aa6f06c3985e27f72ff3f790",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Settings/SettingsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "24436c998b06f71310950cf56342b85a",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Settings/index.ts": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "ebc96e491434ab5518cd4a114fb65a07",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/TenantPaymentAccountsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "a0360252dbcf2ef212c1870171c0b7f3",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/admin/Transactions/TransactionsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "7999285a5e12ea7c7accb668249c8129",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/client/ClientDashboardPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "250940b5cb077a5f9c21352ecb0ee28b",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/client/ClientOrdersPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "90bf3da667dcd2e0c42b391becc6611d",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/client/ClientProfilePage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "18276aa64bf16e12138e2eef48f1f0ce",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/AboutPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "c45c16ce194e5d906f7cee220c4777be",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/BlogDetailPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "16a6fe06b3f9a3d90699adacc56457bb",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/BlogPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "fc282a851c94e3e25026430aa678b8bf",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/ContactPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "ce177e1400815ba2006cf9681b2819e7",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/FaqPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "8c311f29c3235c212fe33f36c4169f89",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/HomePage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "618bcad430ecf6a9b340bddf8c29a05a",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/PackagesPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "098f0d73b05ccb53657d7ea5b0633e0f",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/PortfolioDetailPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "9ae0daa2f97e8cce9ea7aa515e85d04f",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/PrivacyPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "3faf2aae3f5e526add551756bd7d6bf4",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/SearchPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "946486db3905ceba2e08ea33d3a1b647",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/ServicesPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "35b21b8634a019f77b1b4e08b09a20ff",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/TermsPage.tsx": {
+    "mtime": 1786718271.6018775,
+    "ast_hash": "414fc1273d4cac58a7b55dcae77000bf",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/tests/smoke.sh": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "49ea2963ff7cd9885fcb0a7de3342804",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/tsconfig.app.json": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "94739e8220297481644a18d5a81111e5",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/tsconfig.json": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "a3d39fa780ebff65444de257f291ce6c",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/tsconfig.node.json": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "f9cb81ddcea69ffdab672fc8c48dca66",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/vite.config.ts": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "092d0f321342554a2216e9d7887e8c12",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/go.mod": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "a392872e0a9db01da4f4f14646efd4e8",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/client.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "534520b3b5c72335ef022e4b98c89ac4",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/gateway.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "4b5f5b35a7d69d15c9be6519495cfa70",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/handler_test.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "826a1b1c90473645bb4d07edb41296a1",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/invoice.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "0a3d653ef485b0c8dc11c16cc5004314",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/lead.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "bc79a27c636eaf6d824b6f5ff5cabce7",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/order.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "f933c2a7a830c147dc9be173ba750803",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/package.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "5e17aa29b2199986016722503afdf7fb",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/package_crud.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "f36baba97396a4a4f2c5c39fae6e5076",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/payment.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "2d438f59185b5e3a174a996fc72c6134",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/payment_account.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "221af811e5135c53edafe05705a2c3ad",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/payment_test.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "64167b73227a804957b8145427811e22",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/portfolio.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "d8b90950ebf3a5271643f11fad97ebf6",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/post.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "79f2157343949245688e75045490d69e",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/report.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "91327f41673fc1634da2788353037944",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/service.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "ae22e44321617f9ae4da203d34dee229",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/service_crud.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "05abfe13d863062a668a52a2c4b628ca",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/settings.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "f7e5dc9fbfcb0171c8cde178520958a5",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/sitemap.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "7cf760c55eab5d8e1000f4e34581dbba",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/testimonial.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "2a7715c3f6b608448f1bad932cd54537",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/ticket.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "0dd7951e5a42bb932c851053258f3c3c",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/delivery/handler/transaction.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "bb24dbd96988acac6d0b4b6dc61cb139",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/client.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "afea5cf2bc602fd6339cef54f2e72775",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/db.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "14554a16780b33461feab8d7495dadf6",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/invoice.go": {
+    "mtime": 1786718271.617936,
+    "ast_hash": "10d299d92e1bfbf5ed297f63f66866e5",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/lead.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "e7859049d9e86486a716b6d16b49c502",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/order.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "ed2e40f32b24a749931ae337a00eab55",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/package.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "bec4d9ee996ab28fa1b02d6ea6c925a2",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/payment_account.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "237fe67bf4b1d71c3dd4b5ea5a46dec5",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/portfolio.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "f88dd2546203f464c04d34c5f5640982",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/post.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "3d2b3427440dec76cc8f98ef890b14fe",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/service.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "adbd54a5982ff3f4e345427be53edb9c",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/setting.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "6c0c61716be5357165b312fa7a005ff7",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/testimonial.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "7471610dff1048d582fbd948ce05dfe7",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/ticket.go": {
+    "mtime": 1786718271.6338923,
+    "ast_hash": "31cd5c39c49bcc650140572a412f0987",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/transaction.go": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "ee98126d35224aab59e948f44c494cb0",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/domain/model/user.go": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "a3f0b907836a2f59d73a086a8c8e5c3d",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/internal/infrastructure/database/database.go": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "228656f5de43585f86e4b184ba4e5bdc",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/migrations/001_base_schema.sql": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "0a7774c5e3a51ed087ab95fe11d67181",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/migrations/002_full_schema.sql": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "d7ec7e241714a29f1620900eefbf9888",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/migrations/003_seed_dummy.sql": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "d4b11c11f8d85ea3a466a931651f5d11",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/pkg/auth/auth.go": {
+    "mtime": 1786718882.0335073,
+    "ast_hash": "f29f4434688c15a998d7c98c623964ca",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/tsconfig.json": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "ee587a549251f3acd77a65916ee9208b",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/vite.config.ts": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "9b815e5a35fb92eaa6a374a89b4ec93e",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ExampleTest.php": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "0f4d91c9c5bbcd4e2f46cf885acb7fb6",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Livewire/Admin/PackageTest.php": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "0f15d94e100f8291f71d5574ad271fe8",
+    "semantic_hash": ""
+  },
+  "tests/Feature/Livewire/Admin/ServiceTest.php": {
+    "mtime": 1786718271.638179,
+    "ast_hash": "6ff477f3e1bcaa7b11f53b3e999f6ecc",
+    "semantic_hash": ""
+  },
+  "tests/TestCase.php": {
+    "mtime": 1786718271.6498432,
+    "ast_hash": "7e567dc27e68d5b57bae16af07f68907",
+    "semantic_hash": ""
+  },
+  "tests/Unit/ExampleTest.php": {
+    "mtime": 1786718271.6498432,
+    "ast_hash": "3f679e9508c834f0ad95943455fcd836",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1786718271.5380683,
+    "ast_hash": "f1e53ecc9194573d3c28fc116c743a2e",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1786718271.5380683,
+    "ast_hash": "0bc020d491fca99550c1ea3de0a5f862",
+    "semantic_hash": ""
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1786718271.5380683,
+    "ast_hash": "9b31786b637be3c13978bec4c2330752",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "62aa0f6529a7784d9542c575a87d7077",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "d59d027fe449f06aa03905a01184e779",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "9da2a2152e60a22f07f05fed5158f287",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "42fef56a01698118f7fd722acdadea34",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "3c46f8ad006874260614ed8657d02307",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "9378bd03d56baaf78bd738ab3848f142",
+    "semantic_hash": ""
+  },
+  ".github/workflows/deploy.yml": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "2770c5488c48707414570e8ab8ecd69f",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "82efb97a359f5c7290bf2513d14686be",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "d2661a31fed7f254f5b7d3b6fe19330a",
+    "semantic_hash": ""
+  },
+  "docs/DEPLOYMENT_GUIDE.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "a1550f91c148a422ed7d6a7e7091c286",
+    "semantic_hash": ""
+  },
+  "docs/ai-architecture-blueprint.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "2f79f38b82128b16d1d7b26390539884",
+    "semantic_hash": ""
+  },
+  "docs/ai-project-overview.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "8f1ee59d61f75a5f8f8203b1b4cb6dcf",
+    "semantic_hash": ""
+  },
+  "docs/ai-tech-stack.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "080e698a51ac0e676dde8de1a7314fe4",
+    "semantic_hash": ""
+  },
+  "docs/ai-ui-ux-theme-style.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "be02a5c866add6f28e044baadc1ca34e",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/2026-07-11-public-pages-and-payment.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "74e78a110cb119867c60954642fbb4e5",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/2026-07-12-force-password-reset.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "f922e9f19915a3938d0aad7e25b2b878",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/2026-07-12_dynamic_fee_and_disbursement.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "54c7ce2517316a5b486e3a310112ca02",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/2026-07-12_fase_2_ui_ux_refinements.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "88dada0eade859d9ffb7734882749419",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/2026-07-12_payment_hub_integration.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "686606a19301e061b6b213d6b0fb2e83",
+    "semantic_hash": ""
+  },
+  "docs/changelogs/20260712_fase_1_asset_vault_project_thread.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "e636434bc64398ae635ab6590a2bf4f2",
+    "semantic_hash": ""
+  },
+  "docs/how-to-use-ph.md": {
+    "mtime": 1786718271.5540597,
+    "ast_hash": "06191fd6d8f97b38e8313f0844206e3e",
+    "semantic_hash": ""
+  },
+  "docs/pg/result-analyst.md": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "3c65a3ae96d4a885b20d0d9b441dae09",
+    "semantic_hash": ""
+  },
+  "docs/plan/20260712_future_features_planning.md": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "3caab9f3374dc9844d31d60eb85ee9f5",
+    "semantic_hash": ""
+  },
+  "docs/sbdigital/plan.md": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "4503cfb0c800f6c0f622d599491413a4",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/docs/ADR-005-payment-hub.md": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "c07a716046491448b495275b5314d7ed",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/README.md": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "10495bfcc6c568eca4dab6dd5df795d3",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/index.html": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "931456cbf1cfd5ca1ce8c02ecf80c891",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/docs/flow-transaksi-midtrans.png": {
+    "mtime": 1786718271.5700808,
+    "ast_hash": "e33029ede625ef9c637df7dd3f73f52c",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/public/favicon.svg": {
+    "mtime": 1786718271.5875144,
+    "ast_hash": "7e840862161341271697daa99a40d76b",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/public/icons.svg": {
+    "mtime": 1786718271.5875144,
+    "ast_hash": "3b4fcfcf393eca4d264dca4a4663bc37",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/public/logo.png": {
+    "mtime": 1786718271.5875144,
+    "ast_hash": "7672d83e1a33a4ae5158824bab534b39",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/assets/hero.png": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "aead493361b27e7510691c5d7072dfc1",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/assets/react.svg": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "f0402b67b6ce880f65666bb49e841696",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/assets/vite.svg": {
+    "mtime": 1786718271.591688,
+    "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": ""
+  }
+}

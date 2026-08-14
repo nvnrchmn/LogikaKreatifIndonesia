@@ -19,12 +19,19 @@ import (
 var frontendDir string
 
 func init() {
-	frontendDir = filepath.Join("/home/nvnrchmn/projects/LogikaKreatifIndonesia/logikraf-v2/frontend-dist")
+	frontendDir = os.Getenv("FRONTEND_DIR")
+	if frontendDir == "" {
+		if _, err := os.Stat("./frontend/dist"); err == nil {
+			frontendDir = "./frontend/dist"
+		} else if _, err := os.Stat("./frontend-dist"); err == nil {
+			frontendDir = "./frontend-dist"
+		} else {
+			frontendDir = "./frontend/dist"
+		}
+	}
 }
 
 func main() {
-	_ = os.Setenv("DATABASE_DSN", "root:@tcp(127.0.0.1:3306)/logikraf_v2?charset=utf8mb4&parseTime=True&loc=Local")
-
 	if err := model.Connect(); err != nil {
 		log.Fatal(err)
 	}
