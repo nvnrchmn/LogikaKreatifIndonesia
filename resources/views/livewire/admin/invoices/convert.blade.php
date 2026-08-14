@@ -1,3 +1,0 @@
-<div class="p-8 text-center text-txt-muted">
-    Mengkonversi quotation menjadi invoice...
-</div>

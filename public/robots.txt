@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://logikraf.id/sitemap.xml
