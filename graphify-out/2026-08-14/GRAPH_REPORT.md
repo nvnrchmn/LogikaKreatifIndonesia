@@ -1,7 +1,7 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-14)
 
 ## Corpus Check
-- 131 files · ~62,892 words
+- 131 files · ~65,297 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

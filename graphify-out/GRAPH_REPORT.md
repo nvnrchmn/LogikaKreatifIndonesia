@@ -1,16 +1,16 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-14)
 
 ## Corpus Check
-- 131 files · ~65,297 words
+- 131 files · ~65,528 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 773 nodes · 887 edges · 103 communities (62 shown, 41 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.57)
+- 779 nodes · 893 edges · 98 communities (62 shown, 36 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 43 edges (avg confidence: 0.56)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `817dd17f`
+- Built from commit: `68a4b394`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -73,14 +73,11 @@
 - graphify reference: incremental update and cluster-only
 - React + TypeScript + Vite
 - ContactPage.tsx
-- FaqPage.tsx
 - handler/service.go
 - model/payment_account.go
-- ExampleTest
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - Changelog - 12 Juli 2026
-- BlogPage.tsx
 - PortfolioDetailPage.tsx
 - public/ServicesPage.tsx
 - TermsPage.tsx
@@ -107,10 +104,8 @@
 - CLAUDE.md
 - .claude/CLAUDE.md
 - extraction-spec.md
-- TestimonialsSection.tsx
 - add_soft_deletes.php
 - github.com/logikraf/logikraf-v2
-- SearchPage.tsx
 - public/ServicesPage.tsx
 - public/ServicesPage.tsx
 
@@ -141,7 +136,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (103 total, 41 thin omitted)
+## Communities (98 total, 36 thin omitted)
 
 ### Community 0 - "dependencies"
 Cohesion: 0.05
@@ -192,16 +187,16 @@ Cohesion: 0.05
 Nodes (41): AboutPage, AdminDashboardPage, AdminLayout, AdminLoginPage, AdminPaymentHubPage, AdminPaymentLedgerPage, AdminReconciliationPage, AdminReportsPage (+33 more)
 
 ### Community 14 - "PublicLayout.tsx"
-Cohesion: 0.31
-Nodes (4): Footer(), NavbarProps, Props, HomePage()
+Cohesion: 0.17
+Nodes (5): Footer(), NavbarProps, Portfolio, Testimonial, HomePage()
 
 ### Community 15 - "ai-ui-ux-theme-style.md"
 Cohesion: 0.15
 Nodes (12): 01_PROJECT_OVERVIEW.md, 02_TAILWIND_V4_THEME_CONFIG.md, 03_COMPONENT_LIBRARY.md, 04_RESPONSIVE_BREAKPOINTS.md, 05_DEPLOYMENT_PLAYBOOK.md, 10. Documentation & Knowledge Base, 1. Visual Vibe & Design Philosophy, 2. Color System & Theme Variables (+4 more)
 
 ### Community 17 - "PublicLayout"
-Cohesion: 0.22
-Nodes (3): PublicLayout(), Post, Post
+Cohesion: 0.14
+Nodes (7): Props, PublicLayout(), Post, Errors, FormState, Gateway, SearchItem
 
 ### Community 18 - "3. Core Features & Scope of Work (Ruang Lingkup Proyek)"
 Cohesion: 0.20
@@ -244,8 +239,8 @@ Cohesion: 0.25
 Nodes (7): 1. Membuat Sub-Account (Penjual/Merchant), 2. Membuat Invoice (Checkout Pembayaran), 3. Cek Status Invoice, 4. Pencairan Dana (Disbursement), 5. Webhook Forwarding (Callback), Base URL & Autentikasi, Panduan Integrasi Logikraf Payment Hub (XenPlatform)
 
 ### Community 28 - "ReportsPage.tsx"
-Cohesion: 0.09
-Nodes (9): mockOrders, Order, statusColors, FinanceReport, statMeta, mockTxns, statusColors, Transaction (+1 more)
+Cohesion: 0.07
+Nodes (12): Invoice, InvoiceItem, mockInvoices, statusColors, FinanceReport, statMeta, Setting, SETTINGS_KEYS (+4 more)
 
 ### Community 29 - "README.md"
 Cohesion: 0.25
@@ -327,6 +322,10 @@ Nodes (4): Changelog - Fase 2 & UI/UX Refinements, File yang Berubah, Fitur Baru
 Cohesion: 0.40
 Nodes (4): Changelog: 12 Juli 2026 - Payment Hub (xenPlatform), Fitur Baru (Backend & API), Perbaikan Bug & Refactoring, UI/UX & Admin Portal
 
+### Community 49 - "Settings/SettingsPage.tsx"
+Cohesion: 0.40
+Nodes (3): mockOrders, Order, statusColors
+
 ### Community 50 - "package_crud.go"
 Cohesion: 0.60
 Nodes (4): CreatePackage(), DeletePackage(), Ctx, UpdatePackage()
@@ -363,10 +362,6 @@ Nodes (3): GetServiceBySlug(), GetServices(), Ctx
 Cohesion: 0.67
 Nodes (3): Time, PaymentTransaction, TenantPaymentAccount
 
-### Community 61 - "ExampleTest"
-Cohesion: 0.33
-Nodes (4): Invoice, InvoiceItem, mockInvoices, statusColors
-
 ### Community 67 - "public/ServicesPage.tsx"
 Cohesion: 0.53
 Nodes (5): GetReconciliation(), Ctx, ListPaymentTransactions(), ListTenantPaymentAccounts(), RefundPaymentTransaction()
@@ -374,15 +369,15 @@ Nodes (5): GetReconciliation(), Ctx, ListPaymentTransactions(), ListTenantPaymen
 ## Knowledge Gaps
 - **314 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+309 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **36 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `ClientOrdersPage.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `FaqPage.tsx`, `ExampleTest`, `BlogPage.tsx`, `PortfolioDetailPage.tsx`, `TermsPage.tsx`, `TestimonialsSection.tsx`, `add_soft_deletes.php`, `SearchPage.tsx`, `public/ServicesPage.tsx`, `public/ServicesPage.tsx`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
+- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `ClientOrdersPage.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `PortfolioDetailPage.tsx`, `TermsPage.tsx`, `add_soft_deletes.php`, `public/ServicesPage.tsx`, `public/ServicesPage.tsx`?**
+  _High betweenness centrality (0.092) - this node is a cross-community bridge._
 - **Why does `plugins` connect `plugins` to `PackageTest`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `$schema`, `typescript`, `oxc` to the rest of the system?**
   _314 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**
