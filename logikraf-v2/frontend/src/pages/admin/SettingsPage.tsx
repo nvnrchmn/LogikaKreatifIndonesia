@@ -1,43 +1,149 @@
 import { useEffect, useState } from 'react'
 import { apiGet, apiPut } from '../../lib/api'
 
-const companyFields = [
-  { key: 'company_name', label: 'Nama Perusahaan' },
-  { key: 'company_email', label: 'Email' },
-  { key: 'company_phone', label: 'Telepon' },
-  { key: 'company_address', label: 'Alamat' },
+interface FieldSpec {
+  key: string
+  label: string
+  type?: 'text' | 'password' | 'number' | 'select'
+  options?: string[]
+  placeholder?: string
+  hint?: string
+}
+
+interface GatewaySpec {
+  id: string
+  name: string
+  color: string
+  tagline: string
+  docsUrl: string
+  keys: FieldSpec[]
+}
+
+const companyFields: FieldSpec[] = [
+  { key: 'company_name', label: 'Nama Perusahaan', placeholder: 'PT. Logika Kreatif Indonesia' },
+  { key: 'company_email', label: 'Email Resmi', placeholder: 'halo@logikraf.id' },
+  { key: 'company_phone', label: 'Nomor WhatsApp / Telepon', placeholder: '+62 812-3456-7890' },
+  { key: 'company_address', label: 'Alamat Kantor', placeholder: 'Jakarta, Indonesia' },
 ]
 
-const gatewayDefs = [
+const gatewayDefs: GatewaySpec[] = [
   {
-    id: 'midtrans', name: 'Midtrans', color: 'bg-indigo-500',
+    id: 'ipaymu',
+    name: 'iPaymu',
+    color: 'bg-emerald-500',
+    tagline: 'Payment gateway resmi Bank Indonesia (QRIS, VA Bank BCA/Mandiri/BNI/BRI/Permata, Alfamart/Indomaret).',
+    docsUrl: 'https://my.ipaymu.com',
     keys: [
-      { key: 'midtrans_server_key', label: 'Server Key' },
-      { key: 'midtrans_client_key', label: 'Client Key' },
-      { key: 'midtrans_env', label: 'Environment', type: 'select', options: ['sandbox', 'production'] },
-      { key: 'midtrans_fee_percent', label: 'Fee Midtrans (%)', type: 'number' },
-      { key: 'midtrans_fee_flat', label: 'Fee Flat Midtrans (Rp)', type: 'number' },
-      { key: 'platform_fee_percent', label: 'Fee Platform Logikraf (%)', type: 'number' },
+      {
+        key: 'ipaymu_master_va',
+        label: 'Master Virtual Account (VA) iPaymu',
+        type: 'text',
+        placeholder: 'Contoh: 1179000000000000 atau 0000001234567890',
+        hint: 'Nomor VA Master dari menu Profil / Akun di dashboard iPaymu.',
+      },
+      {
+        key: 'ipaymu_master_key',
+        label: 'Master API Key / Secret Key iPaymu',
+        type: 'password',
+        placeholder: 'Tempel API Key dari menu Integrasi > API Key iPaymu',
+        hint: 'Kunci otentikasi rahasia untuk menandatangani transaksi (HMAC-SHA256).',
+      },
+      {
+        key: 'ipaymu_env',
+        label: 'Mode Lingkungan (Environment)',
+        type: 'select',
+        options: ['sandbox', 'production'],
+        hint: 'Gunakan "production" untuk menerima pembayaran nyata, atau "sandbox" untuk uji coba.',
+      },
+      {
+        key: 'ipaymu_fee_percent',
+        label: 'Biaya Provider iPaymu (%)',
+        type: 'number',
+        placeholder: '0',
+        hint: 'Persentase MDR provider (misal: 0.7 untuk QRIS).',
+      },
+      {
+        key: 'ipaymu_fee_flat',
+        label: 'Biaya Flat iPaymu (Rp)',
+        type: 'number',
+        placeholder: '0',
+        hint: 'Biaya tetap per transaksi (misal: 3500 untuk VA Bank).',
+      },
     ],
   },
   {
-    id: 'xendit', name: 'Xendit', color: 'bg-yellow-500',
+    id: 'midtrans',
+    name: 'Midtrans',
+    color: 'bg-indigo-500',
+    tagline: 'Payment aggregator Snap API (Kartu Kredit 3DS, GoPay, ShopeePay, Bank Transfer).',
+    docsUrl: 'https://dashboard.midtrans.com',
     keys: [
-      { key: 'xendit_secret_key', label: 'Secret Key' },
-      { key: 'xendit_public_key', label: 'Public Key' },
-      { key: 'xendit_webhook_token', label: 'Webhook Token' },
-      { key: 'xendit_fee_percent', label: 'Fee Xendit (%)', type: 'number' },
-      { key: 'xendit_fee_flat', label: 'Fee Flat Xendit (Rp)', type: 'number' },
+      {
+        key: 'midtrans_server_key',
+        label: 'Server Key',
+        type: 'password',
+        placeholder: 'SB-Mid-server-... atau Mid-server-...',
+        hint: 'Server Key dari menu Settings > Access Keys di dashboard Midtrans.',
+      },
+      {
+        key: 'midtrans_client_key',
+        label: 'Client Key',
+        type: 'text',
+        placeholder: 'SB-Mid-client-... atau Mid-client-...',
+        hint: 'Client Key publik untuk inisialisasi frontend Snap modal.',
+      },
+      {
+        key: 'midtrans_env',
+        label: 'Environment',
+        type: 'select',
+        options: ['sandbox', 'production'],
+      },
+      {
+        key: 'midtrans_fee_percent',
+        label: 'Fee Midtrans (%)',
+        type: 'number',
+        placeholder: '0',
+      },
+      {
+        key: 'midtrans_fee_flat',
+        label: 'Fee Flat Midtrans (Rp)',
+        type: 'number',
+        placeholder: '0',
+      },
     ],
   },
   {
-    id: 'ipaymu', name: 'iPaymu', color: 'bg-emerald-500',
+    id: 'xendit',
+    name: 'Xendit',
+    color: 'bg-yellow-500',
+    tagline: 'Payment gateway XenInvoice (Virtual Account, E-Wallet, Retail Outlet, Credit Card).',
+    docsUrl: 'https://dashboard.xendit.co',
     keys: [
-      { key: 'ipaymu_master_va', label: 'Master VA iPaymu' },
-      { key: 'ipaymu_master_key', label: 'Master API Key iPaymu' },
-      { key: 'ipaymu_env', label: 'Environment', type: 'select', options: ['sandbox', 'production'] },
-      { key: 'ipaymu_fee_percent', label: 'Fee iPaymu (%)', type: 'number' },
-      { key: 'ipaymu_fee_flat', label: 'Fee Flat iPaymu (Rp)', type: 'number' },
+      {
+        key: 'xendit_secret_key',
+        label: 'Secret API Key',
+        type: 'password',
+        placeholder: 'xnd_development_... atau xnd_production_...',
+        hint: 'Secret Key dari dashboard Xendit (Settings > API Keys).',
+      },
+      {
+        key: 'xendit_webhook_token',
+        label: 'Webhook Verification Token',
+        type: 'password',
+        placeholder: 'Token verifikasi webhook dari Xendit',
+      },
+      {
+        key: 'xendit_fee_percent',
+        label: 'Fee Xendit (%)',
+        type: 'number',
+        placeholder: '0',
+      },
+      {
+        key: 'xendit_fee_flat',
+        label: 'Fee Flat Xendit (Rp)',
+        type: 'number',
+        placeholder: '0',
+      },
     ],
   },
 ]
@@ -45,8 +151,8 @@ const gatewayDefs = [
 export default function AdminSettingsPage() {
   const [items, setItems] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const [editKey, setEditKey] = useState<string | null>(null)
-  const [form, setForm] = useState({ key: '', value: '', label: '' })
+  const [savingKey, setSavingKey] = useState<string | null>(null)
+  const [showSecret, setShowSecret] = useState<Record<string, boolean>>({})
 
   const [gateways, setGateways] = useState<string[]>([])
   const [toast, setToast] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null)
@@ -55,7 +161,7 @@ export default function AdminSettingsPage() {
     setLoading(true)
     try {
       const data = await apiGet('/api/settings')
-      setItems(data as Record<string, string>)
+      setItems((data as Record<string, string>) || {})
     } catch {
       // noop
     } finally {
@@ -69,11 +175,13 @@ export default function AdminSettingsPage() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const flash = (type: 'ok' | 'err', msg: string) => {
     setToast({ type, msg })
-    setTimeout(() => setToast(null), 3000)
+    setTimeout(() => setToast(null), 3500)
   }
 
   const toggleGateway = async (id: string, on: boolean) => {
@@ -81,201 +189,319 @@ export default function AdminSettingsPage() {
     setGateways(next)
     try {
       await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
-      flash('ok', `Gateway ${id} ${on ? 'diaktifkan' : 'dinonaktifkan'}`)
+      flash('ok', `Gateway ${id.toUpperCase()} ${on ? 'diaktifkan' : 'dinonaktifkan'}`)
     } catch {
-      flash('err', 'Gagal menyimpan status gateway')
+      flash('err', 'Gagal mengubah status gateway')
     }
   }
 
-  const saveKey = async (key: string, value: string) => {
-    if (value === '') return
+  const handleFieldChange = (key: string, value: string) => {
+    setItems(prev => ({ ...prev, [key]: value }))
+  }
+
+  const saveSingleGateway = async (spec: GatewaySpec) => {
+    setSavingKey(spec.id)
     try {
-      await apiPut(`/api/settings/${encodeURIComponent(key)}`, { value })
-      flash('ok', `${key} tersimpan`)
+      for (const k of spec.keys) {
+        const val = items[k.key] ?? (k.type === 'select' ? k.options?.[0] || 'sandbox' : '')
+        await apiPut(`/api/settings/${encodeURIComponent(k.key)}`, { value: val })
+      }
+      // Otomatis aktifkan jika belum aktif
+      if (!gateways.includes(spec.id)) {
+        const next = [...gateways, spec.id]
+        setGateways(next)
+        await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
+      }
+      flash('ok', `Pengaturan ${spec.name} berhasil disimpan dan diaktifkan!`)
     } catch {
-      flash('err', `Gagal menyimpan ${key}`)
+      flash('err', `Gagal menyimpan pengaturan ${spec.name}`)
+    } finally {
+      setSavingKey(null)
     }
-    load()
   }
 
-  const startEdit = (key: string, label: string, value: string) => {
-    setEditKey(key)
-    setForm({ key, value, label })
+  const saveCompanyProfile = async () => {
+    setSavingKey('company')
+    try {
+      for (const f of companyFields) {
+        const val = items[f.key] || ''
+        await apiPut(`/api/settings/${encodeURIComponent(f.key)}`, { value: val })
+      }
+      flash('ok', 'Profil perusahaan berhasil disimpan')
+    } catch {
+      flash('err', 'Gagal menyimpan profil perusahaan')
+    } finally {
+      setSavingKey('company')
+    }
   }
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!editKey) return
-    await saveKey(editKey, form.value)
-    setEditKey(null)
+  const toggleShowSecret = (key: string) => {
+    setShowSecret(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    flash('ok', `${label} berhasil disalin ke clipboard!`)
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8 pb-12">
       <div>
-        <h1 className="text-2xl font-display font-extrabold text-text-main">Pengaturan</h1>
-        <p className="text-text-muted text-sm mt-0.5">Kelola profil bisnis dan payment gateway.</p>
+        <h1 className="text-2xl lg:text-3xl font-display font-extrabold text-text-main tracking-tight">Pengaturan Sistem</h1>
+        <p className="text-text-muted text-sm mt-1">Kelola kredensial Payment Gateway (iPaymu, Midtrans, Xendit) dan profil perusahaan.</p>
       </div>
 
       {toast && (
-        <div className={`p-3 rounded-xl text-sm font-medium ${toast.type === 'ok' ? 'bg-status-success/10 border border-status-success/30 text-status-success' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-          {toast.msg}
+        <div className={`p-4 rounded-xl text-sm font-medium transition-all shadow-sm flex items-center justify-between gap-3 ${
+          toast.type === 'ok'
+            ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+            : 'bg-red-50 border border-red-200 text-red-800'
+        }`}>
+          <span>{toast.msg}</span>
+          <button onClick={() => setToast(null)} className="text-xs opacity-70 hover:opacity-100 font-bold">✕</button>
         </div>
       )}
 
-      {/* Company profile */}
-      <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6">
-        <h3 className="font-display font-bold text-text-main mb-1">Profil Perusahaan</h3>
-        <p className="text-text-muted text-sm mb-5">Informasi dasar yang tampil di website & invoice.</p>
-        <div className="divide-y divide-border-minimal">
-          {loading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="py-3 flex justify-between gap-4">
-                <div className="w-32 h-4 bg-gray-100 rounded animate-pulse" />
-                <div className="flex-1 h-4 bg-gray-100 rounded animate-pulse" />
-              </div>
-            ))
-          ) : (
-            companyFields.map(f => (
-              <div key={f.key} className="py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
-                <span className="text-sm font-medium text-text-muted sm:w-40 shrink-0">{f.label}</span>
-                <span className="flex-1 text-sm text-text-main break-words">{items[f.key] || '—'}</span>
-                <button
-                  onClick={() => startEdit(f.key, f.label, items[f.key] || '')}
-                  className="text-brand-primary hover:text-brand-primary/80 font-medium text-sm shrink-0"
-                >
-                  Edit
-                </button>
-              </div>
-            ))
-          )}
+      {/* Payment Gateway Settings */}
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-display font-bold text-text-main">Gerbang Pembayaran (Payment Gateway)</h2>
+          <p className="text-xs text-text-muted mt-0.5">Konfigurasikan API Key dan nomor VA untuk menerima pembayaran otomatis dari klien.</p>
         </div>
-      </div>
 
-      {/* Payment gateways */}
-      <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6">
-        <h3 className="font-display font-bold text-text-main mb-1">Payment Gateway</h3>
-        <p className="text-text-muted text-sm mb-5">Pilih gateway aktif. Perubahan otomatis memengaruhi ToS, FAQ, & checkout.</p>
-        <div className="space-y-3">
-          {gatewayDefs.map(g => {
-            const on = gateways.includes(g.id)
-            return (
-              <div key={g.id} className="p-4 rounded-xl border border-border-minimal">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-2.5 h-2.5 rounded-full ${g.color}`} />
-                    <div>
-                      <p className="font-medium text-text-main text-sm">{g.name}</p>
-                      <p className={`text-xs ${on ? 'text-status-success' : 'text-text-muted'}`}>
-                        {on ? 'Aktif' : 'Nonaktif'}
-                      </p>
+        {gatewayDefs.map(g => {
+          const on = gateways.includes(g.id)
+          const isBusy = savingKey === g.id
+          const isIPaymu = g.id === 'ipaymu'
+          const isConfigured = isIPaymu
+            ? Boolean(items['ipaymu_master_va'] && items['ipaymu_master_key'])
+            : g.id === 'midtrans'
+            ? Boolean(items['midtrans_server_key'])
+            : Boolean(items['xendit_secret_key'])
+
+          return (
+            <div
+              key={g.id}
+              className={`bg-white rounded-2xl border transition-all shadow-sm overflow-hidden ${
+                isIPaymu
+                  ? 'border-emerald-200 ring-2 ring-emerald-500/10'
+                  : 'border-border-minimal'
+              }`}
+            >
+              {/* Header Gateway */}
+              <div className="p-5 sm:p-6 border-b border-border-minimal flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-canvas-overlay/30">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <span className={`w-3.5 h-3.5 rounded-full mt-1 sm:mt-0 shrink-0 ${g.color}`} />
+                  <div>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="font-display font-bold text-text-main text-base">{g.name}</h3>
+                      {isIPaymu && (
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
+                          Rekomendasi Utama
+                        </span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                        on
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {on ? '● Gateway Aktif' : '○ Nonaktif'}
+                      </span>
+                      {isConfigured ? (
+                        <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-medium text-[11px]">
+                          ✓ Kredensial Terisi
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 font-medium text-[11px]">
+                          ⚠️ Kredensial Belum Lengkap
+                        </span>
+                      )}
                     </div>
+                    <p className="text-xs text-text-muted mt-1 leading-relaxed">{g.tagline}</p>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                  <span className="text-xs font-medium text-text-muted">{on ? 'Aktifkan' : 'Matikan'}</span>
                   <button
                     type="button"
                     onClick={() => toggleGateway(g.id, !on)}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${on ? 'bg-brand-primary' : 'bg-gray-300'}`}
+                    className={`relative w-12 h-6.5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-primary/20 ${
+                      on ? 'bg-brand-primary' : 'bg-gray-300'
+                    }`}
                     aria-pressed={on}
+                    aria-label={`Toggle ${g.name}`}
                   >
-                    <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${on ? 'left-[22px]' : 'left-0.5'}`} />
+                    <span
+                      className={`absolute top-0.5 w-5.5 h-5.5 rounded-full bg-white shadow transition-all ${
+                        on ? 'left-[24px]' : 'left-0.5'
+                      }`}
+                    />
                   </button>
                 </div>
-                {on && (
-                  <div className="mt-4 pt-4 border-t border-border-minimal space-y-3">
-                    {/* Heuristic #10: Help and Documentation for Webhook setup */}
-                    <div className="p-3 bg-canvas-light rounded-xl border border-border-minimal flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                      <div>
-                        <span className="font-semibold text-text-main">Webhook Callback URL:</span>
-                        <span className="text-text-muted ml-1.5 font-mono break-all">{`${window.location.origin}/api/webhooks/${g.id}`}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/${g.id}`)
-                          setToast({ type: 'ok', msg: `URL Webhook ${g.name} disalin!` })
-                          setTimeout(() => setToast(null), 2500)
-                        }}
-                        className="text-brand-primary hover:underline font-semibold shrink-0"
-                      >
-                        Salin URL
-                      </button>
+              </div>
+
+              {/* Body Gateway Form */}
+              <div className="p-5 sm:p-6 space-y-5">
+                {/* Documentation / Webhook Helper Box */}
+                <div className="p-4 bg-canvas-light rounded-xl border border-border-minimal flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-text-main">URL Webhook / Notification URL:</span>
+                      <span className="px-1.5 py-0.5 rounded bg-gray-200/80 font-mono text-[10px] text-text-main">POST</span>
                     </div>
-                    {g.keys.map(k => (
-                      <div key={k.key}>
-                        <label className="label text-xs">{k.label}</label>
+                    <p className="font-mono text-text-muted break-all text-[11px]">
+                      {`${window.location.origin}/api/webhooks/${g.id}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(`${window.location.origin}/api/webhooks/${g.id}`, `Webhook URL ${g.name}`)}
+                      className="btn-secondary text-xs py-1.5 px-3 whitespace-nowrap active:scale-[0.98]"
+                    >
+                      📋 Salin URL Webhook
+                    </button>
+                    <a
+                      href={g.docsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand-primary hover:underline text-xs font-semibold whitespace-nowrap px-2"
+                    >
+                      Buka Dashboard {g.name} ↗
+                    </a>
+                  </div>
+                </div>
+
+                {/* Form Inputs Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {g.keys.map(k => {
+                    const isSecret = k.type === 'password'
+                    const show = showSecret[k.key] || false
+                    const val = items[k.key] ?? ''
+
+                    return (
+                      <div
+                        key={k.key}
+                        className={k.key === 'ipaymu_master_key' || k.key === 'midtrans_server_key' || k.key === 'xendit_secret_key' ? 'md:col-span-2' : ''}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-text-main">{k.label}</label>
+                          {isSecret && (
+                            <button
+                              type="button"
+                              onClick={() => toggleShowSecret(k.key)}
+                              className="text-[11px] text-brand-primary hover:underline font-medium"
+                            >
+                              {show ? 'Sembunyikan' : 'Lihat'}
+                            </button>
+                          )}
+                        </div>
+
                         {k.type === 'select' ? (
                           <select
-                            className="form-input"
-                            defaultValue={items[k.key] || 'sandbox'}
-                            onChange={e => saveKey(k.key, e.target.value)}
+                            className="form-input text-sm"
+                            value={val || 'sandbox'}
+                            onChange={e => handleFieldChange(k.key, e.target.value)}
                           >
                             {(k.options || []).map(o => (
-                              <option key={o} value={o}>{o}</option>
+                              <option key={o} value={o}>
+                                {o === 'production' ? '🚀 Production (Live / Transaksi Nyata)' : '🧪 Sandbox (Uji Coba / Testing)'}
+                              </option>
                             ))}
                           </select>
                         ) : k.type === 'number' ? (
                           <input
                             type="number"
                             step="0.01"
-                            className="form-input"
-                            placeholder="0"
-                            defaultValue={items[k.key] || ''}
-                            onBlur={e => saveKey(k.key, e.target.value)}
+                            className="form-input text-sm"
+                            placeholder={k.placeholder || '0'}
+                            value={val}
+                            onChange={e => handleFieldChange(k.key, e.target.value)}
                           />
                         ) : (
-                          <input
-                            type="password"
-                            className="form-input"
-                            placeholder="••••••••"
-                            defaultValue={items[k.key] || ''}
-                            onBlur={e => saveKey(k.key, e.target.value)}
-                          />
+                          <div className="relative">
+                            <input
+                              type={isSecret && !show ? 'password' : 'text'}
+                              className="form-input text-sm pr-10 font-mono"
+                              placeholder={k.placeholder || ''}
+                              value={val}
+                              onChange={e => handleFieldChange(k.key, e.target.value)}
+                            />
+                            {val && (
+                              <button
+                                type="button"
+                                onClick={() => handleFieldChange(k.key, '')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+                                title="Hapus teks"
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {k.hint && (
+                          <p className="text-[11px] text-text-muted mt-1 leading-normal">{k.hint}</p>
                         )}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )
+                  })}
+                </div>
+
+                {/* Save Button for this Gateway */}
+                <div className="pt-3 border-t border-border-minimal flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <p className="text-xs text-text-muted">
+                    Pastikan Master VA & API Key sudah sesuai dengan akun dashboard Anda.
+                  </p>
+                  <button
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => saveSingleGateway(g)}
+                    className="btn-primary text-sm py-2 px-5 whitespace-nowrap active:scale-[0.98] transition-all disabled:opacity-50 w-full sm:w-auto"
+                  >
+                    {isBusy ? 'Menyimpan...' : `Simpan Pengaturan ${g.name}`}
+                  </button>
+                </div>
               </div>
-            )
-          })}
-        </div>
+            </div>
+          )
+        })}
       </div>
 
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={async () => {
-            const pending: Promise<void>[] = []
-            gatewayDefs.filter(g => gateways.includes(g.id)).forEach(g =>
-              g.keys.forEach(k => {
-                const v = items[k.key]
-                if (v) pending.push(saveKey(k.key, v))
-              })
-            )
-            await Promise.all(pending)
-            flash('ok', 'Semua pengaturan gateway tersimpan')
-          }}
-          className="btn-primary"
-        >
-          Simpan Perubahan
-        </button>
-      </div>
-
-      {editKey && (
-        <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6">
-          <h3 className="font-display font-bold text-text-main mb-4">Edit {form.label}</h3>
-          <form onSubmit={save} className="flex flex-col sm:flex-row gap-3">
-            <input
-              className="form-input flex-1"
-              value={form.value}
-              onChange={e => setForm({ ...form, value: e.target.value })}
-              required
-            />
-            <button type="submit" className="btn-primary shrink-0">Simpan</button>
-            <button type="button" onClick={() => setEditKey(null)} className="btn-secondary shrink-0">Batal</button>
-          </form>
+      {/* Company Profile Settings */}
+      <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6 space-y-5">
+        <div>
+          <h2 className="font-display font-bold text-text-main text-base">Profil Perusahaan & Legalitas</h2>
+          <p className="text-xs text-text-muted mt-0.5">Informasi resmi yang tercantum pada header, footer, Terms of Service, dan Invoice.</p>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {companyFields.map(f => (
+            <div key={f.key}>
+              <label className="text-xs font-bold text-text-main mb-1 block">{f.label}</label>
+              <input
+                type="text"
+                className="form-input text-sm"
+                placeholder={f.placeholder || ''}
+                value={items[f.key] || ''}
+                onChange={e => handleFieldChange(f.key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-3 border-t border-border-minimal flex justify-end">
+          <button
+            type="button"
+            disabled={savingKey === 'company'}
+            onClick={saveCompanyProfile}
+            className="btn-secondary text-sm py-2 px-5 active:scale-[0.98] transition-all"
+          >
+            {savingKey === 'company' ? 'Menyimpan...' : 'Simpan Profil Perusahaan'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
