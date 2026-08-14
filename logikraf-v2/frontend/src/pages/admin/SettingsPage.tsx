@@ -190,8 +190,8 @@ export default function AdminSettingsPage() {
     try {
       await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
       flash('ok', `Gateway ${id.toUpperCase()} ${on ? 'diaktifkan' : 'dinonaktifkan'}`)
-    } catch {
-      flash('err', 'Gagal mengubah status gateway')
+    } catch (err: any) {
+      flash('err', err?.message || 'Gagal mengubah status gateway')
     }
   }
 
@@ -213,8 +213,8 @@ export default function AdminSettingsPage() {
         await apiPut(`/api/settings/${encodeURIComponent('payment_gateways')}`, { value: JSON.stringify(next) })
       }
       flash('ok', `Pengaturan ${spec.name} berhasil disimpan dan diaktifkan!`)
-    } catch {
-      flash('err', `Gagal menyimpan pengaturan ${spec.name}`)
+    } catch (err: any) {
+      flash('err', err?.message || `Gagal menyimpan pengaturan ${spec.name}`)
     } finally {
       setSavingKey(null)
     }
@@ -228,8 +228,8 @@ export default function AdminSettingsPage() {
         await apiPut(`/api/settings/${encodeURIComponent(f.key)}`, { value: val })
       }
       flash('ok', 'Profil perusahaan berhasil disimpan')
-    } catch {
-      flash('err', 'Gagal menyimpan profil perusahaan')
+    } catch (err: any) {
+      flash('err', err?.message || 'Gagal menyimpan profil perusahaan')
     } finally {
       setSavingKey('company')
     }

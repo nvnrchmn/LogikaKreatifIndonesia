@@ -1,16 +1,16 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-14)
 
 ## Corpus Check
-- 131 files · ~62,615 words
+- 131 files · ~62,812 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 772 nodes · 881 edges · 102 communities (62 shown, 40 thin omitted)
+- 773 nodes · 886 edges · 102 communities (61 shown, 41 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.57)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8c3269a4`
+- Built from commit: `351933b9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -140,7 +140,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (102 total, 40 thin omitted)
+## Communities (102 total, 41 thin omitted)
 
 ### Community 0 - "dependencies"
 Cohesion: 0.05
@@ -200,7 +200,7 @@ Nodes (12): 01_PROJECT_OVERVIEW.md, 02_TAILWIND_V4_THEME_CONFIG.md, 03_COMPONENT
 
 ### Community 17 - "PublicLayout"
 Cohesion: 0.18
-Nodes (3): PublicLayout(), Post, Post
+Nodes (3): PublicLayout(), Portfolio, Service
 
 ### Community 18 - "3. Core Features & Scope of Work (Ruang Lingkup Proyek)"
 Cohesion: 0.20
@@ -234,17 +234,13 @@ Nodes (8): 1. Persiapan Awal, 2. Alur Pembayaran (Flow), 3. Dokumentasi API (End
 Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
-### Community 26 - "ClientDashboardPage.tsx"
-Cohesion: 0.33
-Nodes (4): mockTxns, statusColors, Transaction, TransactionRefund
-
 ### Community 27 - "Panduan Integrasi Logikraf Payment Hub (XenPlatform)"
 Cohesion: 0.25
 Nodes (7): 1. Membuat Sub-Account (Penjual/Merchant), 2. Membuat Invoice (Checkout Pembayaran), 3. Cek Status Invoice, 4. Pencairan Dana (Disbursement), 5. Webhook Forwarding (Callback), Base URL & Autentikasi, Panduan Integrasi Logikraf Payment Hub (XenPlatform)
 
 ### Community 28 - "ReportsPage.tsx"
-Cohesion: 0.10
-Nodes (8): mockOrders, Order, statusColors, FinanceReport, statMeta, mockServices, Service, ServiceFeature
+Cohesion: 0.11
+Nodes (10): mockOrders, Order, statusColors, mockServices, Service, ServiceFeature, mockTxns, statusColors (+2 more)
 
 ### Community 29 - "README.md"
 Cohesion: 0.25
@@ -335,8 +331,8 @@ Cohesion: 0.60
 Nodes (4): CreateService(), DeleteService(), Ctx, UpdateService()
 
 ### Community 52 - "settings.go"
-Cohesion: 0.60
-Nodes (4): GetSetting(), Ctx, ListSettings(), SetSetting()
+Cohesion: 0.73
+Nodes (5): GetSetting(), Ctx, ListSettings(), resolveTenant(), SetSetting()
 
 ### Community 53 - "graphify reference: add a URL and watch a folder"
 Cohesion: 0.50
@@ -373,7 +369,7 @@ Nodes (5): GetReconciliation(), Ctx, ListPaymentTransactions(), ListTenantPaymen
 ## Knowledge Gaps
 - **314 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+309 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **40 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

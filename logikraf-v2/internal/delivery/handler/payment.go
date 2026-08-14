@@ -23,10 +23,15 @@ import (
 
 func setting(key, tenant string) string {
 	var s model.Setting
-	if err := model.DB.Where("tenant = ? AND `key` = ?", tenant, key).First(&s).Error; err != nil {
-		return ""
+	if err := model.DB.Where("tenant = ? AND `key` = ?", tenant, key).First(&s).Error; err == nil {
+		return s.Value
 	}
-	return s.Value
+	if tenant != "logikraf" {
+		if err := model.DB.Where("tenant = ? AND `key` = ?", "logikraf", key).First(&s).Error; err == nil {
+			return s.Value
+		}
+	}
+	return ""
 }
 
 // tenantOf resolves the tenant from the request Host (strips port and www.).
