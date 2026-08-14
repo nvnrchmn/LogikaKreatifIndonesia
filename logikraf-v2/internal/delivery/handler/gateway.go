@@ -8,20 +8,12 @@ import (
 )
 
 var gatewayPolicies = map[string]string{
-	"xendit": "Xendit adalah penyelenggara jasa sistem pembayaran (PJP) yang tunduk pada regulasi Bank Indonesia. " +
-		"Dana transaksi disetel (settlement) ke rekening merchant sesuai jadwal (umumnya T+3). " +
-		"Biaya layanan (MDR) dipotong per transaksi; merchant bertanggung jawab atas pajak terkait. " +
-		"Pengembalian dana (refund) diinisiasi oleh merchant dan dikembalikan ke metode pembayaran asal; Xendit tidak menanggung biaya chargeback. " +
-		"Xendit berhak menahan (hold) dana jika terindikasi risiko/fraud.",
-	"midtrans": "Midtrans adalah payment aggregator yang tunduk pada ketentuan Bank Indonesia dan peraturan berlaku. " +
-		"Settlement dilakukan T+2 s.d. T+3 tergantung metode pembayaran. " +
-		"Biaya admin dikenakan per transaksi sesuai kontrak; kartu kredit/debit memiliki biaya tambahan. " +
-		"Merchant wajib mematuhi PCI DSS (tidak menyimpan nomor kartu utuh). " +
-		"Midtrans berhak menunda settlement apabila terdapat indikasi fraud atau pelanggaran terms.",
-	"ipaymu": "iPaymu adalah penyelenggara payment gateway berlisensi Bank Indonesia (PJP Kategori 3). " +
-		"Mendukung pembayaran Virtual Account (BCA, Mandiri, BNI, BRI, Permata, Danamon, CIMB Niaga), QRIS, Gerai Ritel (Indomaret & Alfamart), dan Kartu Kredit. " +
-		"Proses transaksi aman dengan enkripsi SSL 256-bit dan settlement otomatis sesuai SLA perbankan. " +
-		"Pengembalian dana (refund) diproses sesuai Kebijakan Refund Logikraf melalui channel pembayaran resmi.",
+	"ipaymu": "iPaymu adalah penyelenggara payment gateway resmi berlisensi Bank Indonesia (PJP Kategori 3). " +
+		"Pembayaran diproses secara instan melalui QRIS Dinamis yang dapat dipindai dari seluruh aplikasi Mobile Banking (BCA Mobile, Livin' Mandiri, BRImo, BNI Mobile, PermataMobile, CIMB OCTO) serta E-Wallet (GoPay, OVO, DANA, ShopeePay, LinkAja). " +
+		"Verifikasi pembayaran berlangsung secara otomatis dan real-time dalam hitungan detik. " +
+		"Semua transaksi aman terenkripsi SSL 256-bit dan proses pengembalian dana (refund) diproses sesuai Kebijakan Refund resmi Logikraf.",
+	"midtrans": "Midtrans adalah payment aggregator berlisensi Bank Indonesia yang memproses pembayaran instan melalui QRIS (GoPay, ShopeePay, & seluruh aplikasi perbankan berstandar QRIS).",
+	"xendit": "Xendit adalah penyelenggara sistem pembayaran berlisensi Bank Indonesia yang memproses pembayaran digital melalui QRIS real-time.",
 }
 
 func activeGatewayIDs(tenant string) []string {

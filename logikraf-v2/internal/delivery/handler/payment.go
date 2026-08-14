@@ -446,17 +446,19 @@ func CreateIpaymuPayment(c fiber.Ctx) error {
 
 	amountStr := strconv.Itoa(int(in.Amount))
 	bodyMap := map[string]any{
-		"product":     []string{orDefault(in.Description, "Logikraf Package")},
-		"qty":         []string{"1"},
-		"price":       []string{amountStr},
-		"description": []string{orDefault(in.Description, "Logikraf Package")},
-		"returnUrl":   "https://" + c.Host() + "/paket?status=success",
-		"cancelUrl":   "https://" + c.Host() + "/paket",
-		"notifyUrl":   "https://" + c.Host() + "/api/webhooks/ipaymu",
-		"referenceId": in.OrderID,
-		"buyerName":   in.FirstName,
-		"buyerEmail":  in.Email,
-		"buyerPhone":  in.Phone,
+		"product":        []string{orDefault(in.Description, "Logikraf Package")},
+		"qty":            []string{"1"},
+		"price":          []string{amountStr},
+		"description":    []string{orDefault(in.Description, "Logikraf Package")},
+		"returnUrl":      "https://" + c.Host() + "/paket?status=success",
+		"cancelUrl":      "https://" + c.Host() + "/paket",
+		"notifyUrl":      "https://" + c.Host() + "/api/webhooks/ipaymu",
+		"referenceId":    in.OrderID,
+		"buyerName":      in.FirstName,
+		"buyerEmail":     in.Email,
+		"buyerPhone":     in.Phone,
+		"paymentMethod":  "qris",
+		"paymentChannel": "qris",
 	}
 	bodyBytes, _ := json.Marshal(bodyMap)
 	sig := ipaymuSign(va, string(bodyBytes), key)

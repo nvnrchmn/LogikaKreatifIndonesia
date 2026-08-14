@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/admin/SettingsPage.tsx": {
-    "mtime": 1786723083.3105068,
-    "ast_hash": "6b473b16555d5ee9fb8111ab251b5a2d",
+    "mtime": 1786723397.7485545,
+    "ast_hash": "db743bfe2f83c5916f883d0101ede339",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/admin/Settings/SettingsPage.tsx": {
@@ -215,8 +215,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/FaqPage.tsx": {
-    "mtime": 1786721728.9190423,
-    "ast_hash": "b45e772be039a509bdf501f84c6b2039",
+    "mtime": 1786723802.4301372,
+    "ast_hash": "fb1c6972168e5cb50eddbbb25651438e",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/HomePage.tsx": {
@@ -225,8 +225,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/PackagesPage.tsx": {
-    "mtime": 1786721750.9594598,
-    "ast_hash": "74ea7e10becad3e6aa56d9bc486c251e",
+    "mtime": 1786723813.2726133,
+    "ast_hash": "72dedc281161173ba273177555929f1d",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/PortfolioDetailPage.tsx": {
@@ -235,8 +235,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/PrivacyPage.tsx": {
-    "mtime": 1786718271.6018775,
-    "ast_hash": "3faf2aae3f5e526add551756bd7d6bf4",
+    "mtime": 1786723783.3049703,
+    "ast_hash": "c81eb26510c4b007782099003cb2f6db",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/SearchPage.tsx": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/TermsPage.tsx": {
-    "mtime": 1786721722.056837,
-    "ast_hash": "f2ac2a3197e6ac2d901e69bf58cb8824",
+    "mtime": 1786723793.4955964,
+    "ast_hash": "c10c84826831544ac780719cbdd3fe2c",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/tests/smoke.sh": {
@@ -290,8 +290,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/gateway.go": {
-    "mtime": 1786721704.368862,
-    "ast_hash": "32c9835255d02af01d57dbd0206ffd07",
+    "mtime": 1786723768.3453882,
+    "ast_hash": "94b05ed8a1e2835d66308337bebeadfc",
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/handler_test.go": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/payment.go": {
-    "mtime": 1786718271.617936,
-    "ast_hash": "2d438f59185b5e3a174a996fc72c6134",
+    "mtime": 1786723773.8719552,
+    "ast_hash": "db7d11859928a635e44df909ffd44469",
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/payment_account.go": {
@@ -365,8 +365,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/settings.go": {
-    "mtime": 1786718271.617936,
-    "ast_hash": "f7e5dc9fbfcb0171c8cde178520958a5",
+    "mtime": 1786723354.0984454,
+    "ast_hash": "a4f4e81de43dad627598372ebb3639d0",
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/sitemap.go": {

@@ -181,13 +181,13 @@ export default function PackagesPage() {
                   <label className="label">Nomor Telepon / WhatsApp</label>
                   <input className="form-input" required value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
                 </div>
-                <div>
-                  <label className="label">Catatan / Brief Pesanan (Opsional)</label>
-                  <textarea className="form-input resize-none" rows={3} value={form.note} onChange={e => setForm({ ...form, note: e.target.value })} />
+                <div className="p-3 bg-canvas-light rounded-xl border border-border-minimal flex items-center gap-2.5 text-xs text-text-muted">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>Metode Pembayaran: <strong>QRIS Dinamis Real-Time</strong> (Scan via seluruh m-Banking & E-Wallet)</span>
                 </div>
                 {err && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{err}</div>}
                 <button type="submit" disabled={busy} className="w-full bg-gradient-to-r from-brand-primary to-blue-600 text-white font-extrabold py-4 rounded-xl hover:opacity-95 transition-all shadow-xl shadow-brand-primary/25 text-base disabled:opacity-60">
-                  {busy ? 'Memproses...' : `Lanjut ke ${gatewayText}`}
+                  {busy ? 'Membuat Kode QRIS...' : `Bayar via QRIS (${gatewayText})`}
                 </button>
               </form>
             </div>
