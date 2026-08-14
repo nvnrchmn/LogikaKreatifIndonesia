@@ -42,12 +42,12 @@ export default function BusinessesPage() {
   const { data: businesses = mockBusinesses, isLoading } = useQuery(['businesses'], () => Promise.resolve(mockBusinesses))
 
   const createMutation = useMutation(
-    (data: Business) => console.log('create', data),
+    async (data: Business) => { console.log('create', data) },
     { onSuccess: () => { message.success('Created'); setIsModalOpen(false); form.resetFields() } }
   )
 
   const updateMutation = useMutation(
-    (data: Business) => console.log('update', data),
+    async (data: Business) => { console.log('update', data) },
     { onSuccess: () => { message.success('Updated'); setIsModalOpen(false); setEditingBusiness(null); form.resetFields() } }
   )
 
@@ -117,7 +117,7 @@ export default function BusinessesPage() {
           <Form.Item name="address" label="Alamat"><Input /></Form.Item>
           <Form.Item name="google_maps" label="Google Maps URL"><Input /></Form.Item>
           <Form.Item name="category" label="Kategori"><Input /></Form.Item>
-          <Form.Item name="status" label="Status"><Select options={[{ value: 'active', label: 'Aktif' }, { value: 'inactive', label: 'Tidak Aktif' }]} defaultFieldValue="active" /></Form.Item>
+          <Form.Item name="status" label="Status"><Select options={[{ value: 'active', label: 'Aktif' }, { value: 'inactive', label: 'Tidak Aktif' }]} defaultValue="active" /></Form.Item>
         </Form>
       </Modal>
     </div>

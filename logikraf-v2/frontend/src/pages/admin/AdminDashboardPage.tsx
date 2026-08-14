@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { apiGet } from '../../lib/api'
 
 type AnyArr = any[]
 
 const get = (url: string) =>
-  fetch(url).then(r => (r.ok ? r.json() : [])).catch(() => [])
+  apiGet(url).then(r => (Array.isArray(r) ? r : [])).catch(() => [])
 
 const len = (a: AnyArr) => (Array.isArray(a) ? a.length : 0)
 

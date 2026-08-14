@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Card, Table, Tag, Select, Popconfirm, message, Tooltip } from 'antd'
-import { DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { Button, Card, Table, Tag, Select, Popconfirm, message } from 'antd'
+import { DeleteOutlined } from '@ant-design/icons'
 
 interface TransactionRefund {
   id: string
@@ -59,10 +59,10 @@ export default function TransactionsPage() {
       : Promise.resolve(mockTxns)
   )
 
-  const refundMutation = useMutation(
-    () => { message.success('Refund diproses'); return Promise.resolve() },
-    { onError: () => message.error('Gagal refund') }
-  )
+  const refundMutation = useMutation({
+    mutationFn: (_: void) => { message.success('Refund diproses'); return Promise.resolve() },
+    onError: () => message.error('Gagal refund'),
+  })
 
   const handleRefund = (txnId: string) => refundMutation.mutate()
 
