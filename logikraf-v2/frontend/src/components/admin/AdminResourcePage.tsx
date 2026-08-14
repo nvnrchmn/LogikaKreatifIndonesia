@@ -39,12 +39,31 @@ function ResourceList({ cfg }: { cfg: any }) {
   }
   useEffect(() => { load() }, [cfg.endpoint])
 
+  // Heuristic #3 & #7: User control and freedom with Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDeleteId(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   const handleDelete = async (id: number) => {
     try {
       await fetch(`${cfg.endpoint}/${id}`, { method: 'DELETE', headers: auth() })
       setDeleteId(null); setToast('Berhasil dihapus'); setTimeout(() => setToast(''), 2500); load()
     }
     catch { setError('Gagal menghapus') }
+  }
+
+  // Heuristic #2: Match between system and real world (auto currency/date format)
+  const formatCell = (c: ColumnDef, item: any) => {
+    if (c.render) return c.render(item)
+    const val = item[c.id]
+    if (typeof val === 'number' && /harga|amount|total|budget|fee|biaya/i.test(c.label || c.id)) {
+      return `Rp ${val.toLocaleString('id-ID')}`
+    }
+    return val !== null && val !== undefined ? String(val) : '-'
   }
 
   const filtered = Array.isArray(items)
@@ -104,7 +123,7 @@ function ResourceList({ cfg }: { cfg: any }) {
                 </td></tr>
               ) : filtered.map((item: any) => (
                 <tr key={item.id} className="border-b border-border-minimal hover:bg-canvas-light transition-colors">
-                  {cfg.columns.map((c: ColumnDef) => <td key={c.id}>{c.render ? c.render(item) : item[c.id]}</td>)}
+                  {cfg.columns.map((c: ColumnDef) => <td key={c.id}>{formatCell(c, item)}</td>)}
                   <td className="text-right whitespace-nowrap">
                     <button onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)} className="text-brand-primary hover:text-brand-primary/80 font-medium text-sm mr-3 active:scale-[0.98] transition-transform">Edit</button>
                     <button onClick={() => setDeleteId(item.id)} className="text-red-600 hover:text-red-700 font-medium text-sm active:scale-[0.98] transition-transform">Hapus</button>
@@ -130,7 +149,7 @@ function ResourceList({ cfg }: { cfg: any }) {
               {cfg.columns.filter((c: ColumnDef) => c.id !== 'id').map((c: ColumnDef) => (
                 <div key={c.id} className="flex justify-between gap-3 py-1 text-sm">
                   <span className="text-text-muted shrink-0">{c.label}</span>
-                  <span className="text-text-main text-right">{c.render ? c.render(item) : String(item[c.id] ?? '-')}</span>
+                  <span className="text-text-main text-right font-medium">{formatCell(c, item)}</span>
                 </div>
               ))}
               <div className="flex gap-3 pt-3 mt-2 border-t border-border-minimal">

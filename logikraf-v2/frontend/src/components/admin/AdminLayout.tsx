@@ -1,5 +1,5 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 // Grouped nav — Nielsen #6 (recognition over recall): scannable sections beat a flat 19-item list.
 const navSections = [
@@ -125,7 +125,28 @@ export default function AdminLayout() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [query, setQuery] = useState('')
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [paletteQuery, setPaletteQuery] = useState('')
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  // Heuristic #7: Global Keyboard Shortcut Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(prev => !prev)
+        setPaletteQuery('')
+        setSelectedIndex(0)
+      } else if (e.key === 'Escape') {
+        setPaletteOpen(false)
+        setUserMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const toggleSection = (t: string) => setCollapsed(c => ({ ...c, [t]: !c[t] }))
   const handleLogout = () => {
@@ -133,12 +154,80 @@ export default function AdminLayout() {
     window.location.href = '/admin/login'
   }
 
-  const allItems = navSections.flatMap(s => s.items)
+  const allItems = navSections.flatMap(s => s.items.map(item => ({ ...item, section: s.title })))
   const activeNav = allItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))
   const pageTitle = activeNav?.label ?? 'Admin'
 
+  const filteredPaletteItems = paletteQuery.trim()
+    ? allItems.filter(i =>
+        i.label.toLowerCase().includes(paletteQuery.toLowerCase()) ||
+        i.section.toLowerCase().includes(paletteQuery.toLowerCase())
+      )
+    : allItems
+
+  const handlePaletteSelect = (path: string) => {
+    navigate(path)
+    setPaletteOpen(false)
+  }
+
   return (
     <div className="min-h-screen bg-canvas-overlay">
+      {/* Command Palette Modal (Nielsen #7: Flexibility & Efficiency) */}
+      {paletteOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/50 backdrop-blur-xs" onClick={() => setPaletteOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl border border-border-minimal w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-100" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-border-minimal">
+              <span className="text-text-muted"><SearchIcon /></span>
+              <input
+                autoFocus
+                value={paletteQuery}
+                onChange={e => { setPaletteQuery(e.target.value); setSelectedIndex(0) }}
+                onKeyDown={e => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    setSelectedIndex(i => (i + 1) % (filteredPaletteItems.length || 1))
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    setSelectedIndex(i => (i - 1 + filteredPaletteItems.length) % (filteredPaletteItems.length || 1))
+                  } else if (e.key === 'Enter' && filteredPaletteItems[selectedIndex]) {
+                    e.preventDefault()
+                    handlePaletteSelect(filteredPaletteItems[selectedIndex].path)
+                  }
+                }}
+                placeholder="Cari menu, halaman, atau aksi admin... (Ketik untuk filter)"
+                className="w-full text-sm outline-none text-text-main placeholder:text-text-muted"
+              />
+              <kbd className="text-[10px] font-semibold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200">ESC</kbd>
+            </div>
+            <div className="max-h-72 overflow-y-auto p-2">
+              {filteredPaletteItems.length === 0 ? (
+                <div className="p-4 text-center text-sm text-text-muted">Tidak ada menu yang cocok.</div>
+              ) : (
+                filteredPaletteItems.map((item, idx) => {
+                  const Icon = item.icon
+                  const isSelected = idx === selectedIndex
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => handlePaletteSelect(item.path)}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors text-left ${
+                        isSelected ? 'bg-brand-primary text-white' : 'text-text-main hover:bg-canvas-light'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`shrink-0 ${isSelected ? 'text-white' : 'text-text-muted'}`}><Icon /></span>
+                        <span className="font-medium">{item.label}</span>
+                      </div>
+                      <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-text-muted'}`}>{item.section}</span>
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {mobileOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       {/* Sidebar desktop */}
@@ -185,17 +274,16 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Live nav filter — Nielsen #6 recognition: find any module fast */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-canvas-light border border-border-minimal focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all">
-              <span className="text-text-muted"><SearchIcon /></span>
-              <input
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Cari modul..."
-                className="bg-transparent text-sm text-text-main placeholder:text-text-muted/60 outline-none w-40"
-                aria-label="Cari modul"
-              />
-            </div>
+            {/* Live nav filter & Command palette trigger — Nielsen #6 & #7 */}
+            <button
+              onClick={() => { setPaletteOpen(true); setPaletteQuery(''); setSelectedIndex(0) }}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-canvas-light border border-border-minimal hover:border-brand-primary/40 transition-all text-left group"
+              title="Quick jump (Ctrl+K)"
+            >
+              <span className="text-text-muted group-hover:text-brand-primary transition-colors"><SearchIcon /></span>
+              <span className="text-sm text-text-muted/70 w-28 truncate">Cari menu...</span>
+              <kbd className="text-[10px] font-semibold bg-white text-text-muted px-1.5 py-0.5 rounded border border-border-minimal shadow-2xs">Ctrl K</kbd>
+            </button>
             <a href="/" target="_blank" rel="noreferrer" className="p-2 rounded-lg hover:bg-gray-100 text-text-muted" title="Lihat Website"><OpenInNewIcon /></a>
 
             {/* User dropdown — Nielsen #1: always show who is logged in */}

@@ -1,35 +1,50 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
-import AdminLayout from './components/admin/AdminLayout'
-import AdminResourcePage from './components/admin/AdminResourcePage'
-import ClientLayout from './components/client/ClientLayout'
-import AdminLoginPage from './pages/admin/AdminLoginPage'
-import AdminDashboardPage from './pages/admin/AdminDashboardPage'
-import AdminPaymentHubPage from './pages/admin/PaymentHubPage'
-import AdminTenantPaymentAccountsPage from './pages/admin/TenantPaymentAccountsPage'
-import AdminPaymentLedgerPage from './pages/admin/PaymentLedgerPage'
-import AdminReconciliationPage from './pages/admin/ReconciliationPage'
-import AdminSettingsPage from './pages/admin/SettingsPage'
-import AdminReportsPage from './pages/admin/ReportsPage'
+
+// Public Pages
 import HomePage from './pages/public/HomePage'
-import ServicesPage from './pages/public/ServicesPage'
-import PortfolioDetailPage from './pages/public/PortfolioDetailPage'
-import BlogPage from './pages/public/BlogPage'
-import BlogDetailPage from './pages/public/BlogDetailPage'
-import AboutPage from './pages/public/AboutPage'
-import ContactPage from './pages/public/ContactPage'
-import PackagesPage from './pages/public/PackagesPage'
-import SearchPage from './pages/public/SearchPage'
-import ClientDashboardPage from './pages/client/ClientDashboardPage'
-import ClientOrdersPage from './pages/client/ClientOrdersPage'
-import ClientProfilePage from './pages/client/ClientProfilePage'
-import TermsPage from './pages/public/TermsPage'
-import PrivacyPage from './pages/public/PrivacyPage'
-import FaqPage from './pages/public/FaqPage'
+const ServicesPage = lazy(() => import('./pages/public/ServicesPage'))
+const PortfolioDetailPage = lazy(() => import('./pages/public/PortfolioDetailPage'))
+const BlogPage = lazy(() => import('./pages/public/BlogPage'))
+const BlogDetailPage = lazy(() => import('./pages/public/BlogDetailPage'))
+const AboutPage = lazy(() => import('./pages/public/AboutPage'))
+const ContactPage = lazy(() => import('./pages/public/ContactPage'))
+const PackagesPage = lazy(() => import('./pages/public/PackagesPage'))
+const SearchPage = lazy(() => import('./pages/public/SearchPage'))
+const TermsPage = lazy(() => import('./pages/public/TermsPage'))
+const PrivacyPage = lazy(() => import('./pages/public/PrivacyPage'))
+const FaqPage = lazy(() => import('./pages/public/FaqPage'))
+
+// Admin Components & Pages (Lazy Loaded)
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
+const AdminResourcePage = lazy(() => import('./components/admin/AdminResourcePage'))
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
+const AdminPaymentHubPage = lazy(() => import('./pages/admin/PaymentHubPage'))
+const AdminTenantPaymentAccountsPage = lazy(() => import('./pages/admin/TenantPaymentAccountsPage'))
+const AdminPaymentLedgerPage = lazy(() => import('./pages/admin/PaymentLedgerPage'))
+const AdminReconciliationPage = lazy(() => import('./pages/admin/ReconciliationPage'))
+const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
+const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
+
+// Client Pages (Lazy Loaded)
+const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
+const ClientDashboardPage = lazy(() => import('./pages/client/ClientDashboardPage'))
+const ClientOrdersPage = lazy(() => import('./pages/client/ClientOrdersPage'))
+const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]">
+      <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuth()
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+  if (loading) return <PageLoader />
   if (!token) return <Navigate to="/admin/login" replace />
   return <>{children}</>
 }
@@ -48,7 +63,8 @@ function RequireClient({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
       {/* Public */}
       <Route path="/" element={<HomePage />} />
       <Route path="/layanan" element={<ServicesPage />} />
@@ -90,5 +106,6 @@ export default function App() {
         <Route path="profile" element={<ClientProfilePage />} />
       </Route>
     </Routes>
+    </Suspense>
   )
 }

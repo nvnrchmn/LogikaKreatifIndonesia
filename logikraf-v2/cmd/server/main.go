@@ -3,11 +3,16 @@ package main
 import (
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/helmet"
+	"github.com/gofiber/fiber/v3/middleware/limiter"
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 
@@ -40,7 +45,27 @@ func main() {
 	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(helmet.New())
-	app.Use(cors.New())
+	app.Use(compress.New())
+
+	allowOrigins := os.Getenv("ALLOW_ORIGINS")
+	if allowOrigins != "" {
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: []string{allowOrigins},
+			AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		}))
+	} else {
+		app.Use(cors.New())
+	}
+
+	// Rate limiters for public endpoints
+	loginLimiter := limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+	})
+	leadLimiter := limiter.New(limiter.Config{
+		Max:        15,
+		Expiration: 1 * time.Minute,
+	})
 
 	app.Get("/health", func(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
@@ -105,12 +130,13 @@ func main() {
 	api.Get("/portfolios", handler.GetPortfolios)
 	api.Get("/packages", handler.GetPackages)
 	api.Get("/leads", handler.GetLeads)
+	api.Post("/leads", leadLimiter, handler.CreateLead)
 	api.Get("/posts", handler.GetPosts)
 	api.Get("/posts/:slug", handler.GetPostBySlug)
 	api.Get("/testimonials", handler.GetTestimonials)
 	api.Get("/orders", handler.GetOrders)
 	api.Get("/tickets", handler.GetTickets)
-	api.Post("/auth/login", auth.Login)
+	api.Post("/auth/login", loginLimiter, auth.Login)
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)
@@ -188,8 +214,22 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	log.Println("Server running on :" + port)
-	if err := app.Listen(":" + port); err != nil {
-		log.Fatal(err)
+
+	// Graceful shutdown channel
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		log.Println("Server running on :" + port)
+		if err := app.Listen(":" + port); err != nil {
+			log.Printf("Server listen stopped: %v\n", err)
+		}
+	}()
+
+	<-quit
+	log.Println("Shutting down server gracefully...")
+	if err := app.Shutdown(); err != nil {
+		log.Printf("Server forced shutdown error: %v\n", err)
 	}
+	log.Println("Server exited cleanly.")
 }

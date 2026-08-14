@@ -5,16 +5,28 @@ interface Gateway { id: string; name: string; policies: string }
 
 const staticFaqs = [
   {
-    q: 'Bagaimana jika pembayaran saya gagal diproses?',
-    a: 'Cek kembali saldo atau limit e-wallet/kartu Anda, lalu coba metode lain. Jika masih gagal, hubungi tim kami melalui halaman Kontak dengan menyertakan ID transaksi.',
+    q: 'Metode pembayaran apa saja yang didukung oleh Logikraf?',
+    a: 'Kami menerima pembayaran melalui gerbang pembayaran resmi iPaymu, Midtrans, dan Xendit. Anda dapat membayar menggunakan Transfer Virtual Account (BCA, Mandiri, BNI, BRI, Permata, CIMB Niaga, Danamon), QRIS (GoPay, OVO, DANA, ShopeePay, LinkAja), Gerai Alfamart/Indomaret, serta Kartu Kredit/Debit berlogo Visa dan MasterCard.',
   },
   {
-    q: 'Apakah bisa mencicil pembayaran proyek?',
-    a: 'Untuk Layanan IT Solutions, kami menerapkan sistem termin berdasarkan milestone. Detail cicilan dibahas saat kontrak proyek.',
+    q: 'Berapa lama proses verifikasi pembayaran saya?',
+    a: 'Semua transaksi via Virtual Account, QRIS, dan E-Wallet diverifikasi secara otomatis dan instan (real-time). Anda akan langsung mendapatkan notifikasi konfirmasi serta invoice digital segera setelah transfer berhasil.',
   },
   {
-    q: 'Apakah ada biaya tambahan dari payment gateway?',
-    a: 'Biaya admin gateway sudah termasuk dalam total tagihan yang tercantum, kecuali ada ketentuan khusus pada paket tertentu.',
+    q: 'Bagaimana prosedur jika saya ingin mengajukan pengembalian dana (Refund)?',
+    a: 'Jika terjadi pembayaran ganda atau pembatalan sebelum proyek/paket diproses (maksimal 1x24 jam), silakan hubungi tim kami via email support@logikraf.id atau WhatsApp ke +62 812-3456-7890 dengan menyertakan Nomor Invoice dan Bukti Transfer. Proses refund akan diverifikasi dalam 1-2 hari kerja dan dicairkan dalam 3-7 hari kerja.',
+  },
+  {
+    q: 'Apakah transaksi pembayaran di Logikraf aman?',
+    a: 'Sangat aman. Seluruh jalur transaksi dilindungi oleh enkripsi SSL 256-bit dan diproses melalui payment gateway berlisensi resmi Bank Indonesia. Kami tidak pernah menyimpan data nomor kartu atau kredensial perbankan Anda di server kami.',
+  },
+  {
+    q: 'Bagaimana jika pembayaran saya gagal atau kedaluwarsa (Expired)?',
+    a: 'Nomor Virtual Account atau kode QRIS memiliki batas waktu pembayaran. Jika transaksi kedaluwarsa sebelum Anda transfer, Anda dapat mengulang proses pemesanan untuk mendapatkan kode pembayaran baru. Jika saldo sudah terpotong namun status belum berubah, hubungi kami beserta bukti mutasi bank.',
+  },
+  {
+    q: 'Apakah bisa melakukan pembayaran bertahap (Milestone / Termin)?',
+    a: 'Ya, khusus untuk Layanan IT Solutions dan Custom Software Development, pembayaran dibagi ke dalam termin (misal: Down Payment 30%, Milestone 40%, dan Peluncuran 30%) sesuai kesepakatan kontrak.',
   },
 ]
 

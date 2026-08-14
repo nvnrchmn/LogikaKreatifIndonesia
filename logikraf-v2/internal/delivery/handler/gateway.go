@@ -18,6 +18,10 @@ var gatewayPolicies = map[string]string{
 		"Biaya admin dikenakan per transaksi sesuai kontrak; kartu kredit/debit memiliki biaya tambahan. " +
 		"Merchant wajib mematuhi PCI DSS (tidak menyimpan nomor kartu utuh). " +
 		"Midtrans berhak menunda settlement apabila terdapat indikasi fraud atau pelanggaran terms.",
+	"ipaymu": "iPaymu adalah penyelenggara payment gateway berlisensi Bank Indonesia (PJP Kategori 3). " +
+		"Mendukung pembayaran Virtual Account (BCA, Mandiri, BNI, BRI, Permata, Danamon, CIMB Niaga), QRIS, Gerai Ritel (Indomaret & Alfamart), dan Kartu Kredit. " +
+		"Proses transaksi aman dengan enkripsi SSL 256-bit dan settlement otomatis sesuai SLA perbankan. " +
+		"Pengembalian dana (refund) diproses sesuai Kebijakan Refund Logikraf melalui channel pembayaran resmi.",
 }
 
 func activeGatewayIDs(tenant string) []string {
@@ -47,11 +51,17 @@ func GetPaymentGateways(c fiber.Ctx) error {
 		case "midtrans":
 			secretKey = setting("midtrans_server_key", tenant)
 			clientKey = setting("midtrans_client_key", tenant)
+		case "ipaymu":
+			secretKey = setting("ipaymu_master_key", tenant)
+			clientKey = setting("ipaymu_master_va", tenant)
 		}
 		if secretKey == "" {
 			continue // enabled but not configured -> skip
 		}
 		name := strings.Title(id)
+		if id == "ipaymu" {
+			name = "iPaymu"
+		}
 		entry := map[string]any{
 			"id":       id,
 			"name":     name,

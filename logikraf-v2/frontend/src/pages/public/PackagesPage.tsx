@@ -47,8 +47,8 @@ export default function PackagesPage() {
       setErr('Belum ada payment gateway yang aktif.')
       return
     }
-    setBusy(true); setErr('')
     const gw = gateways[0]
+    const endpoint = gw.id === 'xendit' ? '/api/payment/xendit/invoice' : `/api/payment/${gw.id}/snap`
     const payload = {
       order_id: `LK-${Date.now()}-${selectedPackage.id}`,
       amount: Number(selectedPackage.price),
@@ -58,14 +58,14 @@ export default function PackagesPage() {
       description: selectedPackage.name,
     }
     try {
-      const r = await fetch(`/api/payment/${gw.id}/snap`, {
+      const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await r.json()
-      if (!r.ok) throw new Error(data?.error || 'Gagal membuat pembayaran')
-      const url = data.redirect_url || data.invoice_url
+      if (!r.ok) throw new Error(data?.error || data?.Message || 'Gagal membuat pembayaran')
+      const url = data.redirect_url || data.invoice_url || data.payment_url || data.Data?.Url || data.url
       if (url) {
         window.location.href = url
       } else if (data.token) {

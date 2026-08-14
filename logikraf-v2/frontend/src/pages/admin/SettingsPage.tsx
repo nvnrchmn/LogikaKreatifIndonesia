@@ -182,6 +182,24 @@ export default function AdminSettingsPage() {
                 </div>
                 {on && (
                   <div className="mt-4 pt-4 border-t border-border-minimal space-y-3">
+                    {/* Heuristic #10: Help and Documentation for Webhook setup */}
+                    <div className="p-3 bg-canvas-light rounded-xl border border-border-minimal flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      <div>
+                        <span className="font-semibold text-text-main">Webhook Callback URL:</span>
+                        <span className="text-text-muted ml-1.5 font-mono break-all">{`${window.location.origin}/api/webhooks/${g.id}`}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/${g.id}`)
+                          setToast({ type: 'ok', msg: `URL Webhook ${g.name} disalin!` })
+                          setTimeout(() => setToast(null), 2500)
+                        }}
+                        className="text-brand-primary hover:underline font-semibold shrink-0"
+                      >
+                        Salin URL
+                      </button>
+                    </div>
                     {g.keys.map(k => (
                       <div key={k.key}>
                         <label className="label text-xs">{k.label}</label>
