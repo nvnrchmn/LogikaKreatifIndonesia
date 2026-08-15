@@ -1,6 +1,5 @@
 // Central registry for admin CRUD resources.
 // One source of truth replaces the 11 per-resource page files.
-// ponytail: columns/formFields typed loosely (any) because render fns vary per resource.
 
 export interface ColumnDef {
   id: string
@@ -21,216 +20,721 @@ export interface FieldDef {
 }
 
 export interface ResourceConfig {
-  resource: string        // url slug, e.g. "services"
-  title: string           // human title, e.g. "Layanan"
-  endpoint: string        // api base, e.g. "/api/services"
+  resource: string // url slug, e.g. "services"
+  title: string // human title, e.g. "Layanan"
+  endpoint: string // api base, e.g. "/api/services"
   columns: ColumnDef[]
   formFields: FieldDef[]
   emptyRow: string
 }
 
+const renderActiveBadge = (val: any) => {
+  const active = val === true || val === 1 || val === '1' || val === 'Ya'
+  return active ? (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      <span>Aktif</span>
+    </span>
+  ) : (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+      Nonaktif
+    </span>
+  )
+}
+
+const renderPublishedBadge = (val: any) => {
+  const pub = val === true || val === 1 || val === '1' || val === 'Ya'
+  return pub ? (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+      <span>Published</span>
+    </span>
+  ) : (
+    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+      Draft
+    </span>
+  )
+}
+
 export const crudConfigs: Record<string, ResourceConfig> = {
   services: {
-    resource: 'services', title: 'Layanan', endpoint: '/api/services',
-    emptyRow: 'Belum ada layanan.',
+    resource: 'services',
+    title: 'Layanan',
+    endpoint: '/api/services',
+    emptyRow: 'Belum ada data layanan.',
     columns: [
-      { id: 'name', label: 'Nama' },
-      { id: 'slug', label: 'Slug' },
-      { id: 'short_desc', label: 'Deskripsi' },
-      { id: 'is_active', label: 'Aktif', render: (r: any) => r.is_active ? 'Ya' : 'Tidak' },
+      {
+        id: 'name',
+        label: 'Nama Layanan',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main block">{r.name}</span>
+            <span className="text-[11px] text-text-muted font-mono">{r.slug}</span>
+          </div>
+        ),
+      },
+      { id: 'short_desc', label: 'Deskripsi Singkat' },
+      {
+        id: 'is_active',
+        label: 'Status',
+        render: (r: any) => renderActiveBadge(r.is_active),
+      },
     ],
     formFields: [
       { name: 'name', label: 'Nama Layanan', required: true },
-      { name: 'slug', label: 'Slug', required: true },
+      { name: 'slug', label: 'Slug URL', required: true },
       { name: 'short_desc', label: 'Deskripsi Singkat', required: true },
-      { name: 'content', label: 'Konten', type: 'textarea', rows: 4 },
-      { name: 'color', label: 'Warna', required: true },
-      { name: 'icon', label: 'Icon' },
+      { name: 'content', label: 'Rincian Konten Lengkap', type: 'textarea', rows: 4 },
+      { name: 'color', label: 'Kode Warna Aksen (Hex/Tailwind)', required: true },
+      { name: 'icon', label: 'Nama Icon / SVG' },
+      {
+        name: 'is_active',
+        label: 'Status Layanan',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Aktif' },
+          { value: '0', label: 'Nonaktif' },
+        ],
+      },
     ],
   },
   portfolios: {
-    resource: 'portfolios', title: 'Portofolio', endpoint: '/api/portfolios',
-    emptyRow: 'Belum ada portofolio.',
+    resource: 'portfolios',
+    title: 'Portofolio',
+    endpoint: '/api/portfolios',
+    emptyRow: 'Belum ada studi kasus portofolio.',
     columns: [
-      { id: 'title', label: 'Judul' },
-      { id: 'slug', label: 'Slug' },
-      { id: 'client_name', label: 'Klien', render: (r: any) => r.client_name || '-' },
-      { id: 'is_published', label: 'Published', render: (r: any) => r.is_published ? 'Ya' : 'Tidak' },
+      {
+        id: 'title',
+        label: 'Judul Proyek',
+        render: (r: any) => (
+          <div className="flex items-center gap-3">
+            {r.thumbnail ? (
+              <img
+                src={r.thumbnail}
+                alt=""
+                className="w-10 h-10 rounded-xl object-cover border border-border-minimal shrink-0"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs shrink-0 border border-purple-100">
+                PROJ
+              </div>
+            )}
+            <div>
+              <span className="font-bold text-text-main block">{r.title}</span>
+              <span className="text-[11px] text-text-muted font-mono">{r.slug}</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: 'client_name',
+        label: 'Klien',
+        render: (r: any) =>
+          r.client_name ? (
+            <span className="px-2.5 py-1 rounded-lg bg-canvas-overlay text-text-main text-xs font-semibold border border-border-minimal">
+              {r.client_name}
+            </span>
+          ) : (
+            <span className="text-text-muted text-xs">—</span>
+          ),
+      },
+      {
+        id: 'is_published',
+        label: 'Visibilitas',
+        render: (r: any) => renderPublishedBadge(r.is_published),
+      },
     ],
     formFields: [
-      { name: 'title', label: 'Judul', required: true },
-      { name: 'slug', label: 'Slug', required: true },
-      { name: 'client_name', label: 'Nama Klien' },
-      { name: 'excerpt', label: 'Excerpt' },
-      { name: 'description', label: 'Konten', type: 'textarea', rows: 4 },
-      { name: 'thumbnail', label: 'URL Gambar' },
-      { name: 'is_published', label: 'Published', type: 'select', options: [{ value: '1', label: 'Ya' }, { value: '0', label: 'Tidak' }] },
+      { name: 'title', label: 'Judul Proyek', required: true },
+      { name: 'slug', label: 'Slug URL', required: true },
+      { name: 'client_name', label: 'Nama Klien / Perusahaan' },
+      { name: 'excerpt', label: 'Ringkasan Singkat' },
+      { name: 'description', label: 'Deskripsi Kasus & Solusi Lengkap', type: 'textarea', rows: 4 },
+      { name: 'thumbnail', label: 'URL Gambar Thumbnail (CDN / Web)' },
+      {
+        name: 'is_published',
+        label: 'Status Rilis',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Published' },
+          { value: '0', label: 'Draft' },
+        ],
+      },
     ],
   },
   packages: {
-    resource: 'packages', title: 'Paket Layanan', endpoint: '/api/packages',
-    emptyRow: 'Belum ada paket.',
+    resource: 'packages',
+    title: 'Paket Layanan',
+    endpoint: '/api/packages',
+    emptyRow: 'Belum ada paket website.',
     columns: [
-      { id: 'name', label: 'Nama' },
-      { id: 'slug', label: 'Slug' },
-      { id: 'price', label: 'Harga', render: (r: any) => `Rp ${Number(r.price).toLocaleString('id-ID')}` },
-      { id: 'is_featured', label: 'Featured', render: (r: any) => r.is_featured ? 'Ya' : 'Tidak' },
-      { id: 'is_active', label: 'Aktif', render: (r: any) => r.is_active ? 'Ya' : 'Tidak' },
+      {
+        id: 'name',
+        label: 'Nama Paket',
+        render: (r: any) => (
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-text-main">{r.name}</span>
+              {r.is_featured && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
+                  ★ Rekomendasi
+                </span>
+              )}
+            </div>
+            {r.tagline && <span className="text-[11px] text-text-muted">{r.tagline}</span>}
+          </div>
+        ),
+      },
+      {
+        id: 'price',
+        label: 'Harga Resmi',
+        render: (r: any) => (
+          <div>
+            <span className="font-mono font-bold text-emerald-700 text-sm">
+              Rp {Number(r.price).toLocaleString('id-ID')}
+            </span>
+            {r.strike_price && (
+              <span className="text-[11px] text-text-muted line-through block font-mono">
+                Rp {Number(r.strike_price).toLocaleString('id-ID')}
+              </span>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: 'is_active',
+        label: 'Status',
+        render: (r: any) => renderActiveBadge(r.is_active),
+      },
     ],
     formFields: [
       { name: 'name', label: 'Nama Paket', required: true },
-      { name: 'slug', label: 'Slug', required: true },
-      { name: 'tagline', label: 'Tagline' },
-      { name: 'price', label: 'Harga', type: 'number', required: true, min: 0 },
-      { name: 'strike_price', label: 'Harga Coret', type: 'number', min: 0 },
-      { name: 'features', label: 'Fitur', type: 'textarea', rows: 4 },
-      { name: 'is_featured', label: 'Featured', type: 'select', options: [{ value: '1', label: 'Ya' }, { value: '0', label: 'Tidak' }] },
-      { name: 'is_active', label: 'Aktif', type: 'select', options: [{ value: '1', label: 'Ya' }, { value: '0', label: 'Tidak' }] },
+      { name: 'slug', label: 'Slug URL', required: true },
+      { name: 'tagline', label: 'Tagline Promosi' },
+      { name: 'price', label: 'Harga Final (IDR)', type: 'number', required: true, min: 0 },
+      { name: 'strike_price', label: 'Harga Coret / Asli (IDR)', type: 'number', min: 0 },
+      { name: 'features', label: 'Daftar Fitur (Pisahkan baris baru)', type: 'textarea', rows: 4 },
+      {
+        name: 'is_featured',
+        label: 'Tandai Sebagai Rekomendasi',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Ya (Tampilkan Badge Populer)' },
+          { value: '0', label: 'Tidak' },
+        ],
+      },
+      {
+        name: 'is_active',
+        label: 'Status Penjualan',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Aktif (Dapat Dipesan)' },
+          { value: '0', label: 'Nonaktif' },
+        ],
+      },
     ],
   },
   blog: {
-    resource: 'blog', title: 'Blog', endpoint: '/api/posts',
-    emptyRow: 'Belum ada post.',
+    resource: 'blog',
+    title: 'Blog & Artikel',
+    endpoint: '/api/posts',
+    emptyRow: 'Belum ada artikel yang dibuat.',
     columns: [
-      { id: 'title', label: 'Judul' },
-      { id: 'slug', label: 'Slug' },
-      { id: 'is_published', label: 'Published', render: (r: any) => r.is_published ? 'Ya' : 'Tidak' },
+      {
+        id: 'title',
+        label: 'Judul Artikel',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main block">{r.title}</span>
+            <span className="text-[11px] text-text-muted font-mono">{r.slug}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'is_published',
+        label: 'Status Publikasi',
+        render: (r: any) => renderPublishedBadge(r.is_published),
+      },
     ],
     formFields: [
-      { name: 'title', label: 'Judul', required: true },
-      { name: 'slug', label: 'Slug', required: true },
-      { name: 'excerpt', label: 'Excerpt' },
-      { name: 'body', label: 'Body', type: 'textarea', rows: 6 },
-      { name: 'featured_image', label: 'URL Gambar' },
-      { name: 'is_published', label: 'Published', type: 'select', options: [{ value: '1', label: 'Ya' }, { value: '0', label: 'Tidak' }] },
+      { name: 'title', label: 'Judul Artikel', required: true },
+      { name: 'slug', label: 'Slug URL', required: true },
+      { name: 'excerpt', label: 'Ringkasan / Sinopsis' },
+      { name: 'body', label: 'Isi Konten Artikel', type: 'textarea', rows: 6 },
+      { name: 'featured_image', label: 'URL Gambar Utama' },
+      {
+        name: 'is_published',
+        label: 'Status Rilis',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Published' },
+          { value: '0', label: 'Draft' },
+        ],
+      },
     ],
   },
   leads: {
-    resource: 'leads', title: 'Leads', endpoint: '/api/leads',
-    emptyRow: 'Belum ada lead.',
+    resource: 'leads',
+    title: 'Prospek Leads',
+    endpoint: '/api/leads',
+    emptyRow: 'Belum ada data prospek lead.',
     columns: [
-      { id: 'name', label: 'Nama' },
-      { id: 'email', label: 'Email' },
-      { id: 'company', label: 'Perusahaan', render: (r: any) => r.company || '-' },
-      { id: 'service_category', label: 'Kategori', render: (r: any) => r.service_category || '-' },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || 'new' },
-      { id: 'lead_score', label: 'Skor' },
+      {
+        id: 'name',
+        label: 'Nama Prospek',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main block">{r.name}</span>
+            <span className="text-[11px] text-text-muted font-mono">{r.email}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'company',
+        label: 'Perusahaan / Kontak',
+        render: (r: any) => (
+          <div>
+            <span className="text-xs font-semibold text-text-main block">{r.company || '—'}</span>
+            <span className="text-[11px] text-text-muted font-mono">{r.phone || '—'}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'status',
+        label: 'Status Prospek',
+        render: (r: any) => {
+          const st = String(r.status || 'new').toLowerCase()
+          const colorMap: Record<string, string> = {
+            new: 'bg-blue-50 text-blue-700 border-blue-200',
+            contacted: 'bg-amber-50 text-amber-700 border-amber-200',
+            qualified: 'bg-purple-50 text-purple-700 border-purple-200',
+            closing: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            lost: 'bg-rose-50 text-rose-700 border-rose-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              <span className="capitalize">{r.status || 'New'}</span>
+            </span>
+          )
+        },
+      },
     ],
     formFields: [
-      { name: 'name', label: 'Nama', required: true },
-      { name: 'email', label: 'Email', required: true },
-      { name: 'company', label: 'Perusahaan' },
-      { name: 'service_category', label: 'Kategori Layanan' },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'new', label: 'New' }, { value: 'contacted', label: 'Contacted' }, { value: 'qualified', label: 'Qualified' }, { value: 'lost', label: 'Lost' }] },
-      { name: 'lead_score', label: 'Lead Score', type: 'number', min: 0 },
-      { name: 'notes', label: 'Catatan', type: 'textarea', rows: 3 },
+      { name: 'name', label: 'Nama Lengkap', required: true },
+      { name: 'email', label: 'Email Aktif', required: true },
+      { name: 'phone', label: 'Nomor WhatsApp' },
+      { name: 'company', label: 'Nama Perusahaan / Instansi' },
+      { name: 'service_category', label: 'Kategori Layanan Minat' },
+      {
+        name: 'status',
+        label: 'Status Pipeline Prospek',
+        type: 'select',
+        options: [
+          { value: 'new', label: 'New (Baru Masuk)' },
+          { value: 'contacted', label: 'Contacted (Sedang Dihubungi)' },
+          { value: 'qualified', label: 'Qualified (Prospek Matang)' },
+          { value: 'closing', label: 'Closing (Deal Proyek)' },
+          { value: 'lost', label: 'Lost (Batal / Tidak Lanjut)' },
+        ],
+      },
+      { name: 'lead_score', label: 'Skor Prospek (1 - 100)', type: 'number', min: 0 },
+      { name: 'notes', label: 'Catatan Kebutuhan Klien', type: 'textarea', rows: 3 },
     ],
   },
   orders: {
-    resource: 'orders', title: 'Orders', endpoint: '/api/orders',
-    emptyRow: 'Belum ada order.',
+    resource: 'orders',
+    title: 'Pesanan Orders',
+    endpoint: '/api/orders',
+    emptyRow: 'Belum ada pesanan masuk.',
     columns: [
-      { id: 'order_number', label: 'Nomor', render: (r: any) => r.order_number || '-' },
-      { id: 'project_name', label: 'Proyek' },
-      { id: 'total_amount', label: 'Total', render: (r: any) => `Rp ${Number(r.total_amount || 0).toLocaleString('id-ID')}` },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || 'pending' },
-      { id: 'milestone_status', label: 'Milestone', render: (r: any) => r.milestone_status || '-' },
+      {
+        id: 'order_number',
+        label: 'No. Order',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-xs text-text-main px-2 py-1 rounded-md bg-canvas-overlay border border-border-minimal">
+            {r.order_number || `#${r.id}`}
+          </span>
+        ),
+      },
+      {
+        id: 'project_name',
+        label: 'Nama Proyek',
+        render: (r: any) => <span className="font-bold text-text-main">{r.project_name}</span>,
+      },
+      {
+        id: 'total_amount',
+        label: 'Nominal Tagihan',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-emerald-700 text-sm">
+            Rp {Number(r.total_amount || 0).toLocaleString('id-ID')}
+          </span>
+        ),
+      },
+      {
+        id: 'status',
+        label: 'Status',
+        render: (r: any) => {
+          const st = String(r.status || 'pending').toLowerCase()
+          const colorMap: Record<string, string> = {
+            pending: 'bg-amber-50 text-amber-700 border-amber-200',
+            active: 'bg-blue-50 text-blue-700 border-blue-200',
+            completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
+              }`}
+            >
+              {r.status || 'pending'}
+            </span>
+          )
+        },
+      },
     ],
     formFields: [
-      { name: 'order_number', label: 'Nomor Order' },
-      { name: 'project_name', label: 'Nama Proyek', required: true },
-      { name: 'total_amount', label: 'Total Amount', type: 'number', required: true, min: 0 },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'pending', label: 'Pending' }, { value: 'active', label: 'Active' }, { value: 'completed', label: 'Completed' }, { value: 'cancelled', label: 'Cancelled' }] },
-      { name: 'milestone_status', label: 'Milestone Status' },
+      { name: 'order_number', label: 'Nomor Order / Referensi' },
+      { name: 'project_name', label: 'Nama Proyek / Paket', required: true },
+      { name: 'total_amount', label: 'Total Nominal (IDR)', type: 'number', required: true, min: 0 },
+      {
+        name: 'status',
+        label: 'Status Pesanan',
+        type: 'select',
+        options: [
+          { value: 'pending', label: 'Pending (Menunggu Bayar)' },
+          { value: 'active', label: 'Active (Dalam Pengerjaan)' },
+          { value: 'completed', label: 'Completed (Selesai)' },
+          { value: 'cancelled', label: 'Cancelled (Dibatalkan)' },
+        ],
+      },
+      { name: 'milestone_status', label: 'Status Milestone / Termin Pengerjaan' },
     ],
   },
   invoices: {
-    resource: 'invoices', title: 'Invoices', endpoint: '/api/invoices',
-    emptyRow: 'Belum ada invoice.',
+    resource: 'invoices',
+    title: 'Invoices Tagihan',
+    endpoint: '/api/invoices',
+    emptyRow: 'Belum ada invoice dibuat.',
     columns: [
-      { id: 'number', label: 'Nomor' },
-      { id: 'type', label: 'Tipe' },
-      { id: 'amount', label: 'Jumlah', render: (r: any) => `Rp ${Number(r.amount || 0).toLocaleString('id-ID')}` },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || '-' },
-      { id: 'id', label: 'PDF', render: (r: any) => <button key={r.id} onClick={() => window.open(`/api/invoices/${r.id}/pdf`, '_blank')} className="text-brand-primary hover:underline text-sm">PDF</button> },
+      {
+        id: 'number',
+        label: 'Nomor Invoice',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-xs text-text-main px-2.5 py-1 rounded-md bg-canvas-overlay border border-border-minimal">
+            {r.number}
+          </span>
+        ),
+      },
+      {
+        id: 'amount',
+        label: 'Jumlah Tagihan',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-emerald-700 text-sm">
+            Rp {Number(r.amount || 0).toLocaleString('id-ID')}
+          </span>
+        ),
+      },
+      {
+        id: 'status',
+        label: 'Status Bayar',
+        render: (r: any) => {
+          const st = String(r.status || 'draft').toLowerCase()
+          const colorMap: Record<string, string> = {
+            paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            sent: 'bg-blue-50 text-blue-700 border-blue-200',
+            draft: 'bg-gray-100 text-gray-700 border-gray-200',
+            overdue: 'bg-rose-50 text-rose-700 border-rose-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
+              }`}
+            >
+              {r.status || 'draft'}
+            </span>
+          )
+        },
+      },
+      {
+        id: 'id',
+        label: 'Dokumen',
+        render: (r: any) => (
+          <button
+            type="button"
+            onClick={() => window.open(`/api/invoices/${r.id}/pdf`, '_blank')}
+            className="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:underline"
+          >
+            <span>📄 Unduh PDF</span>
+          </button>
+        ),
+      },
     ],
     formFields: [
       { name: 'number', label: 'Nomor Invoice', required: true },
-      { name: 'type', label: 'Tipe' },
-      { name: 'amount', label: 'Jumlah', type: 'number', required: true },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'draft', label: 'Draft' }, { value: 'sent', label: 'Sent' }, { value: 'paid', label: 'Paid' }, { value: 'overdue', label: 'Overdue' }] },
-      { name: 'due_date', label: 'Due Date' },
-      { name: 'notes', label: 'Catatan', type: 'textarea', rows: 3 },
+      { name: 'type', label: 'Jenis Tagihan / Termin' },
+      { name: 'amount', label: 'Jumlah Nominal (IDR)', type: 'number', required: true },
+      {
+        name: 'status',
+        label: 'Status Pembayaran',
+        type: 'select',
+        options: [
+          { value: 'draft', label: 'Draft' },
+          { value: 'sent', label: 'Sent (Terkirim ke Klien)' },
+          { value: 'paid', label: 'Paid (Lunas)' },
+          { value: 'overdue', label: 'Overdue (Jatuh Tempo)' },
+        ],
+      },
+      { name: 'due_date', label: 'Batas Pembayaran (Due Date)' },
+      { name: 'notes', label: 'Catatan Rekening / Instruksi Transfer', type: 'textarea', rows: 3 },
     ],
   },
   clients: {
-    resource: 'clients', title: 'Clients', endpoint: '/api/clients',
-    emptyRow: 'Belum ada client.',
+    resource: 'clients',
+    title: 'Klien Terdaftar',
+    endpoint: '/api/clients',
+    emptyRow: 'Belum ada data klien terdaftar.',
     columns: [
-      { id: 'company_name', label: 'Perusahaan', render: (r: any) => r.company_name || r.pic_name || '-' },
-      { id: 'email', label: 'Email' },
-      { id: 'phone', label: 'Phone' },
-      { id: 'city', label: 'Kota' },
+      {
+        id: 'company_name',
+        label: 'Perusahaan & PIC',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main block">{r.company_name || 'Perorangan'}</span>
+            <span className="text-[11px] text-text-muted font-mono">PIC: {r.pic_name || '—'}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'email',
+        label: 'Email & WhatsApp',
+        render: (r: any) => (
+          <div>
+            <span className="text-xs text-text-main font-mono block">{r.email || '—'}</span>
+            <span className="text-[11px] text-text-muted font-mono">{r.phone || '—'}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'city',
+        label: 'Domisili Kota',
+        render: (r: any) => <span className="text-xs text-text-muted">{r.city || '—'}</span>,
+      },
     ],
     formFields: [
-      { name: 'company_name', label: 'Nama Perusahaan' },
-      { name: 'pic_name', label: 'PIC', required: true },
-      { name: 'email', label: 'Email' },
-      { name: 'phone', label: 'Phone' },
-      { name: 'city', label: 'Kota' },
-      { name: 'address', label: 'Alamat', type: 'textarea', rows: 2 },
+      { name: 'company_name', label: 'Nama Perusahaan / Brand' },
+      { name: 'pic_name', label: 'Nama Penanggung Jawab (PIC)', required: true },
+      { name: 'email', label: 'Email Resmi' },
+      { name: 'phone', label: 'Nomor WhatsApp / Telepon' },
+      { name: 'city', label: 'Kota Domisili' },
+      { name: 'address', label: 'Alamat Lengkap', type: 'textarea', rows: 2 },
     ],
   },
   tickets: {
-    resource: 'tickets', title: 'Tickets', endpoint: '/api/tickets',
-    emptyRow: 'Belum ada ticket.',
+    resource: 'tickets',
+    title: 'Tiket Dukungan',
+    endpoint: '/api/tickets',
+    emptyRow: 'Belum ada tiket kendala.',
     columns: [
-      { id: 'subject', label: 'Subject' },
-      { id: 'priority', label: 'Priority', render: (r: any) => r.priority || 'medium' },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || 'open' },
+      {
+        id: 'subject',
+        label: 'Subjek Kendala',
+        render: (r: any) => <span className="font-bold text-text-main">{r.subject}</span>,
+      },
+      {
+        id: 'priority',
+        label: 'Prioritas',
+        render: (r: any) => {
+          const pr = String(r.priority || 'medium').toLowerCase()
+          const colorMap: Record<string, string> = {
+            high: 'bg-rose-50 text-rose-700 border-rose-200',
+            medium: 'bg-amber-50 text-amber-700 border-amber-200',
+            low: 'bg-gray-100 text-gray-700 border-gray-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${
+                colorMap[pr] || 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {r.priority || 'medium'}
+            </span>
+          )
+        },
+      },
+      {
+        id: 'status',
+        label: 'Status Penanganan',
+        render: (r: any) => {
+          const st = String(r.status || 'open').toLowerCase()
+          const colorMap: Record<string, string> = {
+            open: 'bg-blue-50 text-blue-700 border-blue-200',
+            pending: 'bg-amber-50 text-amber-700 border-amber-200',
+            closed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                colorMap[st] || 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {r.status || 'open'}
+            </span>
+          )
+        },
+      },
     ],
     formFields: [
-      { name: 'subject', label: 'Subject', required: true },
-      { name: 'priority', label: 'Priority', type: 'select', options: [{ value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' }, { value: 'high', label: 'High' }] },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'open', label: 'Open' }, { value: 'pending', label: 'Pending' }, { value: 'closed', label: 'Closed' }] },
+      { name: 'subject', label: 'Subjek Kendala / Tiket', required: true },
+      {
+        name: 'priority',
+        label: 'Tingkat Prioritas',
+        type: 'select',
+        options: [
+          { value: 'low', label: 'Low (Rendah)' },
+          { value: 'medium', label: 'Medium (Sedang)' },
+          { value: 'high', label: 'High (Darurat / Mendesak)' },
+        ],
+      },
+      {
+        name: 'status',
+        label: 'Status Penanganan',
+        type: 'select',
+        options: [
+          { value: 'open', label: 'Open (Baru Dibuka)' },
+          { value: 'pending', label: 'Pending (Sedang Dikerjakan)' },
+          { value: 'closed', label: 'Closed (Selesai Diselesaikan)' },
+        ],
+      },
     ],
   },
   testimonials: {
-    resource: 'testimonials', title: 'Testimonials', endpoint: '/api/testimonials',
-    emptyRow: 'Belum ada testimonial.',
+    resource: 'testimonials',
+    title: 'Testimoni Klien',
+    endpoint: '/api/testimonials',
+    emptyRow: 'Belum ada ulasan testimoni.',
     columns: [
-      { id: 'name', label: 'Nama' },
-      { id: 'role', label: 'Role', render: (r: any) => r.role || '-' },
-      { id: 'content', label: 'Testimonial', render: (r: any) => (r.content || '').slice(0, 60) + '...' },
-      { id: 'is_approved', label: 'Approved', render: (r: any) => r.is_approved ? 'Ya' : 'Tidak' },
+      {
+        id: 'name',
+        label: 'Nama Klien',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main block">{r.name}</span>
+            <span className="text-[11px] text-text-muted">{r.role || 'Klien'}</span>
+          </div>
+        ),
+      },
+      {
+        id: 'content',
+        label: 'Ulasan / Review',
+        render: (r: any) => (
+          <p className="text-xs text-text-muted line-clamp-2 max-w-xs">{r.content || '—'}</p>
+        ),
+      },
+      {
+        id: 'is_approved',
+        label: 'Status Tayang',
+        render: (r: any) => renderPublishedBadge(r.is_approved),
+      },
     ],
     formFields: [
       { name: 'name', label: 'Nama Klien', required: true },
-      { name: 'role', label: 'Role / Posisi' },
-      { name: 'content', label: 'Testimonial', type: 'textarea', rows: 4, required: true },
-      { name: 'avatar', label: 'URL Avatar' },
-      { name: 'sort_order', label: 'Urutan', type: 'number' },
-      { name: 'is_approved', label: 'Approved', type: 'select', options: [{ value: '1', label: 'Ya' }, { value: '0', label: 'Tidak' }] },
+      { name: 'role', label: 'Posisi / Jabatan / Perusahaan' },
+      { name: 'content', label: 'Kutipan Testimonial Klien', type: 'textarea', rows: 4, required: true },
+      { name: 'avatar', label: 'URL Foto Profil Avatar' },
+      { name: 'sort_order', label: 'Nomor Urutan Tampil', type: 'number' },
+      {
+        name: 'is_approved',
+        label: 'Setujui Tayang di Beranda Publik',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Disetujui (Tayang)' },
+          { value: '0', label: 'Tangguhkan (Draft)' },
+        ],
+      },
     ],
   },
   transactions: {
-    resource: 'transactions', title: 'Transactions', endpoint: '/api/transactions',
-    emptyRow: 'Belum ada transaksi.',
+    resource: 'transactions',
+    title: 'Riwayat Transaksi',
+    endpoint: '/api/transactions',
+    emptyRow: 'Belum ada data transaksi.',
     columns: [
-      { id: 'order_id', label: 'Order' },
-      { id: 'transaction_reference', label: 'Referensi' },
-      { id: 'milestone_name', label: 'Milestone' },
-      { id: 'amount', label: 'Jumlah', render: (r: any) => `Rp ${Number(r.amount || 0).toLocaleString('id-ID')}` },
-      { id: 'payment_method', label: 'Metode' },
-      { id: 'status', label: 'Status', render: (r: any) => r.status || '-' },
+      {
+        id: 'transaction_reference',
+        label: 'Referensi ID',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-xs text-text-main">
+            {r.transaction_reference || `#${r.id}`}
+          </span>
+        ),
+      },
+      {
+        id: 'amount',
+        label: 'Nominal',
+        render: (r: any) => (
+          <span className="font-mono font-bold text-emerald-700 text-sm">
+            Rp {Number(r.amount || 0).toLocaleString('id-ID')}
+          </span>
+        ),
+      },
+      {
+        id: 'payment_method',
+        label: 'Metode Pembayaran',
+        render: (r: any) => (
+          <span className="px-2 py-0.5 rounded-md bg-canvas-overlay text-text-main text-xs font-semibold uppercase font-mono">
+            {r.payment_method || 'QRIS'}
+          </span>
+        ),
+      },
+      {
+        id: 'status',
+        label: 'Status Transaksi',
+        render: (r: any) => {
+          const st = String(r.status || 'pending').toLowerCase()
+          const colorMap: Record<string, string> = {
+            paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            settled: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            pending: 'bg-amber-50 text-amber-700 border-amber-200',
+            failed: 'bg-rose-50 text-rose-700 border-rose-200',
+            refunded: 'bg-purple-50 text-purple-700 border-purple-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                colorMap[st] || 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {r.status || 'pending'}
+            </span>
+          )
+        },
+      },
     ],
     formFields: [
-      { name: 'order_id', label: 'Order ID', type: 'number' },
-      { name: 'transaction_reference', label: 'Referensi' },
-      { name: 'milestone_name', label: 'Milestone' },
-      { name: 'amount', label: 'Jumlah', type: 'number' },
-      { name: 'payment_method', label: 'Metode Pembayaran' },
-      { name: 'status', label: 'Status', type: 'select', options: [{ value: 'pending', label: 'Pending' }, { value: 'paid', label: 'Paid' }, { value: 'failed', label: 'Failed' }, { value: 'refunded', label: 'Refunded' }] },
+      { name: 'order_id', label: 'Order ID Terkait', type: 'number' },
+      { name: 'transaction_reference', label: 'Nomor Referensi Transaksi' },
+      { name: 'milestone_name', label: 'Nama Milestone / Termin' },
+      { name: 'amount', label: 'Jumlah Transaksi (IDR)', type: 'number' },
+      { name: 'payment_method', label: 'Metode Pembayaran (QRIS / VA)' },
+      {
+        name: 'status',
+        label: 'Status Transaksi',
+        type: 'select',
+        options: [
+          { value: 'pending', label: 'Pending (Menunggu Bayar)' },
+          { value: 'paid', label: 'Paid / Settled (Berhasil)' },
+          { value: 'failed', label: 'Failed (Gagal / Expired)' },
+          { value: 'refunded', label: 'Refunded (Dikembalikan)' },
+        ],
+      },
     ],
   },
 }

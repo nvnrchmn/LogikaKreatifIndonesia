@@ -2,60 +2,104 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="bg-canvas-dark border-t-2 border-brand-primary">
-      <div className="container-narrow py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-6">
+    <footer className="bg-canvas-dark border-t border-white/10 text-white relative overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="container-narrow py-16 lg:py-20 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+          {/* Company Brand Column */}
+          <div className="lg:col-span-5 space-y-6">
+            <Link to="/" className="inline-flex items-center gap-3">
               <img src="/logo.png" alt="Logikraf" className="h-10 w-auto object-contain shrink-0" />
-              <span className="font-display font-bold text-xl text-white tracking-tight mt-1">LOGIKRAF</span>
+              <span className="font-display font-black text-2xl text-white tracking-tight">LOGIKRAF</span>
             </Link>
-            <p className="text-sm text-text-light/70 font-body leading-relaxed max-w-md mb-6">
-              PT. Logika Kreatif Indonesia — Software House dan IT Solutions yang menjembatani solusi berbasis logika teknologi dengan eksekusi kreativitas visual. Membangun produk digital yang berdampak.
+            <p className="text-xs sm:text-sm text-text-light/70 font-body leading-relaxed max-w-md">
+              <strong>PT. Logika Kreatif Indonesia</strong> — Software House &amp; Konsultan Transformasi Digital. Menghadirkan solusi arsitektur aplikasi berkinerja tinggi, UI/UX modern, dan integrasi pembayaran QRIS resmi Bank Indonesia.
             </p>
-            <div className="flex items-center gap-4">
-              <a href="mailto:hello@logikraf.id" className="w-10 h-10 rounded-lg bg-white/5 hover:bg-brand-primary/20 flex items-center justify-center transition-all" aria-label="Email">
-                <svg className="w-5 h-5 text-text-light/50 hover:text-brand-primary transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-              </a>
-              <a href="https://wa.me/6281112345678" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 hover:bg-brand-primary/20 flex items-center justify-center transition-all" aria-label="WhatsApp">
-                <svg className="w-5 h-5 text-text-light/50 hover:text-brand-primary transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              </a>
+
+            {/* Payment & Security Trust Badges */}
+            <div className="pt-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-text-light/50 block mb-2.5">
+                Metode Pembayaran Resmi
+              </span>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white text-xs font-bold shadow-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>QRIS Nasional</span>
+                </div>
+                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-text-light/80 text-xs font-medium">
+                  <span>🔒 256-Bit SSL</span>
+                </div>
+                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-text-light/80 text-xs font-medium">
+                  <span>⚡ iPaymu Gateway</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div>
-            <h4 className="font-display font-semibold text-white text-sm uppercase tracking-wider mb-6">Navigasi</h4>
-            <ul className="space-y-3">
-              <li><Link to="/layanan" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Layanan</Link></li>
-              <li><Link to="/paket" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Paket</Link></li>
-              <li><Link to="/portfolio" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Portofolio</Link></li>
-              <li><Link to="/blog" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Blog</Link></li>
-              <li><Link to="/tentang-kami" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Tentang</Link></li>
-              <li><Link to="/kontak" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Kontak</Link></li>
+          {/* Quick Navigation Links */}
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
+              Navigasi
+            </h4>
+            <ul className="space-y-2.5 text-xs sm:text-sm">
+              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Layanan</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Paket Website</Link></li>
+              <li><Link to="/#portfolio" className="text-text-light/70 hover:text-white transition-colors">Portofolio</Link></li>
+              <li><Link to="/blog" className="text-text-light/70 hover:text-white transition-colors">Artikel &amp; Blog</Link></li>
+              <li><Link to="/tentang-kami" className="text-text-light/70 hover:text-white transition-colors">Tentang Kami</Link></li>
+              <li><Link to="/kontak" className="text-text-light/70 hover:text-white transition-colors">Hubungi Kami</Link></li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="font-display font-semibold text-white text-sm uppercase tracking-wider mb-6">Layanan</h4>
-            <ul className="space-y-3">
-              <li><Link to="/layanan/software-development" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Software Development</Link></li>
-              <li><Link to="/layanan/ui-ux-design" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">UI/UX Design</Link></li>
-              <li><Link to="/layanan/digital-marketing" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Digital Marketing</Link></li>
-              <li><Link to="/layanan/branding" className="text-text-light/60 hover:text-brand-primary font-body text-sm transition-colors">Branding</Link></li>
+          {/* Solution & Services */}
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
+              Layanan Utama
+            </h4>
+            <ul className="space-y-2.5 text-xs sm:text-sm">
+              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Web Application</Link></li>
+              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Mobile App (iOS/Android)</Link></li>
+              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">UI/UX Design</Link></li>
+              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Digital Branding</Link></li>
+              <li><Link to="/search" className="text-text-light/70 hover:text-white transition-colors">Cari Direktori</Link></li>
             </ul>
+          </div>
+
+          {/* Direct Support Column */}
+          <div className="lg:col-span-3 space-y-4">
+            <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
+              Helpdesk &amp; Legal
+            </h4>
+            <div className="space-y-2.5 text-xs text-text-light/70">
+              <p>Email: <a href="mailto:support@logikraf.id" className="text-white hover:underline font-mono">support@logikraf.id</a></p>
+              <p>WhatsApp: <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">+62 812-3456-7890</a></p>
+              <p className="leading-relaxed">Kantor: Jakarta, DKI Jakarta, Indonesia</p>
+            </div>
+            <div className="pt-2">
+              <a
+                href="https://wa.me/6281234567890"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-md"
+              >
+                <span>💬 Chat WhatsApp</span>
+              </a>
+            </div>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-white/10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-text-light/40 font-body text-xs">
-              &copy; {new Date().getFullYear()} PT. Logika Kreatif Indonesia. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <Link to="/faq" className="text-text-light/40 hover:text-text-light/70 font-body text-xs transition-colors">FAQ</Link>
-              <Link to="/syarat-ketentuan" className="text-text-light/40 hover:text-text-light/70 font-body text-xs transition-colors">Syarat & Ketentuan</Link>
-              <Link to="/kebijakan-privasi" className="text-text-light/40 hover:text-text-light/70 font-body text-xs transition-colors">Kebijakan Privasi</Link>
-            </div>
+        {/* Bottom Bar: Copyright & Compliance Links */}
+        <div className="mt-14 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-light/50">
+          <p>
+            &copy; {new Date().getFullYear()} PT. Logika Kreatif Indonesia. Seluruh hak cipta dilindungi undang-undang.
+          </p>
+          <div className="flex flex-wrap items-center gap-5">
+            <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link to="/syarat-ketentuan" className="hover:text-white transition-colors">Syarat &amp; Ketentuan</Link>
+            <Link to="/kebijakan-privasi" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
+            <Link to="/syarat-ketentuan" className="hover:text-white transition-colors">Kebijakan Pengembalian Dana (Refund)</Link>
           </div>
         </div>
       </div>
