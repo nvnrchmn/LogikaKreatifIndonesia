@@ -20,10 +20,12 @@ interface GatewaySpec {
 }
 
 const companyFields: FieldSpec[] = [
-  { key: 'company_name', label: 'Nama Perusahaan', placeholder: 'PT. Logika Kreatif Indonesia' },
-  { key: 'company_email', label: 'Email Resmi', placeholder: 'halo@logikraf.id' },
+  { key: 'company_name', label: 'Nama Perusahaan / Entitas Legal', placeholder: 'PT. Logika Kreatif Indonesia' },
+  { key: 'company_email', label: 'Email Resmi', placeholder: 'support@logikraf.id' },
   { key: 'company_phone', label: 'Nomor WhatsApp / Telepon', placeholder: '+62 812-3456-7890' },
-  { key: 'company_address', label: 'Alamat Kantor', placeholder: 'Jakarta, Indonesia' },
+  { key: 'company_address', label: 'Alamat Kantor / Domisili Usaha', placeholder: 'Jakarta, Indonesia' },
+  { key: 'company_legal_nib', label: 'Nomor Induk Berusaha (NIB)', placeholder: 'Contoh: 0123456789012' },
+  { key: 'company_legal_npwp', label: 'Nomor Pokok Wajib Pajak (NPWP)', placeholder: 'Contoh: 01.234.567.8-901.000' },
 ]
 
 const gatewayDefs: GatewaySpec[] = [
@@ -227,11 +229,11 @@ export default function AdminSettingsPage() {
         const val = items[f.key] || ''
         await apiPut(`/api/settings/${encodeURIComponent(f.key)}`, { value: val })
       }
-      flash('ok', 'Profil perusahaan berhasil disimpan')
+      flash('ok', 'Profil perusahaan & legalitas berhasil disimpan!')
     } catch (err: any) {
       flash('err', err?.message || 'Gagal menyimpan profil perusahaan')
     } finally {
-      setSavingKey('company')
+      setSavingKey(null)
     }
   }
 
