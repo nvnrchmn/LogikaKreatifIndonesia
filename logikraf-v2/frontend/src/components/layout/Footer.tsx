@@ -1,6 +1,22 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
+  const [settings, setSettings] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => (r.ok ? r.json() : {}))
+      .then(d => setSettings(d || {}))
+      .catch(() => {})
+  }, [])
+
+  const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
+  const contactEmail = settings.contact_email || 'support@logikraf.id'
+  const contactWhatsapp = settings.contact_whatsapp || '+62 812-3456-7890'
+  const contactAddress = settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
+  const cleanWaNumber = contactWhatsapp.replace(/[^0-9]/g, '')
+
   return (
     <footer className="bg-canvas-dark border-t border-white/10 text-white relative overflow-hidden">
       {/* Ambient background glow */}
@@ -15,7 +31,7 @@ export default function Footer() {
               <span className="font-display font-black text-2xl text-white tracking-tight">LOGIKRAF</span>
             </Link>
             <p className="text-xs sm:text-sm text-text-light/70 font-body leading-relaxed max-w-md">
-              <strong>PT. Logika Kreatif Indonesia</strong> — Software House &amp; Konsultan Transformasi Digital. Menghadirkan solusi arsitektur aplikasi berkinerja tinggi, UI/UX modern, dan integrasi pembayaran QRIS resmi Bank Indonesia.
+              <strong>{companyName}</strong> — Software House &amp; Konsultan Transformasi Digital. Menghadirkan solusi arsitektur aplikasi berkinerja tinggi, UI/UX modern, dan integrasi pembayaran QRIS resmi Bank Indonesia.
             </p>
 
             {/* Payment & Security Trust Badges */}
@@ -73,13 +89,13 @@ export default function Footer() {
               Helpdesk &amp; Legal
             </h4>
             <div className="space-y-2.5 text-xs text-text-light/70">
-              <p>Email: <a href="mailto:support@logikraf.id" className="text-white hover:underline font-mono">support@logikraf.id</a></p>
-              <p>WhatsApp: <a href="https://wa.me/6281234567890" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">+62 812-3456-7890</a></p>
-              <p className="leading-relaxed">Kantor: Jakarta, DKI Jakarta, Indonesia</p>
+              <p>Email: <a href={`mailto:${contactEmail}`} className="text-white hover:underline font-mono">{contactEmail}</a></p>
+              <p>WhatsApp: <a href={`https://wa.me/${cleanWaNumber || '6281234567890'}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">{contactWhatsapp}</a></p>
+              <p className="leading-relaxed">Kantor: {contactAddress}</p>
             </div>
             <div className="pt-2">
               <a
-                href="https://wa.me/6281234567890"
+                href={`https://wa.me/${cleanWaNumber || '6281234567890'}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-md"
@@ -93,7 +109,7 @@ export default function Footer() {
         {/* Bottom Bar: Copyright & Compliance Links */}
         <div className="mt-14 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-light/50">
           <p>
-            &copy; {new Date().getFullYear()} PT. Logika Kreatif Indonesia. Seluruh hak cipta dilindungi undang-undang.
+            &copy; {new Date().getFullYear()} {companyName}. Seluruh hak cipta dilindungi undang-undang.
           </p>
           <div className="flex flex-wrap items-center gap-5">
             <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>

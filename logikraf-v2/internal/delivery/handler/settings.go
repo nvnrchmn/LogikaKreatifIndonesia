@@ -90,3 +90,34 @@ func ListSettings(c fiber.Ctx) error {
 	}
 	return c.JSON(out)
 }
+
+// GetPublicSettings safely exposes public company, contact, and helpdesk settings without secrets
+func GetPublicSettings(c fiber.Ctx) error {
+	tenant := resolveTenant(c)
+	var items []model.Setting
+	_ = model.DB.Where("tenant = ?", tenant).Find(&items)
+
+	allowedPrefixes := []string{"company_", "contact_", "payment_gateways"}
+	out := map[string]string{}
+
+	if tenant != "logikraf" {
+		var fallbackItems []model.Setting
+		_ = model.DB.Where("tenant = ?", "logikraf").Find(&fallbackItems)
+		for _, it := range fallbackItems {
+			for _, prefix := range allowedPrefixes {
+				if strings.HasPrefix(it.Key, prefix) && !strings.Contains(it.Key, "key") && !strings.Contains(it.Key, "secret") && !strings.Contains(it.Key, "va") {
+					out[it.Key] = it.Value
+				}
+			}
+		}
+	}
+
+	for _, it := range items {
+		for _, prefix := range allowedPrefixes {
+			if strings.HasPrefix(it.Key, prefix) && !strings.Contains(it.Key, "key") && !strings.Contains(it.Key, "secret") && !strings.Contains(it.Key, "va") {
+				out[it.Key] = it.Value
+			}
+		}
+	}
+	return c.JSON(out)
+}

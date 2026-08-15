@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PublicLayout from '../../components/layout/PublicLayout'
 
 interface FormState {
@@ -14,6 +14,7 @@ type Errors = Partial<Record<keyof FormState, string>>
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ContactPage() {
+  const [settings, setSettings] = useState<Record<string, string>>({})
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
@@ -24,6 +25,20 @@ export default function ContactPage() {
   const [errors, setErrors] = useState<Errors>({})
   const [sent, setSent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => (r.ok ? r.json() : {}))
+      .then(d => setSettings(d || {}))
+      .catch(() => {})
+  }, [])
+
+  const contactWhatsapp = settings.contact_whatsapp || '+62 812-3456-7890'
+  const contactEmail = settings.contact_email || 'support@logikraf.id'
+  const contactHours = settings.contact_hours || 'Senin – Jumat, pukul 09:00 – 18:00 WIB'
+  const contactAddress = settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
+  const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
+  const cleanWaNumber = contactWhatsapp.replace(/[^0-9]/g, '')
 
   const update = (key: keyof FormState, value: string) => {
     setForm({ ...form, [key]: value })
@@ -106,7 +121,7 @@ export default function ContactPage() {
                     <span className="text-xs font-bold uppercase tracking-widest text-brand-accent block mb-2">Helpdesk Resmi</span>
                     <h3 className="font-display font-bold text-2xl text-white">Informasi Kontak</h3>
                     <p className="text-text-light/70 text-xs sm:text-sm mt-2 leading-relaxed">
-                      Kami beroperasi Senin – Jumat, pukul 09:00 – 18:00 WIB untuk konsultasi teknis dan penanganan tiket klien.
+                      Kami beroperasi {contactHours} untuk konsultasi teknis dan penanganan tiket klien.
                     </p>
                   </div>
 
@@ -117,8 +132,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <h4 className="font-bold text-sm text-white">Email Resmi</h4>
-                        <p className="text-text-light/70 text-xs mt-0.5 font-mono">support@logikraf.id</p>
-                        <p className="text-text-light/70 text-xs font-mono">halo@logikraf.id</p>
+                        <p className="text-text-light/70 text-xs mt-0.5 font-mono">{contactEmail}</p>
                       </div>
                     </div>
 
@@ -128,7 +142,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <h4 className="font-bold text-sm text-white">WhatsApp &amp; Telepon</h4>
-                        <p className="text-text-light/70 text-xs mt-0.5 font-mono">+62 812-3456-7890</p>
+                        <p className="text-text-light/70 text-xs mt-0.5 font-mono">{contactWhatsapp}</p>
                         <span className="inline-block mt-1 text-[11px] font-semibold text-emerald-400">● Tim Siap Merespon</span>
                       </div>
                     </div>
@@ -140,7 +154,7 @@ export default function ContactPage() {
                       <div>
                         <h4 className="font-bold text-sm text-white">Kantor Pusat</h4>
                         <p className="text-text-light/70 text-xs mt-0.5 leading-relaxed">
-                          PT. Logika Kreatif Indonesia, Jakarta, DKI Jakarta, Indonesia
+                          {companyName}, {contactAddress}
                         </p>
                       </div>
                     </div>
@@ -149,7 +163,7 @@ export default function ContactPage() {
 
                 <div className="relative z-10 pt-8 mt-8 border-t border-white/10">
                   <a
-                    href="https://wa.me/6281234567890"
+                    href={`https://wa.me/${cleanWaNumber || '6281234567890'}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg text-sm"

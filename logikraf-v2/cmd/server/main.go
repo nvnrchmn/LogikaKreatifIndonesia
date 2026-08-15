@@ -140,6 +140,7 @@ func main() {
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans/iPaymu)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)
+	api.Get("/settings/public", handler.GetPublicSettings)
 	api.Post("/payment/xendit/invoice", handler.CreateXenditInvoice)
 	api.Post("/payment/xendit/snap", handler.CreateXenditInvoice)
 	api.Post("/payment/midtrans/snap", handler.CreateMidtransSnap)

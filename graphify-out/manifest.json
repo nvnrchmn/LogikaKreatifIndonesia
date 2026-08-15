@@ -5,8 +5,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/cmd/server/main.go": {
-    "mtime": 1786755426.2991662,
-    "ast_hash": "37332c39c9e7c02646750f3788077a7e",
+    "mtime": 1786759058.0820768,
+    "ast_hash": "c3eb9456f68d344ded51be7248a15a9a",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/.oxlintrc.json": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/components/layout/Footer.tsx": {
-    "mtime": 1786755627.9687142,
-    "ast_hash": "f5c8744874c95c22f1935dc1fc2843e8",
+    "mtime": 1786759128.5827596,
+    "ast_hash": "037d26795127bb49e3e9b2eaed17433e",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/components/layout/Navbar.tsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/admin/SettingsPage.tsx": {
-    "mtime": 1786755258.1274717,
-    "ast_hash": "f1ed65078fe0157457f9c6a294c0cd0c",
+    "mtime": 1786759096.9949274,
+    "ast_hash": "fb840184de5cd14d7f92ef96091261bf",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/admin/Settings/SettingsPage.tsx": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/ContactPage.tsx": {
-    "mtime": 1786724002.2722206,
-    "ast_hash": "7b3edb3997a694e3f94646e1a5eb2a8c",
+    "mtime": 1786759116.0119379,
+    "ast_hash": "d8b67cb17463b4e6a57f047cde67d7ef",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/FaqPage.tsx": {
@@ -365,8 +365,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/settings.go": {
-    "mtime": 1786723354.0984454,
-    "ast_hash": "a4f4e81de43dad627598372ebb3639d0",
+    "mtime": 1786759046.4722471,
+    "ast_hash": "8b57e618501fa86cfbf179076ce44bb5",
     "semantic_hash": ""
   },
   "logikraf-v2/internal/delivery/handler/sitemap.go": {

@@ -21,11 +21,19 @@ interface GatewaySpec {
 
 const companyFields: FieldSpec[] = [
   { key: 'company_name', label: 'Nama Perusahaan / Entitas Legal', placeholder: 'PT. Logika Kreatif Indonesia' },
-  { key: 'company_email', label: 'Email Resmi', placeholder: 'support@logikraf.id' },
-  { key: 'company_phone', label: 'Nomor WhatsApp / Telepon', placeholder: '+62 812-3456-7890' },
-  { key: 'company_address', label: 'Alamat Kantor / Domisili Usaha', placeholder: 'Jakarta, Indonesia' },
+  { key: 'company_tagline', label: 'Slogan / Tagline Perusahaan', placeholder: 'Solusi Digital & Software House Terpercaya' },
   { key: 'company_legal_nib', label: 'Nomor Induk Berusaha (NIB)', placeholder: 'Contoh: 0123456789012' },
   { key: 'company_legal_npwp', label: 'Nomor Pokok Wajib Pajak (NPWP)', placeholder: 'Contoh: 01.234.567.8-901.000' },
+  { key: 'company_founding_year', label: 'Tahun Pendirian', placeholder: '2024' },
+]
+
+const contactFields: FieldSpec[] = [
+  { key: 'contact_whatsapp', label: 'Nomor WhatsApp Helpdesk Resmi (Aktif)', placeholder: '+62 812-3456-7890' },
+  { key: 'contact_email', label: 'Email Helpdesk & Layanan Klien', placeholder: 'support@logikraf.id' },
+  { key: 'contact_phone', label: 'Nomor Telepon Kantor / Helpdesk', placeholder: '+62 21 1234567' },
+  { key: 'contact_hours', label: 'Jam Operasional Helpdesk', placeholder: 'Senin – Jumat, 09:00 – 18:00 WIB' },
+  { key: 'contact_address', label: 'Alamat Helpdesk / Kantor Domisili', placeholder: 'Jakarta, DKI Jakarta, Indonesia' },
+  { key: 'contact_maps_url', label: 'Tautan Google Maps Domisili Kantor', placeholder: 'https://maps.google.com/...' },
 ]
 
 const gatewayDefs: GatewaySpec[] = [
@@ -232,6 +240,21 @@ export default function AdminSettingsPage() {
       flash('ok', 'Profil perusahaan & legalitas berhasil disimpan!')
     } catch (err: any) {
       flash('err', err?.message || 'Gagal menyimpan profil perusahaan')
+    } finally {
+      setSavingKey(null)
+    }
+  }
+
+  const saveContactSettings = async () => {
+    setSavingKey('contact')
+    try {
+      for (const f of contactFields) {
+        const val = items[f.key] || ''
+        await apiPut(`/api/settings/${encodeURIComponent(f.key)}`, { value: val })
+      }
+      flash('ok', 'Kontak & Helpdesk resmi berhasil disimpan!')
+    } catch (err: any) {
+      flash('err', err?.message || 'Gagal menyimpan kontak helpdesk')
     } finally {
       setSavingKey(null)
     }
@@ -474,7 +497,7 @@ export default function AdminSettingsPage() {
       {/* Company Profile Settings */}
       <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6 space-y-5">
         <div>
-          <h2 className="font-display font-bold text-text-main text-base">Profil Perusahaan & Legalitas</h2>
+          <h2 className="font-display font-bold text-text-main text-base">Profil Perusahaan &amp; Legalitas</h2>
           <p className="text-xs text-text-muted mt-0.5">Informasi resmi yang tercantum pada header, footer, Terms of Service, dan Invoice.</p>
         </div>
 
@@ -501,6 +524,45 @@ export default function AdminSettingsPage() {
             className="btn-secondary text-sm py-2 px-5 active:scale-[0.98] transition-all"
           >
             {savingKey === 'company' ? 'Menyimpan...' : 'Simpan Profil Perusahaan'}
+          </button>
+        </div>
+      </div>
+
+      {/* Helpdesk & Contact Settings */}
+      <div className="bg-white rounded-2xl border border-border-minimal shadow-sm p-6 space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display font-bold text-text-main text-base">Helpdesk &amp; Kontak Resmi</h2>
+            <p className="text-xs text-text-muted mt-0.5">Pengaturan nomor WhatsApp, email helpdesk, dan alamat yang tampil di seluruh halaman website publik &amp; portal klien.</p>
+          </div>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+            💬 Live Support
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {contactFields.map(f => (
+            <div key={f.key} className={f.key === 'contact_address' || f.key === 'contact_maps_url' ? 'sm:col-span-2' : ''}>
+              <label className="text-xs font-bold text-text-main mb-1 block">{f.label}</label>
+              <input
+                type="text"
+                className="form-input text-sm"
+                placeholder={f.placeholder || ''}
+                value={items[f.key] || ''}
+                onChange={e => handleFieldChange(f.key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-3 border-t border-border-minimal flex justify-end">
+          <button
+            type="button"
+            disabled={savingKey === 'contact'}
+            onClick={saveContactSettings}
+            className="btn-primary text-sm py-2 px-5 active:scale-[0.98] transition-all"
+          >
+            {savingKey === 'contact' ? 'Menyimpan...' : 'Simpan Kontak & Helpdesk 💾'}
           </button>
         </div>
       </div>
