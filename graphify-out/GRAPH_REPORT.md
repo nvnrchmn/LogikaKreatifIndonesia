@@ -1,16 +1,16 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-15)
 
 ## Corpus Check
-- 132 files · ~69,690 words
+- 132 files · ~69,854 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 780 nodes · 899 edges · 101 communities (61 shown, 40 thin omitted)
+- 781 nodes · 901 edges · 102 communities (59 shown, 43 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.56)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2f06db43`
+- Built from commit: `0cd9c9f5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -83,6 +83,7 @@
 - PortfolioGallery.tsx
 - TestimonialsSection.tsx
 - public/ServicesPage.tsx
+- PortfolioDetailPage.tsx
 - smoke.sh
 - frontend/tsconfig.json
 - GetPackages
@@ -106,6 +107,7 @@
 - CLAUDE.md
 - .claude/CLAUDE.md
 - extraction-spec.md
+- db.go
 - PortfolioPage.tsx
 - github.com/logikraf/logikraf-v2
 - PrivacyPage.tsx
@@ -139,7 +141,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (101 total, 40 thin omitted)
+## Communities (102 total, 43 thin omitted)
 
 ### Community 0 - "dependencies"
 Cohesion: 0.05
@@ -148,10 +150,6 @@ Nodes (41): @ant-design/icons, antd, dependencies, @ant-design/icons, antd, reac
 ### Community 1 - "AdminDashboardPage.tsx"
 Cohesion: 0.09
 Nodes (32): apiGet(), apiPost(), apiPut(), auth(), handleResponse(), Activity, AdminDashboardPage(), AnyArr (+24 more)
-
-### Community 2 - "ClientLayout.tsx"
-Cohesion: 0.09
-Nodes (8): navItems, Invoice, InvoiceItem, mockInvoices, statusColors, mockOrders, Order, statusColors
 
 ### Community 3 - "payment.go"
 Cohesion: 0.23
@@ -170,8 +168,8 @@ Cohesion: 0.14
 Nodes (19): Claims, LoginRequest, main(), Handler, T, migratePaymentTables(), postJSON(), TestForcePasswordReset() (+11 more)
 
 ### Community 7 - "PackageTest"
-Cohesion: 0.21
-Nodes (6): App(), Testimonial, usePageMeta(), Root(), Order, react
+Cohesion: 0.24
+Nodes (5): App(), usePageMeta(), Root(), Order, react
 
 ### Community 8 - "compilerOptions"
 Cohesion: 0.09
@@ -193,17 +191,13 @@ Nodes (14): 10. References, 1. Context, 2. Decision, 3. Multi-Tenancy Model, 4. 
 Cohesion: 0.06
 Nodes (41): AboutPage, AdminDashboardPage, AdminLayout, AdminLoginPage, AdminPaymentHubPage, AdminPaymentLedgerPage, AdminReconciliationPage, AdminReportsPage (+33 more)
 
-### Community 14 - "PublicLayout.tsx"
-Cohesion: 0.17
-Nodes (4): PublicLayout(), Gateway, Package, Portfolio
-
 ### Community 15 - "ai-ui-ux-theme-style.md"
 Cohesion: 0.15
 Nodes (12): 01_PROJECT_OVERVIEW.md, 02_TAILWIND_V4_THEME_CONFIG.md, 03_COMPONENT_LIBRARY.md, 04_RESPONSIVE_BREAKPOINTS.md, 05_DEPLOYMENT_PLAYBOOK.md, 10. Documentation & Knowledge Base, 1. Visual Vibe & Design Philosophy, 2. Color System & Theme Variables (+4 more)
 
 ### Community 16 - "react"
-Cohesion: 0.24
-Nodes (4): Footer(), NavbarProps, Props, HomePage()
+Cohesion: 0.21
+Nodes (5): Footer(), NavbarProps, Props, Portfolio, HomePage()
 
 ### Community 18 - "3. Core Features & Scope of Work (Ruang Lingkup Proyek)"
 Cohesion: 0.20
@@ -236,6 +230,10 @@ Nodes (8): 1. Persiapan Awal, 2. Alur Pembayaran (Flow), 3. Dokumentasi API (End
 ### Community 25 - "plugins"
 Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
+
+### Community 26 - "ClientDashboardPage.tsx"
+Cohesion: 0.20
+Nodes (4): PublicLayout(), Post, Errors, FormState
 
 ### Community 27 - "Panduan Integrasi Logikraf Payment Hub (XenPlatform)"
 Cohesion: 0.25
@@ -322,8 +320,8 @@ Cohesion: 0.40
 Nodes (4): Changelog: 12 Juli 2026 - Payment Hub (xenPlatform), Fitur Baru (Backend & API), Perbaikan Bug & Refactoring, UI/UX & Admin Portal
 
 ### Community 49 - "Settings/SettingsPage.tsx"
-Cohesion: 0.33
-Nodes (4): mockTxns, statusColors, Transaction, TransactionRefund
+Cohesion: 0.11
+Nodes (10): mockOrders, Order, statusColors, mockServices, Service, ServiceFeature, mockTxns, statusColors (+2 more)
 
 ### Community 50 - "package_crud.go"
 Cohesion: 0.60
@@ -354,8 +352,8 @@ Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
 ### Community 58 - "ContactPage.tsx"
-Cohesion: 0.40
-Nodes (3): mockServices, Service, ServiceFeature
+Cohesion: 0.33
+Nodes (4): Invoice, InvoiceItem, mockInvoices, statusColors
 
 ### Community 59 - "handler/service.go"
 Cohesion: 0.67
@@ -368,22 +366,22 @@ Nodes (3): Time, PaymentTransaction, TenantPaymentAccount
 ## Knowledge Gaps
 - **314 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+309 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **40 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **43 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `PortfolioGallery.tsx`, `TestimonialsSection.tsx`, `public/ServicesPage.tsx`, `PortfolioPage.tsx`, `PrivacyPage.tsx`, `public/ServicesPage.tsx`, `TermsPage.tsx`?**
+- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `PortfolioGallery.tsx`, `TestimonialsSection.tsx`, `public/ServicesPage.tsx`, `PortfolioDetailPage.tsx`, `PortfolioPage.tsx`, `PrivacyPage.tsx`, `public/ServicesPage.tsx`, `TermsPage.tsx`?**
   _High betweenness centrality (0.092) - this node is a cross-community bridge._
 - **Why does `plugins` connect `plugins` to `PackageTest`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `$schema`, `typescript`, `oxc` to the rest of the system?**
   _314 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
 - **Should `AdminDashboardPage.tsx` be split into smaller, more focused modules?**
   _Cohesion score 0.08780487804878048 - nodes in this community are weakly interconnected._
-- **Should `ClientLayout.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.08947368421052632 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
   _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
+- **Should `compilerOptions` be split into smaller, more focused modules?**
+  _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._

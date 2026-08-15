@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/components/admin/AdminResourcePage.tsx": {
-    "mtime": 1786755538.2499459,
-    "ast_hash": "0be5b2df44d22f6e99cc6a9cddc7de7f",
+    "mtime": 1786758059.8374548,
+    "ast_hash": "4113bde3dd205817f2a9b0f65213e230",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/components/admin/crudConfigs.tsx": {
@@ -395,8 +395,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/internal/domain/model/db.go": {
-    "mtime": 1786718271.617936,
-    "ast_hash": "14554a16780b33461feab8d7495dadf6",
+    "mtime": 1786758041.2952654,
+    "ast_hash": "6d9ffa81f8e0f92169c84671e06a4683",
     "semantic_hash": ""
   },
   "logikraf-v2/internal/domain/model/invoice.go": {

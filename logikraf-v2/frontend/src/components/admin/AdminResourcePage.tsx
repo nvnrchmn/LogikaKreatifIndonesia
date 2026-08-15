@@ -44,8 +44,15 @@ function ResourceList({ cfg }: { cfg: any }) {
     setLoading(true)
     setError('')
     try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error('Sesi login tidak ditemukan. Silakan login terlebih dahulu sebagai Admin.')
+      }
       const res = await fetch(cfg.endpoint, { headers: auth() })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('Sesi login telah berakhir atau Anda belum memiliki izin admin. Silakan login ulang di /admin/login.')
+      }
       if (!res.ok) {
         throw new Error(data?.error || data?.message || 'Gagal memuat data dari server')
       }
@@ -401,6 +408,9 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
         })
       }
       const data = await res.json().catch(() => ({}))
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('Sesi login telah berakhir atau Anda belum memiliki izin admin. Silakan login ulang di /admin/login.')
+      }
       if (!res.ok) {
         throw new Error(data?.error || data?.message || 'Gagal menyimpan data ke database')
       }
