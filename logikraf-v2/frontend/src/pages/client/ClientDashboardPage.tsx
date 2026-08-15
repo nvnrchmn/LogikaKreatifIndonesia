@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 interface Order {
@@ -11,110 +12,252 @@ interface Order {
   created_at: string
 }
 
-const statusStyle: Record<string, string> = {
-  pending: 'bg-status-warning/10 text-status-warning',
-  active: 'bg-status-info/10 text-status-info',
-  completed: 'bg-status-success/10 text-status-success',
-  cancelled: 'bg-status-danger/10 text-status-danger',
-}
-
-const fmt = (n: number) => `Rp ${Number(n || 0).toLocaleString('id-ID')}`
-const StatusBadge = ({ s }: { s: string }) => (
-  <span className={`badge ${statusStyle[s] || 'bg-gray-100 text-gray-600'}`}>{s || 'pending'}</span>
-)
-
 export default function ClientDashboardPage() {
   const { name } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/orders').then(r => r.json()).then((d: Order[]) => {
-      setOrders(Array.isArray(d) ? d : [])
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    fetch('/api/orders')
+      .then(r => (r.ok ? r.json() : []))
+      .then((d: Order[]) => {
+        setOrders(Array.isArray(d) ? d : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
   }, [])
 
   const total = orders.length
   const active = orders.filter(o => o.status === 'active').length
+  const pending = orders.filter(o => o.status === 'pending').length
   const completed = orders.filter(o => o.status === 'completed').length
   const recent = orders.slice(0, 5)
 
   const stats = [
-    { label: 'Total Order', value: total, icon: BagIcon },
-    { label: 'Order Aktif', value: active, icon: PulseIcon },
-    { label: 'Selesai', value: completed, icon: CheckIcon },
+    {
+      label: 'Total Proyek',
+      value: total,
+      icon: BagIcon,
+      tone: 'text-blue-600',
+      bgTone: 'bg-blue-50 border-blue-100',
+    },
+    {
+      label: 'Sedang Berjalan',
+      value: active,
+      icon: PulseIcon,
+      tone: 'text-amber-600',
+      bgTone: 'bg-amber-50 border-amber-100',
+    },
+    {
+      label: 'Menunggu Bayar',
+      value: pending,
+      icon: PendingIcon,
+      tone: 'text-rose-600',
+      bgTone: 'bg-rose-50 border-rose-100',
+    },
+    {
+      label: 'Selesai & Rilis',
+      value: completed,
+      icon: CheckIcon,
+      tone: 'text-emerald-600',
+      bgTone: 'bg-emerald-50 border-emerald-100',
+    },
   ]
 
+  const fmt = (n: number) => `Rp ${Number(n || 0).toLocaleString('id-ID')}`
+  const fmtDate = (s: string) =>
+    s
+      ? new Date(s).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        })
+      : '-'
+
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-display font-extrabold text-text-main">Halo, {name || 'Client'} 👋</h1>
-        <p className="text-text-muted text-sm mt-1">Berikut ringkasan proyek Anda di LOGIKRAF.</p>
+    <div className="space-y-8 pb-12">
+      {/* Welcome Banner */}
+      <div className="relative rounded-3xl bg-gradient-to-r from-canvas-dark via-gray-900 to-canvas-dark p-6 sm:p-8 text-white shadow-xl overflow-hidden border border-white/10">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-primary/20 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-brand-accent text-xs font-semibold border border-white/10">
+              <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
+              <span>Portal Klien Terverifikasi</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
+              Selamat Datang, {name || 'Klien Logikraf'} 👋
+            </h1>
+            <p className="text-xs sm:text-sm text-text-light/70 font-body max-w-xl">
+              Pantau progres pengerjaan software, milestone termin, serta invoice pembayaran proyek Anda di Logikraf.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              to="/paket"
+              className="btn-primary text-xs py-2.5 px-4 shadow-lg shadow-brand-primary/25 active:scale-[0.98] transition-transform"
+            >
+              + Pesan Proyek Baru
+            </Link>
+          </div>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => <div key={i} className="card animate-pulse h-28" />)}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {stats.map(s => {
-            const Icon = s.icon
-            return (
-              <div key={s.label} className="card p-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center"><Icon /></div>
-                  <div>
-                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">{s.label}</p>
-                    <p className="text-xl font-display font-extrabold text-text-main">{s.value}</p>
-                  </div>
+      {/* Stats Metric Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map(s => {
+          const Icon = s.icon
+          return (
+            <div
+              key={s.label}
+              className="bg-white rounded-3xl border border-border-minimal shadow-sm p-5 flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div
+                  className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${s.bgTone} ${s.tone}`}
+                >
+                  <Icon />
                 </div>
               </div>
-            )
-          })}
-        </div>
-      )}
+              <div>
+                <p className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-0.5">
+                  {s.label}
+                </p>
+                <p className="text-2xl font-display font-black text-text-main">
+                  {loading ? '...' : s.value}
+                </p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
-      <div className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-border-minimal flex items-center justify-between">
-          <h2 className="font-display font-bold text-text-main">Order Terbaru</h2>
+      {/* Recent Orders Card */}
+      <div className="bg-white rounded-3xl border border-border-minimal shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b border-border-minimal flex items-center justify-between">
+          <div>
+            <h2 className="font-display font-bold text-base text-text-main">Pesanan &amp; Proyek Terbaru</h2>
+            <p className="text-xs text-text-muted mt-0.5">Daftar layanan yang sedang atau telah dikerjakan.</p>
+          </div>
+          <Link to="/client/orders" className="text-xs font-bold text-brand-primary hover:underline">
+            Lihat Semua Pesanan →
+          </Link>
         </div>
+
         {loading ? (
-          <div className="p-5 space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-10 bg-gray-100 rounded animate-pulse" />)}
+          <div className="p-6 space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded-2xl animate-pulse" />
+            ))}
           </div>
         ) : recent.length === 0 ? (
-          <p className="px-5 py-8 text-center text-text-muted text-sm">Belum ada order.</p>
+          <div className="p-12 text-center">
+            <p className="text-text-main font-bold mb-1">Belum Ada Riwayat Pesanan</p>
+            <p className="text-text-muted text-xs mb-4">Mulai kolaborasi digital Anda dengan memesan paket layanan.</p>
+            <Link to="/paket" className="btn-primary text-xs py-2 px-4 shadow-sm">
+              Lihat Katalog Paket Website UMKM
+            </Link>
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-border-minimal">
-                  <th className="text-left px-5 py-3 font-semibold text-text-muted text-xs uppercase tracking-wider">Nomor</th>
-                  <th className="text-left px-5 py-3 font-semibold text-text-muted text-xs uppercase tracking-wider">Proyek</th>
-                  <th className="text-left px-5 py-3 font-semibold text-text-muted text-xs uppercase tracking-wider">Status</th>
-                  <th className="text-right px-5 py-3 font-semibold text-text-muted text-xs uppercase tracking-wider">Total</th>
+                <tr className="border-b border-border-minimal bg-canvas-overlay/60">
+                  <th className="text-left font-bold text-text-main py-3.5 px-6">No. Order</th>
+                  <th className="text-left font-bold text-text-main py-3.5 px-6">Nama Proyek</th>
+                  <th className="text-left font-bold text-text-main py-3.5 px-6">Status Pengerjaan</th>
+                  <th className="text-right font-bold text-text-main py-3.5 px-6">Total Nominal</th>
+                  <th className="text-right font-bold text-text-main py-3.5 px-6">Tanggal</th>
                 </tr>
               </thead>
-              <tbody>
-                {recent.map(o => (
-                  <tr key={o.id} className="border-b border-border-minimal last:border-0 hover:bg-canvas-light transition-colors">
-                    <td className="px-5 py-3 font-medium text-text-main">{o.order_number || '-'}</td>
-                    <td className="px-5 py-3 text-text-main">{o.project_name}</td>
-                    <td className="px-5 py-3"><StatusBadge s={o.status} /></td>
-                    <td className="px-5 py-3 text-right text-text-main">{fmt(o.total_amount)}</td>
-                  </tr>
-                ))}
+              <tbody className="divide-y divide-border-minimal">
+                {recent.map(o => {
+                  const st = String(o.status || 'pending').toLowerCase()
+                  const statusBadge: Record<string, string> = {
+                    pending: 'bg-amber-50 text-amber-700 border-amber-200',
+                    active: 'bg-blue-50 text-blue-700 border-blue-200',
+                    completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
+                  }
+                  return (
+                    <tr key={o.id} className="hover:bg-canvas-light/60 transition-colors">
+                      <td className="py-3.5 px-6 font-mono font-bold text-text-main">
+                        {o.order_number || `#${o.id}`}
+                      </td>
+                      <td className="py-3.5 px-6 font-bold text-text-main">{o.project_name}</td>
+                      <td className="py-3.5 px-6">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+                            statusBadge[st] || 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {o.status || 'pending'}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-6 text-right font-mono font-bold text-emerald-700">
+                        {fmt(o.total_amount)}
+                      </td>
+                      <td className="py-3.5 px-6 text-right text-text-muted font-mono text-xs">
+                        {fmtDate(o.created_at)}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
+
+      {/* Support Box */}
+      <div className="bg-canvas-overlay rounded-3xl border border-border-minimal p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="font-display font-bold text-base text-text-main">Butuh Bantuan Teknis atau Penambahan Fitur?</h3>
+          <p className="text-xs text-text-muted mt-1">Konsultasikan langsung dengan tim engineer Logikraf via WhatsApp resmi.</p>
+        </div>
+        <a
+          href="https://wa.me/6281234567890"
+          target="_blank"
+          rel="noreferrer"
+          className="btn-primary text-xs py-2.5 px-5 shadow-sm whitespace-nowrap"
+        >
+          💬 Chat WhatsApp Support
+        </a>
+      </div>
     </div>
   )
 }
 
-function BagIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg> }
-function PulseIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> }
-function CheckIcon() { return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }
+function BagIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+  )
+}
+
+function PulseIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  )
+}
+
+function PendingIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  )
+}

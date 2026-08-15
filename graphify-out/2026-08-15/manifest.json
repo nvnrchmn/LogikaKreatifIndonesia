@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/App.tsx": {
-    "mtime": 1786721192.2729595,
-    "ast_hash": "3c7046e00b1f08090de4a173c3f8097a",
+    "mtime": 1786757112.5930028,
+    "ast_hash": "ee5f1cbd969de68caa82f6332d575228",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/components/admin/AdminLayout.tsx": {
@@ -697,6 +697,11 @@
   "logikraf-v2/frontend/src/assets/vite.svg": {
     "mtime": 1786718271.591688,
     "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": ""
+  },
+  "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx": {
+    "mtime": 1786757098.0229025,
+    "ast_hash": "9a3ebaa6ea609cb38e37880ddb6d817b",
     "semantic_hash": ""
   }
 }

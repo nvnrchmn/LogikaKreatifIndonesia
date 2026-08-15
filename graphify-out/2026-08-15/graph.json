@@ -631,10 +631,21 @@
       "norm_label": "servicespage"
     },
     {
-      "label": "PortfolioDetailPage",
+      "label": "PortfolioPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
       "source_location": "L8",
+      "_origin": "ast",
+      "id": "logikraf_v2_frontend_src_app_portfoliopage",
+      "community": 13,
+      "community_name": "App.tsx",
+      "norm_label": "portfoliopage"
+    },
+    {
+      "label": "PortfolioDetailPage",
+      "file_type": "code",
+      "source_file": "logikraf-v2/frontend/src/App.tsx",
+      "source_location": "L9",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_portfoliodetailpage",
       "community": 13,
@@ -645,7 +656,7 @@
       "label": "BlogPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_blogpage",
       "community": 13,
@@ -656,7 +667,7 @@
       "label": "BlogDetailPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_blogdetailpage",
       "community": 13,
@@ -667,7 +678,7 @@
       "label": "AboutPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_aboutpage",
       "community": 13,
@@ -678,7 +689,7 @@
       "label": "ContactPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_contactpage",
       "community": 13,
@@ -689,7 +700,7 @@
       "label": "PackagesPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_packagespage",
       "community": 13,
@@ -700,7 +711,7 @@
       "label": "SearchPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_searchpage",
       "community": 13,
@@ -711,7 +722,7 @@
       "label": "TermsPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_termspage",
       "community": 13,
@@ -722,7 +733,7 @@
       "label": "PrivacyPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_privacypage",
       "community": 13,
@@ -733,7 +744,7 @@
       "label": "FaqPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L17",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_faqpage",
       "community": 13,
@@ -744,7 +755,7 @@
       "label": "AdminLayout",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminlayout",
       "community": 13,
@@ -755,7 +766,7 @@
       "label": "AdminResourcePage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminresourcepage",
       "community": 13,
@@ -766,7 +777,7 @@
       "label": "AdminLoginPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminloginpage",
       "community": 13,
@@ -777,7 +788,7 @@
       "label": "AdminDashboardPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_admindashboardpage",
       "community": 13,
@@ -788,7 +799,7 @@
       "label": "AdminPaymentHubPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminpaymenthubpage",
       "community": 13,
@@ -799,7 +810,7 @@
       "label": "AdminTenantPaymentAccountsPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L25",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_admintenantpaymentaccountspage",
       "community": 13,
@@ -810,7 +821,7 @@
       "label": "AdminPaymentLedgerPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L26",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminpaymentledgerpage",
       "community": 13,
@@ -821,7 +832,7 @@
       "label": "AdminReconciliationPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminreconciliationpage",
       "community": 13,
@@ -832,7 +843,7 @@
       "label": "AdminSettingsPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminsettingspage",
       "community": 13,
@@ -843,7 +854,7 @@
       "label": "AdminReportsPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_adminreportspage",
       "community": 13,
@@ -854,7 +865,7 @@
       "label": "ClientLayout",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_clientlayout",
       "community": 13,
@@ -865,7 +876,7 @@
       "label": "ClientDashboardPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L33",
+      "source_location": "L34",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_clientdashboardpage",
       "community": 13,
@@ -876,7 +887,7 @@
       "label": "ClientOrdersPage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_clientorderspage",
       "community": 13,
@@ -887,7 +898,7 @@
       "label": "ClientProfilePage",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_clientprofilepage",
       "community": 13,
@@ -898,7 +909,7 @@
       "label": "PageLoader()",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L37",
+      "source_location": "L38",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_pageloader",
       "community": 13,
@@ -909,44 +920,44 @@
       "label": "ProtectedRoute()",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_protectedroute",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "protectedroute()"
     },
     {
       "label": "RequireAdmin()",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_requireadmin",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "requireadmin()"
     },
     {
       "label": "RequireClient()",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_requireclient",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "requireclient()"
     },
     {
       "label": "App()",
       "file_type": "code",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L64",
+      "source_location": "L65",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_app_app",
-      "community": 13,
-      "community_name": "App.tsx",
+      "community": 7,
+      "community_name": "PackageTest",
       "norm_label": "app()"
     },
     {
@@ -1484,8 +1495,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_footer",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "footer.tsx"
     },
     {
@@ -1495,8 +1506,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_footer_footer",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "footer()"
     },
     {
@@ -1506,8 +1517,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_navbar",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "navbar.tsx"
     },
     {
@@ -1517,8 +1528,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_navbar_navbarprops",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "navbarprops"
     },
     {
@@ -1528,8 +1539,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_navbar_navbar",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "navbar()"
     },
     {
@@ -1539,8 +1550,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_publiclayout",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "publiclayout.tsx"
     },
     {
@@ -1550,8 +1561,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_layout_publiclayout_props",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "props"
     },
     {
@@ -1594,8 +1605,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_portfoliogallery",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 65,
+      "community_name": "PortfolioGallery.tsx",
       "norm_label": "portfoliogallery.tsx"
     },
     {
@@ -1605,8 +1616,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_portfoliogallery_portfolio",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 65,
+      "community_name": "PortfolioGallery.tsx",
       "norm_label": "portfolio"
     },
     {
@@ -1616,8 +1627,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_portfoliogallery_portfoliogallery",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 65,
+      "community_name": "PortfolioGallery.tsx",
       "norm_label": "portfoliogallery()"
     },
     {
@@ -1627,8 +1638,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_projectbriefform",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 7,
+      "community_name": "PackageTest",
       "norm_label": "projectbriefform.tsx"
     },
     {
@@ -1638,8 +1649,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_projectbriefform_projectbriefform",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 7,
+      "community_name": "PackageTest",
       "norm_label": "projectbriefform()"
     },
     {
@@ -1726,8 +1737,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_testimonialssection",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 66,
+      "community_name": "TestimonialsSection.tsx",
       "norm_label": "testimonialssection.tsx"
     },
     {
@@ -1737,8 +1748,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_testimonialssection_testimonial",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 66,
+      "community_name": "TestimonialsSection.tsx",
       "norm_label": "testimonial"
     },
     {
@@ -1748,8 +1759,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_components_public_testimonialssection_testimonialssection",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 66,
+      "community_name": "TestimonialsSection.tsx",
       "norm_label": "testimonialssection()"
     },
     {
@@ -1759,8 +1770,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_contexts_authcontext",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "authcontext.tsx"
     },
     {
@@ -1770,8 +1781,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_contexts_authcontext_authcontexttype",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "authcontexttype"
     },
     {
@@ -1781,8 +1792,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_contexts_authcontext_authcontext",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "authcontext"
     },
     {
@@ -1792,8 +1803,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_contexts_authcontext_authprovider",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "authprovider()"
     },
     {
@@ -1803,8 +1814,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_contexts_authcontext_useauth",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "useauth()"
     },
     {
@@ -2067,8 +2078,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_adminloginpage",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "adminloginpage.tsx"
     },
     {
@@ -2078,8 +2089,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_adminloginpage_adminloginpage",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "adminloginpage()"
     },
     {
@@ -2089,8 +2100,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_businesses_businessespage",
-      "community": 7,
-      "community_name": "PackageTest",
+      "community": 17,
+      "community_name": "PublicLayout",
       "norm_label": "businessespage.tsx"
     },
     {
@@ -2100,8 +2111,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_businesses_businessespage_business",
-      "community": 7,
-      "community_name": "PackageTest",
+      "community": 17,
+      "community_name": "PublicLayout",
       "norm_label": "business"
     },
     {
@@ -2111,8 +2122,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_businesses_businessespage_mockbusinesses",
-      "community": 7,
-      "community_name": "PackageTest",
+      "community": 17,
+      "community_name": "PublicLayout",
       "norm_label": "mockbusinesses"
     },
     {
@@ -2122,8 +2133,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_businesses_businessespage_businessespage",
-      "community": 7,
-      "community_name": "PackageTest",
+      "community": 17,
+      "community_name": "PublicLayout",
       "norm_label": "businessespage()"
     },
     {
@@ -2474,8 +2485,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_services_servicespage",
-      "community": 26,
-      "community_name": "ClientDashboardPage.tsx",
+      "community": 58,
+      "community_name": "ContactPage.tsx",
       "norm_label": "services/servicespage.tsx"
     },
     {
@@ -2485,8 +2496,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_services_servicespage_service",
-      "community": 26,
-      "community_name": "ClientDashboardPage.tsx",
+      "community": 58,
+      "community_name": "ContactPage.tsx",
       "norm_label": "service"
     },
     {
@@ -2496,8 +2507,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_services_servicespage_servicefeature",
-      "community": 26,
-      "community_name": "ClientDashboardPage.tsx",
+      "community": 58,
+      "community_name": "ContactPage.tsx",
       "norm_label": "servicefeature"
     },
     {
@@ -2507,8 +2518,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_services_servicespage_mockservices",
-      "community": 26,
-      "community_name": "ClientDashboardPage.tsx",
+      "community": 58,
+      "community_name": "ContactPage.tsx",
       "norm_label": "mockservices"
     },
     {
@@ -2518,8 +2529,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_admin_services_servicespage_servicespage",
-      "community": 26,
-      "community_name": "ClientDashboardPage.tsx",
+      "community": 58,
+      "community_name": "ContactPage.tsx",
       "norm_label": "servicespage()"
     },
     {
@@ -2760,8 +2771,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "clientdashboardpage.tsx"
     },
     {
@@ -2771,8 +2782,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_order",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "order"
     },
     {
@@ -2782,8 +2793,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_statusstyle",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "statusstyle"
     },
     {
@@ -2793,8 +2804,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_fmt",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "fmt()"
     },
     {
@@ -2804,8 +2815,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_statusbadge",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "statusbadge()"
     },
     {
@@ -2815,8 +2826,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_clientdashboardpage",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "clientdashboardpage()"
     },
     {
@@ -2826,8 +2837,8 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_bagicon",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "bagicon()"
     },
     {
@@ -2837,8 +2848,8 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_pulseicon",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "pulseicon()"
     },
     {
@@ -2848,8 +2859,8 @@
       "source_location": "L120",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientdashboardpage_checkicon",
-      "community": 17,
-      "community_name": "PublicLayout",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "checkicon()"
     },
     {
@@ -2936,8 +2947,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientprofilepage",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "clientprofilepage.tsx"
     },
     {
@@ -2947,8 +2958,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_client_clientprofilepage_clientprofilepage",
-      "community": 16,
-      "community_name": "react",
+      "community": 13,
+      "community_name": "App.tsx",
       "norm_label": "clientprofilepage()"
     },
     {
@@ -3046,8 +3057,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_contactpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 26,
+      "community_name": "ClientDashboardPage.tsx",
       "norm_label": "contactpage.tsx"
     },
     {
@@ -3057,8 +3068,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_contactpage_formstate",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 26,
+      "community_name": "ClientDashboardPage.tsx",
       "norm_label": "formstate"
     },
     {
@@ -3068,8 +3079,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_contactpage_errors",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 26,
+      "community_name": "ClientDashboardPage.tsx",
       "norm_label": "errors"
     },
     {
@@ -3079,8 +3090,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_contactpage_contactpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 26,
+      "community_name": "ClientDashboardPage.tsx",
       "norm_label": "contactpage()"
     },
     {
@@ -3090,8 +3101,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_faqpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 67,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "faqpage.tsx"
     },
     {
@@ -3101,8 +3112,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_faqpage_gateway",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 67,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "gateway"
     },
     {
@@ -3112,8 +3123,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_faqpage_faqpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 67,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "faqpage()"
     },
     {
@@ -3123,8 +3134,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_homepage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "homepage.tsx"
     },
     {
@@ -3134,8 +3145,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_homepage_homepage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 16,
+      "community_name": "react",
       "norm_label": "homepage()"
     },
     {
@@ -3145,8 +3156,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_packagespage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 68,
+      "community_name": "PackagesPage.tsx",
       "norm_label": "packagespage.tsx"
     },
     {
@@ -3156,8 +3167,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_packagespage_package",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 68,
+      "community_name": "PackagesPage.tsx",
       "norm_label": "package"
     },
     {
@@ -3167,8 +3178,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_packagespage_packagespage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 68,
+      "community_name": "PackagesPage.tsx",
       "norm_label": "packagespage()"
     },
     {
@@ -3178,8 +3189,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 93,
+      "community_name": "PortfolioDetailPage.tsx",
       "norm_label": "portfoliodetailpage.tsx"
     },
     {
@@ -3189,8 +3200,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage_portfolio",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 93,
+      "community_name": "PortfolioDetailPage.tsx",
       "norm_label": "portfolio"
     },
     {
@@ -3200,9 +3211,42 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage_portfoliodetailpage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 93,
+      "community_name": "PortfolioDetailPage.tsx",
       "norm_label": "portfoliodetailpage()"
+    },
+    {
+      "label": "PortfolioPage.tsx",
+      "file_type": "code",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "logikraf_v2_frontend_src_pages_public_portfoliopage",
+      "community": 96,
+      "community_name": "PortfolioPage.tsx",
+      "norm_label": "portfoliopage.tsx"
+    },
+    {
+      "label": "Portfolio",
+      "file_type": "code",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "logikraf_v2_frontend_src_pages_public_portfoliopage_portfolio",
+      "community": 96,
+      "community_name": "PortfolioPage.tsx",
+      "norm_label": "portfolio"
+    },
+    {
+      "label": "PortfolioPage()",
+      "file_type": "code",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "logikraf_v2_frontend_src_pages_public_portfoliopage_portfoliopage",
+      "community": 96,
+      "community_name": "PortfolioPage.tsx",
+      "norm_label": "portfoliopage()"
     },
     {
       "label": "PrivacyPage.tsx",
@@ -3211,8 +3255,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_privacypage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 100,
+      "community_name": "PrivacyPage.tsx",
       "norm_label": "privacypage.tsx"
     },
     {
@@ -3222,8 +3266,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_privacypage_gateway",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 100,
+      "community_name": "PrivacyPage.tsx",
       "norm_label": "gateway"
     },
     {
@@ -3233,8 +3277,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_privacypage_privacypage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 100,
+      "community_name": "PrivacyPage.tsx",
       "norm_label": "privacypage()"
     },
     {
@@ -3277,8 +3321,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_servicespage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 101,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "public/servicespage.tsx"
     },
     {
@@ -3288,8 +3332,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_servicespage_service",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 101,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "service"
     },
     {
@@ -3299,8 +3343,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_servicespage_servicespage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 101,
+      "community_name": "public/ServicesPage.tsx",
       "norm_label": "servicespage()"
     },
     {
@@ -3310,8 +3354,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_termspage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 102,
+      "community_name": "TermsPage.tsx",
       "norm_label": "termspage.tsx"
     },
     {
@@ -3321,8 +3365,8 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_termspage_gateway",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 102,
+      "community_name": "TermsPage.tsx",
       "norm_label": "gateway"
     },
     {
@@ -3332,8 +3376,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "logikraf_v2_frontend_src_pages_public_termspage_termspage",
-      "community": 14,
-      "community_name": "PublicLayout.tsx",
+      "community": 102,
+      "community_name": "TermsPage.tsx",
       "norm_label": "termspage()"
     },
     {
@@ -4611,8 +4655,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "handler/payment_account.go"
     },
     {
@@ -4622,8 +4666,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account_refundpaymenttransaction",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "refundpaymenttransaction()"
     },
     {
@@ -4633,8 +4677,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account_go_ctx",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "ctx"
     },
     {
@@ -4644,8 +4688,8 @@
       "source_location": "L86",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account_getreconciliation",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "getreconciliation()"
     },
     {
@@ -4655,8 +4699,8 @@
       "source_location": "L113",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account_listpaymenttransactions",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "listpaymenttransactions()"
     },
     {
@@ -4666,8 +4710,8 @@
       "source_location": "L123",
       "_origin": "ast",
       "id": "logikraf_v2_internal_delivery_handler_payment_account_listtenantpaymentaccounts",
-      "community": 67,
-      "community_name": "public/ServicesPage.tsx",
+      "community": 3,
+      "community_name": "payment.go",
       "norm_label": "listtenantpaymentaccounts()"
     },
     {
@@ -9160,6 +9204,18 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_pages_public_portfoliopage",
+      "target": "ref_react",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/pages/public/PrivacyPage.tsx",
       "source_location": "L1",
       "weight": 1.0,
@@ -9708,7 +9764,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9719,7 +9775,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9730,7 +9786,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9741,7 +9797,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9752,7 +9808,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9763,7 +9819,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9774,7 +9830,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9785,7 +9841,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9796,7 +9852,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9807,7 +9863,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9818,7 +9874,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9829,7 +9885,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L64",
+      "source_location": "L65",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9840,7 +9896,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9851,7 +9907,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9862,7 +9918,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L33",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9873,7 +9929,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9884,7 +9940,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L34",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9895,7 +9951,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9906,7 +9962,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9917,7 +9973,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9928,7 +9984,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9939,7 +9995,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L37",
+      "source_location": "L38",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9950,7 +10006,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9961,7 +10017,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L16",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_app",
+      "target": "logikraf_v2_frontend_src_app_portfoliopage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/App.tsx",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9972,7 +10039,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9983,7 +10050,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -9994,7 +10061,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -10005,7 +10072,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -10027,7 +10094,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app",
@@ -10099,7 +10166,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app_protectedroute",
@@ -10111,7 +10178,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app_requireadmin",
@@ -10123,11 +10190,23 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/App.tsx",
-      "source_location": "L59",
+      "source_location": "L60",
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_app_requireclient",
       "target": "logikraf_v2_frontend_src_contexts_authcontext_useauth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/main.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_main",
+      "target": "logikraf_v2_frontend_src_app_app",
       "confidence_score": 1.0
     },
     {
@@ -10934,6 +11013,18 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_pages_public_portfoliopage",
+      "target": "logikraf_v2_frontend_src_components_layout_publiclayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "logikraf-v2/frontend/src/pages/public/PrivacyPage.tsx",
       "source_location": "L2",
       "weight": 1.0,
@@ -11059,6 +11150,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage",
+      "target": "logikraf_v2_frontend_src_components_layout_publiclayout_publiclayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_pages_public_portfoliopage",
       "target": "logikraf_v2_frontend_src_components_layout_publiclayout_publiclayout",
       "confidence_score": 1.0
     },
@@ -13146,6 +13249,28 @@
       "_origin": "ast",
       "source": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage",
       "target": "logikraf_v2_frontend_src_pages_public_portfoliodetailpage_portfoliodetailpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_pages_public_portfoliopage",
+      "target": "logikraf_v2_frontend_src_pages_public_portfoliopage_portfolio",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "logikraf-v2/frontend/src/pages/public/PortfolioPage.tsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "logikraf_v2_frontend_src_pages_public_portfoliopage",
+      "target": "logikraf_v2_frontend_src_pages_public_portfoliopage_portfoliopage",
       "confidence_score": 1.0
     },
     {
