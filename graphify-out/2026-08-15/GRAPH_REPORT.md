@@ -1,16 +1,16 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-15)
 
 ## Corpus Check
-- 132 files · ~69,854 words
+- 132 files · ~70,376 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 781 nodes · 901 edges · 102 communities (59 shown, 43 thin omitted)
+- 783 nodes · 904 edges · 98 communities (60 shown, 38 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.56)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0cd9c9f5`
+- Built from commit: `f613d058`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -80,9 +80,7 @@
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - Changelog - 12 Juli 2026
-- PortfolioGallery.tsx
 - TestimonialsSection.tsx
-- public/ServicesPage.tsx
 - PortfolioDetailPage.tsx
 - smoke.sh
 - frontend/tsconfig.json
@@ -108,14 +106,12 @@
 - .claude/CLAUDE.md
 - extraction-spec.md
 - db.go
-- PortfolioPage.tsx
 - github.com/logikraf/logikraf-v2
-- PrivacyPage.tsx
 - public/ServicesPage.tsx
 - TermsPage.tsx
 
 ## God Nodes (most connected - your core abstractions)
-1. `react` - 41 edges
+1. `react` - 42 edges
 2. `compilerOptions` - 18 edges
 3. `compilerOptions` - 17 edges
 4. `compilerOptions` - 15 edges
@@ -127,33 +123,33 @@
 10. `ADR-005: Multi-Tenant Payment Hub` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `RefundPaymentTransaction()` --calls--> `setting()`  [INFERRED]
-  logikraf-v2/internal/delivery/handler/payment_account.go → logikraf-v2/internal/delivery/handler/payment.go
-- `ForcePasswordReset()` --calls--> `HashPassword()`  [INFERRED]
-  logikraf-v2/internal/delivery/handler/payment.go → logikraf-v2/pkg/auth/auth.go
 - `main()` --calls--> `AdminOnly()`  [INFERRED]
   logikraf-v2/cmd/server/main.go → logikraf-v2/pkg/auth/auth.go
 - `main()` --calls--> `AuthMiddleware()`  [INFERRED]
   logikraf-v2/cmd/server/main.go → logikraf-v2/pkg/auth/auth.go
 - `ProtectedRoute()` --calls--> `useAuth()`  [EXTRACTED]
   logikraf-v2/frontend/src/App.tsx → logikraf-v2/frontend/src/contexts/AuthContext.tsx
+- `RequireAdmin()` --calls--> `useAuth()`  [EXTRACTED]
+  logikraf-v2/frontend/src/App.tsx → logikraf-v2/frontend/src/contexts/AuthContext.tsx
+- `RequireClient()` --calls--> `useAuth()`  [EXTRACTED]
+  logikraf-v2/frontend/src/App.tsx → logikraf-v2/frontend/src/contexts/AuthContext.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (102 total, 43 thin omitted)
+## Communities (98 total, 38 thin omitted)
 
 ### Community 0 - "dependencies"
 Cohesion: 0.05
 Nodes (41): @ant-design/icons, antd, dependencies, @ant-design/icons, antd, react, react-dom, react-router-dom (+33 more)
 
 ### Community 1 - "AdminDashboardPage.tsx"
-Cohesion: 0.09
-Nodes (32): apiGet(), apiPost(), apiPut(), auth(), handleResponse(), Activity, AdminDashboardPage(), AnyArr (+24 more)
+Cohesion: 0.08
+Nodes (33): apiGet(), apiPost(), apiPut(), auth(), handleResponse(), Activity, AdminDashboardPage(), AnyArr (+25 more)
 
 ### Community 3 - "payment.go"
-Cohesion: 0.23
-Nodes (20): xenditInvoiceRequest, activeGatewayIDs(), GetPaymentGateways(), Ctx, calcFee(), CreateIpaymuPayment(), CreateMidtransSnap(), CreateXenditInvoice() (+12 more)
+Cohesion: 0.17
+Nodes (24): xenditInvoiceRequest, activeGatewayIDs(), GetPaymentGateways(), Ctx, GetReconciliation(), Ctx, ListPaymentTransactions(), ListTenantPaymentAccounts() (+16 more)
 
 ### Community 4 - "What You Must Do When Invoked"
 Cohesion: 0.07
@@ -164,11 +160,11 @@ Cohesion: 0.08
 Nodes (23): compilerOptions, allowArbitraryExtensions, allowImportingTsExtensions, jsx, lib, module, moduleDetection, moduleResolution (+15 more)
 
 ### Community 6 - "auth.go"
-Cohesion: 0.14
-Nodes (19): Claims, LoginRequest, main(), Handler, T, migratePaymentTables(), postJSON(), TestForcePasswordReset() (+11 more)
+Cohesion: 0.13
+Nodes (20): Claims, LoginRequest, main(), ForcePasswordReset(), Handler, T, migratePaymentTables(), postJSON() (+12 more)
 
 ### Community 7 - "PackageTest"
-Cohesion: 0.24
+Cohesion: 0.31
 Nodes (5): App(), usePageMeta(), Root(), Order, react
 
 ### Community 8 - "compilerOptions"
@@ -191,13 +187,17 @@ Nodes (14): 10. References, 1. Context, 2. Decision, 3. Multi-Tenancy Model, 4. 
 Cohesion: 0.06
 Nodes (41): AboutPage, AdminDashboardPage, AdminLayout, AdminLoginPage, AdminPaymentHubPage, AdminPaymentLedgerPage, AdminReconciliationPage, AdminReportsPage (+33 more)
 
+### Community 14 - "PublicLayout.tsx"
+Cohesion: 0.40
+Nodes (3): mockOrders, Order, statusColors
+
 ### Community 15 - "ai-ui-ux-theme-style.md"
 Cohesion: 0.15
 Nodes (12): 01_PROJECT_OVERVIEW.md, 02_TAILWIND_V4_THEME_CONFIG.md, 03_COMPONENT_LIBRARY.md, 04_RESPONSIVE_BREAKPOINTS.md, 05_DEPLOYMENT_PLAYBOOK.md, 10. Documentation & Knowledge Base, 1. Visual Vibe & Design Philosophy, 2. Color System & Theme Variables (+4 more)
 
 ### Community 16 - "react"
-Cohesion: 0.21
-Nodes (5): Footer(), NavbarProps, Props, Portfolio, HomePage()
+Cohesion: 0.13
+Nodes (4): NavbarProps, Portfolio, Testimonial, HomePage()
 
 ### Community 18 - "3. Core Features & Scope of Work (Ruang Lingkup Proyek)"
 Cohesion: 0.20
@@ -232,8 +232,8 @@ Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
 ### Community 26 - "ClientDashboardPage.tsx"
-Cohesion: 0.20
-Nodes (4): PublicLayout(), Post, Errors, FormState
+Cohesion: 0.11
+Nodes (8): Props, PublicLayout(), Post, Post, Gateway, Portfolio, Gateway, SearchItem
 
 ### Community 27 - "Panduan Integrasi Logikraf Payment Hub (XenPlatform)"
 Cohesion: 0.25
@@ -252,8 +252,8 @@ Cohesion: 0.38
 Nodes (6): categoryLabel(), fallbackServices, iconFor(), icons, Service, ServiceShowcase()
 
 ### Community 32 - "ClientOrdersPage.tsx"
-Cohesion: 0.53
-Nodes (5): GetReconciliation(), Ctx, ListPaymentTransactions(), ListTenantPaymentAccounts(), RefundPaymentTransaction()
+Cohesion: 0.40
+Nodes (3): mockServices, Service, ServiceFeature
 
 ### Community 33 - "handler_test.go"
 Cohesion: 0.38
@@ -320,8 +320,8 @@ Cohesion: 0.40
 Nodes (4): Changelog: 12 Juli 2026 - Payment Hub (xenPlatform), Fitur Baru (Backend & API), Perbaikan Bug & Refactoring, UI/UX & Admin Portal
 
 ### Community 49 - "Settings/SettingsPage.tsx"
-Cohesion: 0.11
-Nodes (10): mockOrders, Order, statusColors, mockServices, Service, ServiceFeature, mockTxns, statusColors (+2 more)
+Cohesion: 0.33
+Nodes (4): mockTxns, statusColors, Transaction, TransactionRefund
 
 ### Community 50 - "package_crud.go"
 Cohesion: 0.60
@@ -332,8 +332,8 @@ Cohesion: 0.60
 Nodes (4): CreateService(), DeleteService(), Ctx, UpdateService()
 
 ### Community 52 - "settings.go"
-Cohesion: 0.73
-Nodes (5): GetSetting(), Ctx, ListSettings(), resolveTenant(), SetSetting()
+Cohesion: 0.67
+Nodes (6): GetPublicSettings(), GetSetting(), Ctx, ListSettings(), resolveTenant(), SetSetting()
 
 ### Community 53 - "graphify reference: add a URL and watch a folder"
 Cohesion: 0.50
@@ -364,23 +364,23 @@ Cohesion: 0.67
 Nodes (3): Time, PaymentTransaction, TenantPaymentAccount
 
 ## Knowledge Gaps
-- **314 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+309 more)
+- **315 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+310 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **43 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **38 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `PortfolioGallery.tsx`, `TestimonialsSection.tsx`, `public/ServicesPage.tsx`, `PortfolioDetailPage.tsx`, `PortfolioPage.tsx`, `PrivacyPage.tsx`, `public/ServicesPage.tsx`, `TermsPage.tsx`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
+- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `ClientOrdersPage.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `TestimonialsSection.tsx`, `PortfolioDetailPage.tsx`, `public/ServicesPage.tsx`, `TermsPage.tsx`?**
+  _High betweenness centrality (0.093) - this node is a cross-community bridge._
 - **Why does `plugins` connect `plugins` to `PackageTest`?**
   _High betweenness centrality (0.006) - this node is a cross-community bridge._
 - **What connects `$schema`, `typescript`, `oxc` to the rest of the system?**
-  _314 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _315 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.047619047619047616 - nodes in this community are weakly interconnected._
 - **Should `AdminDashboardPage.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.08780487804878048 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08478513356562137 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
   _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
 - **Should `compilerOptions` be split into smaller, more focused modules?**

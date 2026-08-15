@@ -200,13 +200,13 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/BlogDetailPage.tsx": {
-    "mtime": 1786724015.955233,
-    "ast_hash": "0f913414936087ce0c1c7bf551267698",
+    "mtime": 1786759627.8596697,
+    "ast_hash": "42911ac0030533d349a24af1e4df59e1",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/BlogPage.tsx": {
-    "mtime": 1786724009.3411794,
-    "ast_hash": "1570caed285bd4d813455845117580c3",
+    "mtime": 1786759614.947539,
+    "ast_hash": "817c46a7daccdcf50809074b72b6a3db",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/ContactPage.tsx": {
@@ -225,8 +225,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/PackagesPage.tsx": {
-    "mtime": 1786723813.2726133,
-    "ast_hash": "72dedc281161173ba273177555929f1d",
+    "mtime": 1786759644.4559805,
+    "ast_hash": "b8fdbc2f5576c200d1284ab7f21e58fb",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/PortfolioDetailPage.tsx": {
@@ -245,8 +245,8 @@
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/ServicesPage.tsx": {
-    "mtime": 1786723980.6113858,
-    "ast_hash": "85721e990bf9ffd5b61cdb116d5c9d44",
+    "mtime": 1786759655.7051463,
+    "ast_hash": "ca7d272a3302dd9257a16e2857e79bcc",
     "semantic_hash": ""
   },
   "logikraf-v2/frontend/src/pages/public/TermsPage.tsx": {
