@@ -252,6 +252,18 @@ export const crudConfigs: Record<string, ResourceConfig> = {
         ),
       },
       {
+        id: 'excerpt',
+        label: 'Ringkasan Sinopsis',
+        render: (r: any) => {
+          const raw = (r.excerpt || r.body || '').replace(/<[^>]*>?/gm, '').trim()
+          return (
+            <span className="text-xs text-text-muted line-clamp-2 max-w-sm">
+              {raw || '—'}
+            </span>
+          )
+        },
+      },
+      {
         id: 'is_published',
         label: 'Status Publikasi',
         render: (r: any) => renderPublishedBadge(r.is_published),

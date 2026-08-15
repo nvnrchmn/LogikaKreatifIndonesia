@@ -13,6 +13,8 @@ interface Post {
 
 const CATEGORIES = ['Semua', 'Teknologi', 'Bisnis & UMKM', 'UI/UX Design', 'Payment & QRIS', 'Studi Kasus']
 
+const stripHtml = (html: string) => (html || '').replace(/<[^>]*>?/gm, '').trim()
+
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -187,7 +189,7 @@ export default function BlogPage() {
 
                     <div className="p-6 sm:p-8 flex flex-col justify-between">
                       <p className="text-text-muted text-sm sm:text-base leading-relaxed font-body mb-6">
-                        {leadPost.excerpt ||
+                        {stripHtml(leadPost.excerpt || leadPost.body) ||
                           'Pelajari analisa mendalam, studi kasus lapangan, dan panduan teknis yang disusun langsung oleh tim rekayasa software Logikraf.'}
                       </p>
 
@@ -314,7 +316,7 @@ export default function BlogPage() {
                             {post.title}
                           </h3>
                           <p className="text-text-muted text-xs sm:text-sm leading-relaxed font-body line-clamp-3 mb-6">
-                            {post.excerpt ||
+                            {stripHtml(post.excerpt || post.body) ||
                               'Baca artikel lengkap untuk memahami insight dan analisa mendalam seputar topik ini.'}
                           </p>
                         </div>

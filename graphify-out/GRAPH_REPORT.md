@@ -1,16 +1,16 @@
 # Graph Report - LogikaKreatifIndonesia  (2026-08-15)
 
 ## Corpus Check
-- 132 files · ~72,970 words
+- 132 files · ~73,116 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 784 nodes · 905 edges · 98 communities (60 shown, 38 thin omitted)
+- 785 nodes · 907 edges · 97 communities (61 shown, 36 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.56)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `81110bdf`
+- Built from commit: `885605b9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -107,7 +107,6 @@
 - extraction-spec.md
 - db.go
 - github.com/logikraf/logikraf-v2
-- public/ServicesPage.tsx
 - TermsPage.tsx
 
 ## God Nodes (most connected - your core abstractions)
@@ -137,7 +136,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (98 total, 38 thin omitted)
+## Communities (97 total, 36 thin omitted)
 
 ### Community 0 - "dependencies"
 Cohesion: 0.05
@@ -232,8 +231,8 @@ Cohesion: 0.22
 Nodes (8): plugins, rules, react/only-export-components, react/rules-of-hooks, $schema, oxc, typescript, warn
 
 ### Community 26 - "ClientDashboardPage.tsx"
-Cohesion: 0.12
-Nodes (8): Props, PublicLayout(), Errors, FormState, Package, Portfolio, Portfolio, SearchItem
+Cohesion: 0.11
+Nodes (9): Props, PublicLayout(), Errors, FormState, Package, Portfolio, Portfolio, SearchItem (+1 more)
 
 ### Community 27 - "Panduan Integrasi Logikraf Payment Hub (XenPlatform)"
 Cohesion: 0.25
@@ -355,6 +354,10 @@ Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphif
 Cohesion: 0.50
 Nodes (3): Expanding the Oxlint configuration, React Compiler, React + TypeScript + Vite
 
+### Community 58 - "ContactPage.tsx"
+Cohesion: 0.50
+Nodes (4): BlogPage(), CATEGORIES, Post, stripHtml()
+
 ### Community 59 - "handler/service.go"
 Cohesion: 0.67
 Nodes (3): GetServiceBySlug(), GetServices(), Ctx
@@ -366,15 +369,15 @@ Nodes (3): Time, PaymentTransaction, TenantPaymentAccount
 ## Knowledge Gaps
 - **316 isolated node(s):** `$schema`, `typescript`, `oxc`, `react/rules-of-hooks`, `warn` (+311 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **38 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **36 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `ClientOrdersPage.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `FaqPage.tsx`, `TestimonialsSection.tsx`, `public/ServicesPage.tsx`, `TermsPage.tsx`?**
-  _High betweenness centrality (0.093) - this node is a cross-community bridge._
+- **Why does `react` connect `PackageTest` to `AdminDashboardPage.tsx`, `ClientLayout.tsx`, `AdminLayout.tsx`, `App.tsx`, `PublicLayout.tsx`, `react`, `PublicLayout`, `AdminResourcePage.tsx`, `plugins`, `ClientDashboardPage.tsx`, `ReportsPage.tsx`, `ServiceShowcase.tsx`, `ClientOrdersPage.tsx`, `Settings/SettingsPage.tsx`, `ContactPage.tsx`, `ContactPage.tsx`, `PortfolioGallery.tsx`, `FaqPage.tsx`, `TestimonialsSection.tsx`, `TermsPage.tsx`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Why does `plugins` connect `plugins` to `PackageTest`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `$schema`, `typescript`, `oxc` to the rest of the system?**
   _316 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `dependencies` be split into smaller, more focused modules?**

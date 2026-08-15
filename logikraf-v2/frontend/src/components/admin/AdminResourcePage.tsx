@@ -24,7 +24,16 @@ export default function AdminResourcePage() {
 
   // EDIT / NEW mode → dedicated page
   if (id || window.location.pathname.endsWith('/new')) {
-    return <ResourceForm cfg={cfg} id={id} onDone={() => navigate(`/admin/${cfg.resource}`)} />
+    return (
+      <ResourceForm
+        cfg={cfg}
+        id={id}
+        onDone={(msg?: string) => {
+          if (msg) sessionStorage.setItem('crud_toast', msg)
+          navigate(`/admin/${cfg.resource}`)
+        }}
+      />
+    )
   }
 
   // LIST mode
@@ -37,8 +46,16 @@ function ResourceList({ cfg }: { cfg: any }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [toast, setToast] = useState('')
+  const [toast, setToast] = useState(sessionStorage.getItem('crud_toast') || '')
   const [q, setQ] = useState('')
+
+  useEffect(() => {
+    if (toast) {
+      sessionStorage.removeItem('crud_toast')
+      const t = setTimeout(() => setToast(''), 3000)
+      return () => clearTimeout(t)
+    }
+  }, [toast])
 
   const load = async () => {
     setLoading(true)
@@ -322,9 +339,10 @@ function ResourceList({ cfg }: { cfg: any }) {
   )
 }
 
-function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () => void }) {
+function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg?: string) => void }) {
   const [form, setForm] = useState<Record<string, any>>({})
   const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState(false)
   const [loadingInitial, setLoadingInitial] = useState(Boolean(id))
@@ -379,6 +397,7 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccessMsg('')
     if (!validate()) return
     setBusy(true)
 
@@ -414,7 +433,10 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
       if (!res.ok) {
         throw new Error(data?.error || data?.message || 'Gagal menyimpan data ke database')
       }
-      onDone()
+      setSuccessMsg(`✓ ${cfg.title} berhasil disimpan!`)
+      setTimeout(() => {
+        onDone(`${cfg.title} berhasil disimpan!`)
+      }, 700)
     } catch (err: any) {
       setError(err?.message || 'Gagal menyimpan data')
     } finally {
@@ -437,9 +459,16 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
           {id ? 'Edit' : 'Tambah'} {cfg.title}
         </h1>
 
+        {successMsg && (
+          <div className="mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
+            <span>✓</span>
+            <span>{successMsg}</span>
+          </div>
+        )}
+
         {error && (
-          <div className="mb-5 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs">
-            {error}
+          <div className="mb-5 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+            ⚠️ {error}
           </div>
         )}
 
@@ -512,7 +541,7 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: () =
               </button>
               <button
                 type="button"
-                onClick={onDone}
+                onClick={() => onDone()}
                 className="btn-secondary text-xs py-2.5 px-5"
               >
                 Batal

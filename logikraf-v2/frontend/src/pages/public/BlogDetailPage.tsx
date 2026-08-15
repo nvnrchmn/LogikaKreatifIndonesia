@@ -161,14 +161,23 @@ Estetika visual modern yang dipadukan dengan responsivitas tinggi menciptakan ra
                   <span>Intisari &amp; Ringkasan Eksekutif</span>
                 </div>
                 <p className="text-text-main text-xs sm:text-sm leading-relaxed font-body">
-                  {activePost.excerpt ||
+                  {(activePost.excerpt || activePost.body || '').replace(/<[^>]*>?/gm, '').trim() ||
                     'Pelajari prinsip arsitektur sistem modern, efisiensi pembayaran digital otomatis dengan QRIS, dan peningkatan conversion rate produk digital Anda.'}
                 </p>
               </div>
 
               {/* Article Content */}
-              <div className="prose prose-blue max-w-none text-text-main font-body text-sm sm:text-base leading-relaxed whitespace-pre-line space-y-6">
-                {activePost.body || activePost.excerpt}
+              <div className="prose prose-blue max-w-none text-text-main font-body text-sm sm:text-base leading-relaxed space-y-6">
+                {/<[a-z][\s\S]*>/i.test(activePost.body) ? (
+                  <div
+                    className="article-body-html space-y-4"
+                    dangerouslySetInnerHTML={{ __html: activePost.body }}
+                  />
+                ) : (
+                  <div className="whitespace-pre-line space-y-6">
+                    {activePost.body || activePost.excerpt}
+                  </div>
+                )}
               </div>
 
               {/* Author Bio Box */}
