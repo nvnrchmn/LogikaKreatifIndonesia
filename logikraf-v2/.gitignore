@@ -14,3 +14,4 @@
 
 # Graphify cache (optional, keep if committed elsewhere)
 /graphify-out/
+dist-tenant/
