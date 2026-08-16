@@ -121,9 +121,18 @@ func main() {
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 
-	// Static assets
+	// Static assets (Host-aware: tenant subdomain -> tenantDir, else main)
 	app.Get("/assets/:file", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "assets", c.Params("file")))
+		host := c.Hostname()
+		dir := frontendDir
+		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
+			dir = tenantDir
+		}
+		file := filepath.Join(dir, "assets", c.Params("file"))
+		if _, err := os.Stat(file); err != nil {
+			return c.Status(404).SendString("not found")
+		}
+		return c.SendFile(file)
 	})
 	app.Get("/favicon.svg", func(c fiber.Ctx) error {
 		return c.SendFile(filepath.Join(frontendDir, "favicon.svg"))
