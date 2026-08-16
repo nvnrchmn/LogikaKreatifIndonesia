@@ -241,8 +241,16 @@ func main() {
 	admin.Put("/pages/:id", handler.UpdatePage)
 	admin.Post("/sections", handler.CreateSection)
 	admin.Put("/sections/:id", handler.UpdateSection)
+	admin.Post("/media", handler.UploadMedia)
 
-	// SPA fallback: tenant subdomain -> tenant SPA, else main SPA
+	// Media uploads (Host-aware)
+	app.Get("/media/:file", func(c fiber.Ctx) error {
+		file := filepath.Join(tenantDir, "uploads", c.Params("file"))
+		if _, err := os.Stat(file); err != nil {
+			return c.Status(404).SendString("not found")
+		}
+		return c.SendFile(file)
+	})
 	app.Get("/*", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {

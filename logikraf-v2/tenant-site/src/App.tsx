@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { fetchSite, SiteData } from './api'
 import Admin from './Admin'
+import Onboarding from './Onboarding'
 
 function parseJSON(s: string, fallback: any = {}) {
   try { return JSON.parse(s || '{}') } catch { return fallback }
@@ -99,6 +100,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/*" element={<Site />} />
       </Routes>

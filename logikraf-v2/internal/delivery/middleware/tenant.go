@@ -1,11 +1,21 @@
 package middleware
 
 import (
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 )
+
+// TenantUploadDir returns the dir for tenant uploads (TENANT_DIR/uploads or ./dist-tenant/uploads).
+func TenantUploadDir() string {
+	dir := os.Getenv("TENANT_DIR")
+	if dir == "" {
+		dir = "./dist-tenant"
+	}
+	return dir + "/uploads"
+}
 
 // TenantFromHost resolves the tenant from the request Host subdomain
 // (e.g. {slug}.logikraf.id) and stores tenant_id + tenant in locals.
