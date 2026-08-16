@@ -87,7 +87,7 @@ Frontend: feature flags from `/tenant/entitlements` endpoint → hide/disable lo
 | ORM | GORM | Already used |
 | Frontend | React + Vite + Tailwind | Already used; same as SmartHub |
 | Auth | JWT + tenant_id claim | Extend existing JWT |
-| Rendering | SSR or SPA-per-tenant? | **Open** — see ROADMAP §4 |
+| Rendering | **SPA (React + Vite)** | Decided 2026-08-16. One React app; tenant site = SPA fetching config from API. Reuse SmartHub frontend patterns. |
 
 ## 7. Open Questions
 
