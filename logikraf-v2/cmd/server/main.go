@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -23,6 +24,7 @@ import (
 )
 
 var frontendDir string
+var tenantDir string
 
 func init() {
 	frontendDir = os.Getenv("FRONTEND_DIR")
@@ -33,6 +35,14 @@ func init() {
 			frontendDir = "./frontend-dist"
 		} else {
 			frontendDir = "./frontend/dist"
+		}
+	}
+	tenantDir = os.Getenv("TENANT_DIR")
+	if tenantDir == "" {
+		if _, err := os.Stat("./dist-tenant"); err == nil {
+			tenantDir = "./dist-tenant"
+		} else {
+			tenantDir = "./dist-tenant"
 		}
 	}
 }
@@ -74,6 +84,10 @@ func main() {
 
 	// Public SPA routes
 	app.Get("/", func(c fiber.Ctx) error {
+		host := c.Hostname()
+		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
+			return c.SendFile(filepath.Join(tenantDir, "index.html"))
+		}
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 	app.Get("/layanan", func(c fiber.Ctx) error {
@@ -214,8 +228,12 @@ func main() {
 	admin.Post("/tenants", handler.CreateTenant)
 	admin.Get("/tenants", handler.ListTenants)
 
-	// SPA fallback untuk semua route yang tidak terdaftar
+	// SPA fallback: tenant subdomain -> tenant SPA, else main SPA
 	app.Get("/*", func(c fiber.Ctx) error {
+		host := c.Hostname()
+		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
+			return c.SendFile(filepath.Join(tenantDir, "index.html"))
+		}
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 
