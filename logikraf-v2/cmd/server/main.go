@@ -227,6 +227,10 @@ func main() {
 	admin.Put("/settings/:key", handler.SetSetting)
 	admin.Post("/tenants", handler.CreateTenant)
 	admin.Get("/tenants", handler.ListTenants)
+	admin.Get("/pages", handler.ListPages)
+	admin.Post("/pages", handler.CreatePage)
+	admin.Put("/pages/:id", handler.UpdatePage)
+	admin.Post("/sections", handler.CreateSection)
 
 	// SPA fallback: tenant subdomain -> tenant SPA, else main SPA
 	app.Get("/*", func(c fiber.Ctx) error {
