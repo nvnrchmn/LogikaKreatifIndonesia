@@ -39,6 +39,12 @@ func Connect() error {
 		&Testimonial{},
 		&Setting{},
 		&TenantPaymentAccount{},
+		&Tenant{},
+		&Plan{},
+		&Entitlement{},
+		&Page{},
+		&Section{},
+		&Media{},
 	); err != nil {
 		log.Printf("AutoMigrate warning: %v\n", err)
 	}
