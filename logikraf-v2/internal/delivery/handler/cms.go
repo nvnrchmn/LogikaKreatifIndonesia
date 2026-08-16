@@ -43,6 +43,26 @@ func CreateSection(c fiber.Ctx) error {
 	return c.Status(201).JSON(s)
 }
 
+// UpdateSection updates a section's content (admin).
+func UpdateSection(c fiber.Ctx) error {
+	id := c.Params("id")
+	var s model.Section
+	if err := model.DB.First(&s, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "section not found"})
+	}
+	var body struct {
+		ContentJSON string `json:"content_json"`
+	}
+	if err := c.Bind().JSON(&body); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid body"})
+	}
+	if body.ContentJSON != "" {
+		s.ContentJSON = body.ContentJSON
+	}
+	model.DB.Save(&s)
+	return c.JSON(s)
+}
+
 // ListPages returns pages for a tenant (?tenant_id= query).
 func ListPages(c fiber.Ctx) error {
 	tid := c.Query("tenant_id")

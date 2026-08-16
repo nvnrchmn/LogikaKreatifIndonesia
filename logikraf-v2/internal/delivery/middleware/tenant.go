@@ -16,26 +16,29 @@ func TenantFromHost() fiber.Handler {
 		host = strings.TrimSuffix(host, ":80")
 		host = strings.TrimSuffix(host, ":443")
 
-		// Skip for main domain / API / asset paths
+		var tenant model.Tenant
+
+		// Skip for main domain / API / asset paths / unknown hosts
 		if host == "logikraf.id" || host == "www.logikraf.id" || strings.HasPrefix(host, "api.") {
 			return c.Next()
 		}
-
-		var tenant model.Tenant
-		// Subdomain: slug.logikraf.id
-		if strings.HasSuffix(host, ".logikraf.id") {
-			slug := strings.TrimSuffix(host, ".logikraf.id")
-			if slug == "" || slug == "www" {
+		// Only resolve tenant for subdomains or explicit custom domains
+		if !strings.HasSuffix(host, ".logikraf.id") {
+			// try custom domain, else skip (don't 404 on main/api hosts)
+			if err := model.DB.Where("domain = ?", host).First(&tenant).Error; err != nil {
 				return c.Next()
 			}
-			if err := model.DB.Where("slug = ?", slug).First(&tenant).Error; err != nil {
-				return c.Status(404).JSON(fiber.Map{"error": "tenant not found"})
-			}
-		} else {
-			// Custom domain
-			if err := model.DB.Where("domain = ?", host).First(&tenant).Error; err != nil {
-				return c.Status(404).JSON(fiber.Map{"error": "tenant not found"})
-			}
+			c.Locals("tenant_id", tenant.ID)
+			c.Locals("tenant", &tenant)
+			return c.Next()
+		}
+
+		slug := strings.TrimSuffix(host, ".logikraf.id")
+		if slug == "" || slug == "www" {
+			return c.Next()
+		}
+		if err := model.DB.Where("slug = ?", slug).First(&tenant).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "tenant not found"})
 		}
 
 		c.Locals("tenant_id", tenant.ID)

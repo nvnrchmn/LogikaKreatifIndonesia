@@ -32,7 +32,7 @@ type Tenant struct {
 	ContactPhone string     `gorm:"size:40" json:"contact_phone"`
 	Address      string     `gorm:"size:255" json:"address"`
 	MapsEmbed    string     `gorm:"type:text" json:"maps_embed"`
-	WhatsApp     string     `gorm:"size:40" json:"whatsapp"`
+	WhatsApp     string     `gorm:"column:whatsapp;size:40" json:"whatsapp"`
 	Domain       string     `gorm:"size:255" json:"domain"`
 	PlanID       uint       `json:"plan_id"`
 	ThemeJSON    string     `gorm:"type:json" json:"theme_json"`

@@ -61,10 +61,47 @@ func CreateTenant(c fiber.Ctx) error {
 		model.DB.Where("code = ?", "starter").First(&p)
 		t.PlanID = p.ID
 	}
+	// JSON columns need valid JSON, not empty string
+	if t.ThemeJSON == "" {
+		t.ThemeJSON = "{}"
+	}
+	if t.SEOJSON == "" {
+		t.SEOJSON = "{}"
+	}
+	if t.SocialJSON == "" {
+		t.SocialJSON = "{}"
+	}
 	if err := model.DB.Create(&t).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+	// Auto-seed Starter default pages (onboarding: template pages)
+	seedStarterPages(t.ID)
 	return c.Status(201).JSON(t)
+}
+
+// seedStarterPages creates default Starter pages + hero section for a tenant.
+func seedStarterPages(tenantID uint) {
+	pages := []model.Page{
+		{TenantID: tenantID, Slug: "home", Title: "Beranda", Published: true, SortOrder: 0, MetaJSON: "{}"},
+		{TenantID: tenantID, Slug: "about", Title: "Tentang", Published: true, SortOrder: 1, MetaJSON: "{}"},
+		{TenantID: tenantID, Slug: "services", Title: "Layanan", Published: true, SortOrder: 2, MetaJSON: "{}"},
+		{TenantID: tenantID, Slug: "contact", Title: "Kontak", Published: true, SortOrder: 3, MetaJSON: "{}"},
+	}
+	model.DB.Create(&pages)
+	var home model.Page
+	model.DB.Where("tenant_id = ? AND slug = ?", tenantID, "home").First(&home)
+	model.DB.Create(&model.Section{
+		PageID:     home.ID,
+		Type:       "hero",
+		ContentJSON: `{"heading":"` + getBizName(tenantID) + `","subheading":"Selamat datang di website kami","cta":"Hubungi Kami","cta_url":"#contact"}`,
+		SortOrder:  0,
+	})
+}
+
+func getBizName(tenantID uint) string {
+	var t model.Tenant
+	model.DB.First(&t, tenantID)
+	return t.BusinessName
 }
 
 // ListTenants admin listing.

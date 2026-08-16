@@ -231,6 +231,7 @@ func main() {
 	admin.Post("/pages", handler.CreatePage)
 	admin.Put("/pages/:id", handler.UpdatePage)
 	admin.Post("/sections", handler.CreateSection)
+	admin.Put("/sections/:id", handler.UpdateSection)
 
 	// SPA fallback: tenant subdomain -> tenant SPA, else main SPA
 	app.Get("/*", func(c fiber.Ctx) error {

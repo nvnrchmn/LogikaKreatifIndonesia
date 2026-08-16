@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { fetchSite, SiteData } from './api'
+import Admin from './Admin'
 
 function parseJSON(s: string, fallback: any = {}) {
   try { return JSON.parse(s || '{}') } catch { return fallback }
@@ -48,7 +50,7 @@ function SectionView({ section }: { section: any }) {
   }
 }
 
-export default function App() {
+function Site() {
   const [data, setData] = useState<SiteData | null>(null)
   const [error, setError] = useState('')
 
@@ -90,5 +92,16 @@ export default function App() {
         © {new Date().getFullYear()} {t.business_name} · Powered by Logikraf
       </footer>
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/*" element={<Site />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
