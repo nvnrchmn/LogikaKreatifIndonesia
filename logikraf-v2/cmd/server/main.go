@@ -19,12 +19,10 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
-	"github.com/logikraf/logikraf-v2/internal/delivery/middleware"
 	"github.com/logikraf/logikraf-v2/pkg/auth"
 )
 
 var frontendDir string
-var tenantDir string
 
 func init() {
 	frontendDir = os.Getenv("FRONTEND_DIR")
@@ -35,14 +33,6 @@ func init() {
 			frontendDir = "./frontend-dist"
 		} else {
 			frontendDir = "./frontend/dist"
-		}
-	}
-	tenantDir = os.Getenv("TENANT_DIR")
-	if tenantDir == "" {
-		if _, err := os.Stat("./dist-tenant"); err == nil {
-			tenantDir = "./dist-tenant"
-		} else {
-			tenantDir = "./dist-tenant"
 		}
 	}
 }
@@ -86,7 +76,7 @@ func main() {
 	app.Get("/", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
-			return c.SendFile(filepath.Join(tenantDir, "index.html"))
+			return c.SendFile(filepath.Join(frontendDir, "index.html"))
 		}
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
@@ -121,14 +111,9 @@ func main() {
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 
-	// Static assets (Host-aware: tenant subdomain -> tenantDir, else main)
+	// Static assets
 	app.Get("/assets/:file", func(c fiber.Ctx) error {
-		host := c.Hostname()
-		dir := frontendDir
-		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
-			dir = tenantDir
-		}
-		file := filepath.Join(dir, "assets", c.Params("file"))
+		file := filepath.Join(frontendDir, "assets", c.Params("file"))
 		if _, err := os.Stat(file); err != nil {
 			return c.Status(404).SendString("not found")
 		}
@@ -149,8 +134,6 @@ func main() {
 
 	// Public API
 	api := app.Group("/api")
-	app.Use(middleware.TenantFromHost()) // resolve tenant by Host subdomain
-	api.Get("/site", handler.GetSitePublic) // tenant site config (Host-resolved)
 	api.Get("/services", handler.GetServices)
 	api.Get("/services/:slug", handler.GetServiceBySlug)
 	api.Get("/portfolios", handler.GetPortfolios)
@@ -234,27 +217,12 @@ func main() {
 	admin.Get("/settings", handler.ListSettings)
 	admin.Get("/settings/:key", handler.GetSetting)
 	admin.Put("/settings/:key", handler.SetSetting)
-	admin.Post("/tenants", handler.CreateTenant)
-	admin.Get("/tenants", handler.ListTenants)
-	admin.Get("/pages", handler.ListPages)
-	admin.Post("/pages", handler.CreatePage)
-	admin.Put("/pages/:id", handler.UpdatePage)
-	admin.Post("/sections", handler.CreateSection)
-	admin.Put("/sections/:id", handler.UpdateSection)
-	admin.Post("/media", handler.UploadMedia)
+	admin.Get("/payment-transactions", handler.ListPaymentTransactions)
 
-	// Media uploads (Host-aware)
-	app.Get("/media/:file", func(c fiber.Ctx) error {
-		file := filepath.Join(tenantDir, "uploads", c.Params("file"))
-		if _, err := os.Stat(file); err != nil {
-			return c.Status(404).SendString("not found")
-		}
-		return c.SendFile(file)
-	})
 	app.Get("/*", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
-			return c.SendFile(filepath.Join(tenantDir, "index.html"))
+			return c.SendFile(filepath.Join(frontendDir, "index.html"))
 		}
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
