@@ -18,6 +18,7 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
+	"github.com/logikraf/logikraf-v2/internal/delivery/middleware"
 	"github.com/logikraf/logikraf-v2/pkg/auth"
 )
 
@@ -125,6 +126,8 @@ func main() {
 
 	// Public API
 	api := app.Group("/api")
+	app.Use(middleware.TenantFromHost()) // resolve tenant by Host subdomain
+	api.Get("/site", handler.GetSitePublic) // tenant site config (Host-resolved)
 	api.Get("/services", handler.GetServices)
 	api.Get("/services/:slug", handler.GetServiceBySlug)
 	api.Get("/portfolios", handler.GetPortfolios)
@@ -208,6 +211,8 @@ func main() {
 	admin.Get("/settings", handler.ListSettings)
 	admin.Get("/settings/:key", handler.GetSetting)
 	admin.Put("/settings/:key", handler.SetSetting)
+	admin.Post("/tenants", handler.CreateTenant)
+	admin.Get("/tenants", handler.ListTenants)
 
 	// SPA fallback untuk semua route yang tidak terdaftar
 	app.Get("/*", func(c fiber.Ctx) error {
