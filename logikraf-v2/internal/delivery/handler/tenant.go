@@ -9,8 +9,8 @@ import (
 // Used by SPA tenant site. Resolved via TenantFromHost middleware.
 func GetSitePublic(c fiber.Ctx) error {
 	t, ok := c.Locals("tenant").(*model.Tenant)
-	if !ok {
-		return c.Status(404).JSON(fiber.Map{"error": "tenant not found"})
+	if !ok || t.ID == 0 {
+		return c.JSON(fiber.Map{"tenant": nil, "pages": []interface{}{}})
 	}
 
 	var pages []model.Page
