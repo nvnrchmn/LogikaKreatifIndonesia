@@ -12,7 +12,6 @@ const navSections = [
   {
     title: 'Konten',
     items: [
-      { label: 'Services', path: '/admin/services', icon: ExtensionIcon },
       { label: 'Portfolios', path: '/admin/portfolios', icon: WorkIcon },
       { label: 'Packages', path: '/admin/packages', icon: ShoppingBagIcon },
       { label: 'Blog', path: '/admin/blog', icon: ArticleIcon },

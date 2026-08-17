@@ -18,24 +18,11 @@ export default function SearchPage() {
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      fetch('/api/services').then(r => r.json()).catch(() => []),
       fetch('/api/packages').then(r => r.json()).catch(() => []),
       fetch('/api/posts').then(r => r.json()).catch(() => []),
       fetch('/api/portfolios').then(r => r.json()).catch(() => []),
-    ]).then(([services, packages, posts, portfolios]) => {
+    ]).then(([packages, posts, portfolios]) => {
       const all: SearchItem[] = []
-
-      if (Array.isArray(services)) {
-        services.forEach((s: any) => {
-          all.push({
-            id: `svc-${s.id}`,
-            title: s.name,
-            desc: s.short_desc || '',
-            url: '/layanan',
-            category: 'Layanan',
-          })
-        })
-      }
 
       if (Array.isArray(packages)) {
         packages.forEach((p: any) => {

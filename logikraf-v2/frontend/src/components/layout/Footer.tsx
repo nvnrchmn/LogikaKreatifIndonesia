@@ -60,7 +60,7 @@ export default function Footer() {
               Navigasi
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Layanan</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Layanan</Link></li>
               <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Paket Website</Link></li>
               <li><Link to="/#portfolio" className="text-text-light/70 hover:text-white transition-colors">Portofolio</Link></li>
               <li><Link to="/blog" className="text-text-light/70 hover:text-white transition-colors">Artikel &amp; Blog</Link></li>
@@ -75,10 +75,10 @@ export default function Footer() {
               Layanan Utama
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Web Application</Link></li>
-              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Mobile App (iOS/Android)</Link></li>
-              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">UI/UX Design</Link></li>
-              <li><Link to="/layanan" className="text-text-light/70 hover:text-white transition-colors">Digital Branding</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Web Application</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Mobile App (iOS/Android)</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">UI/UX Design</Link></li>
+              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Digital Branding</Link></li>
               <li><Link to="/search" className="text-text-light/70 hover:text-white transition-colors">Cari Direktori</Link></li>
             </ul>
           </div>

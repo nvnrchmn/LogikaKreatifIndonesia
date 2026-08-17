@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      get('/api/services'),
+      get('/api/packages'),
       get('/api/portfolios'),
       get('/api/leads'),
       get('/api/orders'),
@@ -46,16 +46,16 @@ export default function AdminDashboardPage() {
       get('/api/testimonials'),
       apiGet('/api/reports/finance').catch(() => null),
       apiGet('/api/payment-gateways').catch(() => []),
-    ]).then(([services, portfolios, leads, orders, invoices, testimonials, finance, gws]) => {
+    ]).then(([packages, portfolios, leads, orders, invoices, testimonials, finance, gws]) => {
       setMetrics([
         {
-          key: 'services',
-          label: 'Layanan',
-          value: len(services),
+          key: 'packages',
+          label: 'Paket',
+          value: len(packages),
           icon: ServicesIcon,
           tone: 'text-blue-600',
           bgTone: 'bg-blue-50 border-blue-100',
-          url: '/admin/services',
+          url: '/admin/packages',
         },
         {
           key: 'portfolios',

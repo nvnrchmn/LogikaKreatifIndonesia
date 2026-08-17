@@ -58,47 +58,6 @@ const renderPublishedBadge = (val: any) => {
 }
 
 export const crudConfigs: Record<string, ResourceConfig> = {
-  services: {
-    resource: 'services',
-    title: 'Layanan',
-    endpoint: '/api/services',
-    emptyRow: 'Belum ada data layanan.',
-    columns: [
-      {
-        id: 'name',
-        label: 'Nama Layanan',
-        render: (r: any) => (
-          <div>
-            <span className="font-bold text-text-main block">{r.name}</span>
-            <span className="text-[11px] text-text-muted font-mono">{r.slug}</span>
-          </div>
-        ),
-      },
-      { id: 'short_desc', label: 'Deskripsi Singkat' },
-      {
-        id: 'is_active',
-        label: 'Status',
-        render: (r: any) => renderActiveBadge(r.is_active),
-      },
-    ],
-    formFields: [
-      { name: 'name', label: 'Nama Layanan', required: true },
-      { name: 'slug', label: 'Slug URL', required: true },
-      { name: 'short_desc', label: 'Deskripsi Singkat', required: true },
-      { name: 'content', label: 'Rincian Konten Lengkap', type: 'textarea', rows: 4 },
-      { name: 'color', label: 'Kode Warna Aksen (Hex/Tailwind)', required: true },
-      { name: 'icon', label: 'Nama Icon / SVG' },
-      {
-        name: 'is_active',
-        label: 'Status Layanan',
-        type: 'select',
-        options: [
-          { value: '1', label: 'Aktif' },
-          { value: '0', label: 'Nonaktif' },
-        ],
-      },
-    ],
-  },
   portfolios: {
     resource: 'portfolios',
     title: 'Portofolio',

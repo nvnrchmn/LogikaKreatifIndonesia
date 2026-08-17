@@ -25,11 +25,6 @@ func GetSitemap(c fiber.Ctx) error {
 	}
 
 	var slugs []string
-	model.DB.Model(&model.Service{}).Pluck("slug", &slugs)
-	for _, s := range slugs {
-		write("/layanan/" + s)
-	}
-	slugs = nil
 	model.DB.Model(&model.Portfolio{}).Where("is_published = ?", true).Pluck("slug", &slugs)
 	for _, s := range slugs {
 		write("/portfolio/" + s)

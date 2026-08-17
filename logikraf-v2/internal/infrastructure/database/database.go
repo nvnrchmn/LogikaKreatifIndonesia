@@ -34,7 +34,6 @@ func Connect() error {
 func AutoMigrate() error {
 	return DB.AutoMigrate(
 		&model.User{},
-		&model.Service{},
 		&model.Package{},
 		&model.Portfolio{},
 		&model.Post{},

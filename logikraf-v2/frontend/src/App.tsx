@@ -4,7 +4,7 @@ import { useAuth } from './contexts/AuthContext'
 
 // Public Pages
 import HomePage from './pages/public/HomePage'
-const ServicesPage = lazy(() => import('./pages/public/ServicesPage'))
+
 const PortfolioPage = lazy(() => import('./pages/public/PortfolioPage'))
 const PortfolioDetailPage = lazy(() => import('./pages/public/PortfolioDetailPage'))
 const BlogPage = lazy(() => import('./pages/public/BlogPage'))
@@ -68,7 +68,6 @@ export default function App() {
       <Routes>
       {/* Public */}
       <Route path="/" element={<HomePage />} />
-      <Route path="/layanan" element={<ServicesPage />} />
       <Route path="/portfolio" element={<PortfolioPage />} />
       <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
       <Route path="/paket" element={<PackagesPage />} />

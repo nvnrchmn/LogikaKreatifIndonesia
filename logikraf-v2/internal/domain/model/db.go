@@ -27,7 +27,6 @@ func Connect() error {
 
 	if err := DB.AutoMigrate(
 		&User{},
-		&Service{},
 		&Package{},
 		&Portfolio{},
 		&Post{},

@@ -134,8 +134,6 @@ func main() {
 
 	// Public API
 	api := app.Group("/api")
-	api.Get("/services", handler.GetServices)
-	api.Get("/services/:slug", handler.GetServiceBySlug)
 	api.Get("/portfolios", handler.GetPortfolios)
 	api.Get("/packages", handler.GetPackages)
 	api.Get("/leads", handler.GetLeads)
@@ -176,9 +174,6 @@ func main() {
 	admin.Post("/portfolios", handler.CreatePortfolio)
 	admin.Put("/portfolios/:id", handler.UpdatePortfolio)
 	admin.Delete("/portfolios/:id", handler.DeletePortfolio)
-	admin.Get("/services", handler.GetServices)
-	admin.Post("/services", handler.CreateService)
-	admin.Put("/services/:id", handler.UpdateService)
 	admin.Post("/upload", handler.UploadImage)
 	admin.Get("/packages", handler.GetPackages)
 	admin.Post("/packages", handler.CreatePackage)
