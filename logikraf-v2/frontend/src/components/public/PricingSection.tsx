@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 interface Pkg {
   id: number
@@ -7,6 +8,8 @@ interface Pkg {
   features: string // newline-separated
   color: string
   is_featured: boolean
+  price: number
+  strike_price?: number
 }
 
 const colorFor = (name: string) =>
@@ -50,15 +53,32 @@ export default function PricingSection() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="https://wa.me/628128760434?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
-                  target="_blank"
-                  rel="noopener"
-                  className="mt-6 block text-center text-white font-semibold py-2 rounded-xl"
-                  style={{ backgroundColor: color }}
-                >
-                  Pesan Sekarang
-                </a>
+                {p.price > 0 && (
+                  <div className="mt-4 text-center">
+                    <span className="text-2xl font-bold text-gray-900">Rp{p.price.toLocaleString('id-ID')}</span>
+                    {p.strike_price > 0 && (
+                      <span className="ml-2 text-sm text-gray-400 line-through">Rp{p.strike_price.toLocaleString('id-ID')}</span>
+                    )}
+                  </div>
+                )}
+                <div className="mt-4 flex flex-col gap-2">
+                  <Link
+                    to="/kontak"
+                    className="block text-center text-white font-semibold py-2 rounded-xl"
+                    style={{ backgroundColor: color }}
+                  >
+                    Pesan Sekarang
+                  </Link>
+                  <a
+                    href="https://wa.me/628128760434?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
+                    target="_blank"
+                    rel="noopener"
+                    className="block text-center text-sm font-medium py-2 rounded-xl border"
+                    style={{ borderColor: color, color }}
+                  >
+                    Chat WhatsApp
+                  </a>
+                </div>
               </div>
             )
           })}
