@@ -21,7 +21,6 @@ export default function PackagesPage() {
   const [gateways, setGateways] = useState<{ id: string; name: string }[]>([])
   const [selectedPkg, setSelectedPkg] = useState<Package | null>(null)
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false)
-  const [billingCycle, setBillingCycle] = useState<'project' | 'annual'>('project')
   const [form, setForm] = useState({ name: '', email: '', phone: '', note: '' })
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
@@ -217,32 +216,6 @@ export default function PackagesPage() {
               </p>
             </div>
 
-            {/* Billing Cycle Switcher */}
-            <div className="flex items-center justify-center gap-3 mb-16">
-              <span className={`text-xs font-bold ${billingCycle === 'project' ? 'text-text-main' : 'text-text-muted'}`}>
-                Proyek Sekali Bayar
-              </span>
-              <button
-                type="button"
-                onClick={() => setBillingCycle(b => (b === 'project' ? 'annual' : 'project'))}
-                className="w-13 h-7 bg-gray-200 rounded-full p-1 transition-colors relative focus:outline-none"
-              >
-                <div
-                  className={`w-5 h-5 rounded-full bg-brand-primary transition-transform ${
-                    billingCycle === 'annual' ? 'translate-x-6' : 'translate-x-0'
-                  }`}
-                />
-              </button>
-              <div className="flex items-center gap-1.5">
-                <span className={`text-xs font-bold ${billingCycle === 'annual' ? 'text-text-main' : 'text-text-muted'}`}>
-                  Maintenance Tahunan
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">
-                  Hemat 20%
-                </span>
-              </div>
-            </div>
-
             {/* SaaS Pricing Cards Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-20">
               {displayPackages.map((pkg, idx) => {
@@ -283,7 +256,7 @@ export default function PackagesPage() {
                           </span>
                         </div>
                         <span className={`text-[11px] font-mono mt-1 block ${isFeatured ? 'text-brand-accent' : 'text-text-muted'}`}>
-                          {billingCycle === 'annual' ? 'Per tahun (sudah termasuk cloud server)' : 'Satu kali investasi pengerjaan'}
+                          Satu kali investasi pengerjaan
                         </span>
                       </div>
 
