@@ -30,7 +30,7 @@ export default function PackagesPage() {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length) {
-          setItems(data)
+          setItems(data.map(p => ({ ...p, features: Array.isArray(p.features) ? p.features : (p.features || '').split('\n').filter(Boolean) })))
         }
       })
       .catch(() => {})
