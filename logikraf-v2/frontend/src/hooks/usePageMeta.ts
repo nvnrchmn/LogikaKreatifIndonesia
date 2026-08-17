@@ -4,7 +4,7 @@ export default function usePageMeta() {
   const [meta, setMeta] = useState({ title: '', description: '' })
 
   useEffect(() => {
-    fetch('/api/settings')
+    fetch('/api/settings/public')
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
         const title = data.company_name ? `${data.company_name} — Digital Creative Agency & Software House` : 'Logika Kreatif Indonesia'
