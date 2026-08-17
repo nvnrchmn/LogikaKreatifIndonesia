@@ -19,9 +19,6 @@ func CreatePortfolio(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
 	}
-	if input.ServiceID == 0 {
-		input.ServiceID = 1
-	}
 	var dup model.Portfolio
 	if err := model.DB.Where("slug = ?", input.Slug).First(&dup).Error; err == nil {
 		return c.Status(409).JSON(fiber.Map{"error": "slug sudah digunakan, gunakan slug lain"})

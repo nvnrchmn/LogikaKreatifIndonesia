@@ -4,7 +4,6 @@ import "time"
 
 type Portfolio struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
-	ServiceID    uint      `json:"service_id"`
 	Title        string    `gorm:"size:255;not null" json:"title"`
 	Slug         string    `gorm:"size:255;uniqueIndex;not null" json:"slug"`
 	Excerpt      string    `gorm:"size:500" json:"excerpt"`
