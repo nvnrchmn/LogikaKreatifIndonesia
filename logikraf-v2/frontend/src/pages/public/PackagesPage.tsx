@@ -11,6 +11,7 @@ interface Package {
   features: string[]
   is_featured: boolean
   slug: string
+  sort_order: number
 }
 
 export default function PackagesPage() {
@@ -30,7 +31,7 @@ export default function PackagesPage() {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length) {
-          setItems(data.map(p => ({ ...p, features: Array.isArray(p.features) ? p.features : (p.features || '').split('\n').filter(Boolean) })))
+          setItems(data)
         }
       })
       .catch(() => {})
@@ -43,7 +44,7 @@ export default function PackagesPage() {
 
   // Default rich fallback packages if database is fresh
   const displayPackages: Package[] = useMemo(() => {
-    if (items.length > 0) return items
+    if (items.length > 0) return [...items].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0))
     return [
       {
         id: 1,
@@ -53,6 +54,7 @@ export default function PackagesPage() {
         formatted_price: 'Rp 2.499.000',
         is_featured: false,
         slug: 'logikraf-starter',
+        sort_order: 1,
         features: [
           'Landing page',
           'Profil bisnis',
@@ -77,6 +79,7 @@ export default function PackagesPage() {
         formatted_price: 'Rp 4.999.000',
         is_featured: true,
         slug: 'logikraf-business',
+        sort_order: 2,
         features: [
           'Semua fitur Starter',
           'Katalog produk',
@@ -100,6 +103,7 @@ export default function PackagesPage() {
         formatted_price: 'Rp 9.999.000',
         is_featured: false,
         slug: 'logikraf-commerce',
+        sort_order: 3,
         features: [
           'Semua fitur Business',
           'Online order',
@@ -242,7 +246,7 @@ export default function PackagesPage() {
             {/* SaaS Pricing Cards Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-20">
               {displayPackages.map((pkg, idx) => {
-                const isFeatured = pkg.is_featured || idx === 1
+                const isFeatured = pkg.is_featured
                 return (
                   <div
                     key={pkg.id}

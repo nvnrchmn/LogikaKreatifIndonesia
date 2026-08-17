@@ -1,7 +1,19 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import PublicLayout from '../../components/layout/PublicLayout'
 
 export default function AboutPage() {
+  const [settings, setSettings] = useState<Record<string, string>>({})
+  useEffect(() => {
+    fetch('/api/settings/public')
+      .then(r => (r.ok ? r.json() : {}))
+      .then(d => setSettings(d || {}))
+      .catch(() => {})
+  }, [])
+  const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
+  const companyAddress = settings.company_address || settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
+  const companyEmail = settings.company_email || 'support@logikraf.id'
+  const companyPhone = settings.company_phone || settings.contact_phone || '+62 812-3456-7890'
   const stats = [
     { num: '50+', label: 'Proyek Selesai & Rilis', desc: 'Solusi website, aplikasi mobile, dan platform enterprise.' },
     { num: '30+', label: 'Klien Terpercaya', desc: 'Mulai dari UMKM, startup, hingga institusi korporasi.' },
@@ -108,7 +120,7 @@ export default function AboutPage() {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                   </div>
                   <h4 className="font-bold text-text-main text-sm mb-1">Entitas Resmi</h4>
-                  <p className="text-xs text-text-muted">PT. Logika Kreatif Indonesia</p>
+                  <p className="text-xs text-text-muted">{companyName}</p>
                 </div>
 
                 <div className="pt-4 md:pt-0 md:pl-6">
@@ -116,7 +128,7 @@ export default function AboutPage() {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   </div>
                   <h4 className="font-bold text-text-main text-sm mb-1">Lokasi Kantor</h4>
-                  <p className="text-xs text-text-muted">Jakarta, DKI Jakarta, Indonesia</p>
+                  <p className="text-xs text-text-muted">{companyAddress}</p>
                 </div>
 
                 <div className="pt-4 md:pt-0 md:pl-6">
@@ -124,7 +136,7 @@ export default function AboutPage() {
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                   </div>
                   <h4 className="font-bold text-text-main text-sm mb-1">Kontak Resmi</h4>
-                  <p className="text-xs text-text-muted">support@logikraf.id<br />+62 812-3456-7890</p>
+                  <p className="text-xs text-text-muted">{companyEmail}<br />{companyPhone}</p>
                 </div>
               </div>
             </div>
