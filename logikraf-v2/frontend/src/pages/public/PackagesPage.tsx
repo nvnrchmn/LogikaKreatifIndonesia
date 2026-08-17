@@ -47,55 +47,74 @@ export default function PackagesPage() {
     return [
       {
         id: 1,
-        name: 'Website UMKM Starter',
-        tagline: 'Ideal untuk profil bisnis, landing page promosi, dan UMKM go-digital.',
+        name: 'Logikraf Starter',
+        tagline: 'Paket dasar untuk profil bisnis & landing page profesional yang langsung go-digital.',
         price: 2499000,
         formatted_price: 'Rp 2.499.000',
         is_featured: false,
-        slug: 'website-umkm-starter',
+        slug: 'logikraf-starter',
         features: [
-          'Desain UI/UX Modern & Mobile Responsive',
-          'Domain .com / .id & Cloud Hosting 1 Tahun',
-          'Sertifikat Keamanan SSL 256-Bit',
-          'Integrasi Tombol WhatsApp & Google Maps',
-          'Optimasi SEO On-Page Dasar & Google Indexing',
-          'Garansi & Pemeliharaan Teknis 3 Bulan',
+          'Landing page',
+          'Profil bisnis',
+          'Produk / jasa',
+          'Galeri',
+          'Kontak',
+          'Google Maps',
+          'WhatsApp CTA',
+          'Social media links',
+          'SEO basic',
+          'Mobile responsive',
+          'SSL',
+          'Hosting',
+          'CMS sederhana',
         ],
       },
       {
         id: 2,
-        name: 'Bisnis & E-Commerce Pro',
-        tagline: 'Solusi lengkap toko online & platform katalog dengan checkout QRIS otomatis.',
+        name: 'Logikraf Business',
+        tagline: 'Tingkatkan dengan katalog produk, blog, hingga manajemen lead & customer terpusat.',
         price: 4999000,
         formatted_price: 'Rp 4.999.000',
         is_featured: true,
-        slug: 'bisnis-ecommerce-pro',
+        slug: 'logikraf-business',
         features: [
-          'Semua Fitur Paket Starter',
-          'Integrasi Payment Gateway QRIS Dinamis Otomatis',
-          'Dashboard Admin CMS Kelola Produk & Pesanan',
-          'Sistem Manajemen Stok & Notifikasi Transaksi',
-          'Arsitektur High-Speed Cache & Kecepatan 95+ PageSpeed',
-          'Panduan & Training Penggunaan Admin Lengkap',
-          'Garansi & Dukungan Teknis Prioritas 6 Bulan',
+          'Semua fitur Starter',
+          'Katalog produk',
+          'Kategori produk',
+          'Form order',
+          'Booking',
+          'Artikel / blog',
+          'Promo',
+          'Customer database',
+          'Dashboard admin',
+          'Analytics',
+          'Lead management',
+          'Notification',
         ],
       },
       {
         id: 3,
-        name: 'Custom Web App & Enterprise',
-        tagline: 'Aplikasi web kompleks, multi-tenant SaaS, sistem internal kustom, dan API microservices.',
+        name: 'Logikraf Commerce',
+        tagline: 'Toko online lengkap dengan payment gateway, inventori, hingga laporan penjualan.',
         price: 9999000,
         formatted_price: 'Rp 9.999.000',
         is_featured: false,
-        slug: 'custom-web-app-enterprise',
+        slug: 'logikraf-commerce',
         features: [
-          'Arsitektur Kustom Go Fiber + React High-Performance',
-          'Multi-Tenant Role-Based Access Control (RBAC)',
-          'Integrasi API Payment (iPaymu / Midtrans / Xendit)',
-          'SLA Uptime Server 99.9% & Monitoring Real-Time',
-          'Dokumentasi OpenAPI / Swagger Lengkap',
-          'Source Code Penuh & Hak Kepemilikan 100%',
-          'Dedicated Project Manager & Dukungan 12 Bulan',
+          'Semua fitur Business',
+          'Online order',
+          'Cart',
+          'Checkout',
+          'Payment gateway',
+          'Invoice',
+          'Customer management',
+          'Inventory',
+          'Order management',
+          'Sales report',
+          'Payment report',
+          'Promo / voucher',
+          'Product variants',
+          'Shipping integration',
         ],
       },
     ]
@@ -326,11 +345,11 @@ export default function PackagesPage() {
                   <thead>
                     <tr className="border-b border-border-minimal text-text-main">
                       <th className="text-left font-bold py-4 px-4">Fitur Teknis</th>
-                      <th className="text-center font-bold py-4 px-4">Starter UMKM</th>
+                      <th className="text-center font-bold py-4 px-4">Logikraf Starter</th>
                       <th className="text-center font-bold py-4 px-4 bg-brand-primary/5 text-brand-primary rounded-t-xl">
-                        Bisnis Pro
+                        Logikraf Business
                       </th>
-                      <th className="text-center font-bold py-4 px-4">Enterprise Custom</th>
+                      <th className="text-center font-bold py-4 px-4">Logikraf Commerce</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border-minimal text-text-muted">
