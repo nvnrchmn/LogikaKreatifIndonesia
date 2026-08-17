@@ -15,11 +15,12 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ContactPage() {
   const [settings, setSettings] = useState<Record<string, string>>({})
+  const [packages, setPackages] = useState<{ id: number; name: string }[]>([])
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
     phone: '',
-    service: 'Web Development',
+    service: '',
     message: '',
   })
   const [errors, setErrors] = useState<Errors>({})
@@ -30,6 +31,10 @@ export default function ContactPage() {
     fetch('/api/settings/public')
       .then(r => (r.ok ? r.json() : {}))
       .then(d => setSettings(d || {}))
+      .catch(() => {})
+    fetch('/api/packages')
+      .then(r => (r.ok ? r.json() : []))
+      .then(d => setPackages(Array.isArray(d) ? d : []))
       .catch(() => {})
   }, [])
 
@@ -82,7 +87,7 @@ export default function ContactPage() {
   }
 
   const reset = () => {
-    setForm({ name: '', email: '', phone: '', service: 'Web Development', message: '' })
+    setForm({ name: '', email: '', phone: '', service: '', message: '' })
     setErrors({})
     setSent(false)
   }
@@ -233,17 +238,16 @@ export default function ContactPage() {
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-text-main mb-1.5 block">Kategori Layanan</label>
+                        <label className="text-xs font-bold text-text-main mb-1.5 block">Pilih Paket</label>
                         <select
                           className="form-input text-sm"
                           value={form.service}
                           onChange={e => update('service', e.target.value)}
                         >
-                          <option value="Web Development">Web Development &amp; Custom Apps</option>
-                          <option value="Paket Website UMKM">Paket Website UMKM Siap Pakai</option>
-                          <option value="Mobile App Development">Mobile App (iOS &amp; Android)</option>
-                          <option value="UI/UX Design">UI/UX Design &amp; Prototyping</option>
-                          <option value="Digital Marketing & Branding">Digital Marketing &amp; Branding</option>
+                          <option value="">— Pilih paket —</option>
+                          {packages.map(p => (
+                            <option key={p.id} value={p.name}>{p.name}</option>
+                          ))}
                         </select>
                       </div>
                     </div>
