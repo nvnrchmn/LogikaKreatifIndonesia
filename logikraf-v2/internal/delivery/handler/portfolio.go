@@ -22,6 +22,10 @@ func CreatePortfolio(c fiber.Ctx) error {
 	if input.ServiceID == 0 {
 		input.ServiceID = 1
 	}
+	var dup model.Portfolio
+	if err := model.DB.Where("slug = ?", input.Slug).First(&dup).Error; err == nil {
+		return c.Status(409).JSON(fiber.Map{"error": "slug sudah digunakan, gunakan slug lain"})
+	}
 	if err := model.DB.Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
@@ -37,6 +41,10 @@ func UpdatePortfolio(c fiber.Ctx) error {
 	var p model.Portfolio
 	if err := model.DB.First(&p, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+	var dup model.Portfolio
+	if err := model.DB.Where("slug = ? AND id <> ?", input.Slug, id).First(&dup).Error; err == nil {
+		return c.Status(409).JSON(fiber.Map{"error": "slug sudah digunakan, gunakan slug lain"})
 	}
 	p.Title = input.Title
 	p.Slug = input.Slug

@@ -341,6 +341,7 @@ function ResourceList({ cfg }: { cfg: any }) {
 
 function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg?: string) => void }) {
   const [form, setForm] = useState<Record<string, any>>({})
+  const [slugTouched, setSlugTouched] = useState(false)
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -554,7 +555,16 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg
                     type={f.type || 'text'}
                     value={form[f.name] ?? ''}
                     onChange={e => {
-                      setForm({ ...form, [f.name]: e.target.value })
+                      const val = e.target.value
+                      if (f.name === 'slug') setSlugTouched(true)
+                      setForm(prev => {
+                        const next = { ...prev, [f.name]: val }
+                        if (f.name === 'title' && !slugTouched) {
+                          next.slug = val.toLowerCase().trim()
+                            .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
+                        }
+                        return next
+                      })
                       if (fieldErrors[f.name]) setFieldErrors({ ...fieldErrors, [f.name]: '' })
                     }}
                   />
