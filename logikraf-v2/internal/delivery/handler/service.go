@@ -8,7 +8,11 @@ import (
 
 func GetServices(c fiber.Ctx) error {
 	var services []model.Service
-	if err := model.DB.Find(&services).Error; err != nil {
+	q := model.DB
+	if c.Query("package") == "1" {
+		q = q.Where("is_package = ?", true)
+	}
+	if err := q.Find(&services).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(services)
