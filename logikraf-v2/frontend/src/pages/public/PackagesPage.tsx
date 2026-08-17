@@ -31,7 +31,7 @@ export default function PackagesPage() {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length) {
-          setItems(data)
+          setItems(data.map(p => ({ ...p, features: Array.isArray(p.features) ? p.features : (p.features || '').split('\n').filter(Boolean) })))
         }
       })
       .catch(() => {})
@@ -257,9 +257,9 @@ export default function PackagesPage() {
                     }`}
                   >
                     {isFeatured && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <span className="px-4 py-1.5 rounded-full bg-brand-primary text-white text-[11px] font-extrabold uppercase tracking-wider shadow-md">
-                          ★ Paling Populer &amp; Rekomendasi
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
+                        <span className="inline-block px-5 py-2 rounded-full bg-gradient-to-r from-brand-primary to-blue-600 text-white text-[11px] font-extrabold uppercase tracking-wider shadow-lg whitespace-nowrap">
+                          ★ Paling Populer
                         </span>
                       </div>
                     )}
