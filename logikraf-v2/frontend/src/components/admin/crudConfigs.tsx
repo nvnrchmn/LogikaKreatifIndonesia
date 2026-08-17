@@ -10,7 +10,8 @@ export interface ColumnDef {
 export interface FieldDef {
   name: string
   label: string
-  type?: 'text' | 'number' | 'textarea' | 'select'
+  type?: 'text' | 'number' | 'textarea' | 'select' | 'image'
+  uploadFolder?: string // for type:'image', e.g. "portfolio" | "post"
   required?: boolean
   multiline?: boolean
   rows?: number
@@ -151,7 +152,7 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       { name: 'client_name', label: 'Nama Klien / Perusahaan' },
       { name: 'excerpt', label: 'Ringkasan Singkat' },
       { name: 'description', label: 'Deskripsi Kasus & Solusi Lengkap', type: 'textarea', rows: 4 },
-      { name: 'thumbnail', label: 'URL Gambar Thumbnail (CDN / Web)' },
+      { name: 'thumbnail', label: 'Gambar Thumbnail', type: 'image', uploadFolder: 'portfolio' },
       {
         name: 'is_published',
         label: 'Status Rilis',
@@ -274,7 +275,7 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       { name: 'slug', label: 'Slug URL', required: true },
       { name: 'excerpt', label: 'Ringkasan / Sinopsis' },
       { name: 'body', label: 'Isi Konten Artikel', type: 'textarea', rows: 6 },
-      { name: 'featured_image', label: 'URL Gambar Utama' },
+      { name: 'featured_image', label: 'Gambar Utama', type: 'image', uploadFolder: 'post' },
       {
         name: 'is_published',
         label: 'Status Rilis',

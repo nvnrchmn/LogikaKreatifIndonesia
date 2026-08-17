@@ -512,6 +512,40 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg
                       <option key={o.value} value={o.value}>{o.label}</option>
                     ))}
                   </select>
+                ) : f.type === 'image' ? (
+                  <div>
+                    {form[f.name] ? (
+                      <img src={form[f.name]} alt="" className="w-24 h-24 object-cover rounded-lg mb-2 border border-border-minimal" />
+                    ) : null}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input text-xs sm:text-sm file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-brand/10 file:text-brand file:cursor-pointer"
+                      disabled={busy}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const fd = new FormData()
+                        fd.append('image', file)
+                        try {
+                          const r = await fetch(`/api/upload?folder=${f.uploadFolder || 'misc'}`, {
+                            method: 'POST',
+                            headers: auth(),
+                            body: fd,
+                          })
+                          const d = await r.json()
+                          if (!r.ok || !d.url) throw new Error(d.error || 'upload gagal')
+                          setForm({ ...form, [f.name]: d.url })
+                          if (fieldErrors[f.name]) setFieldErrors({ ...fieldErrors, [f.name]: '' })
+                        } catch (err: any) {
+                          setError(err?.message || 'Gagal upload gambar')
+                        }
+                      }}
+                    />
+                    {form[f.name] && (
+                      <p className="text-[11px] text-emerald-600 mt-1 break-all">✓ {form[f.name]}</p>
+                    )}
+                  </div>
                 ) : (
                   <input
                     className={`form-input text-xs sm:text-sm ${

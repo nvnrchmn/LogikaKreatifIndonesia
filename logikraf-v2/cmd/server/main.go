@@ -179,7 +179,7 @@ func main() {
 	admin.Get("/services", handler.GetServices)
 	admin.Post("/services", handler.CreateService)
 	admin.Put("/services/:id", handler.UpdateService)
-	admin.Delete("/services/:id", handler.DeleteService)
+	admin.Post("/upload", handler.UploadImage)
 	admin.Get("/packages", handler.GetPackages)
 	admin.Post("/packages", handler.CreatePackage)
 	admin.Put("/packages/:id", handler.UpdatePackage)
