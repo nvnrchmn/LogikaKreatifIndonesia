@@ -5,7 +5,7 @@ interface Pkg {
   id: number
   name: string
   tagline: string
-  features: string // newline-separated
+  features: string | string[] // newline-separated or JSON array from API
   color: string
   is_featured: boolean
   price: number
@@ -32,7 +32,7 @@ export default function PricingSection() {
         <div className="grid md:grid-cols-3 gap-6">
           {packages.map((p) => {
             const color = p.color || colorFor(p.name)
-            const feats = p.features.split('\n').filter(Boolean)
+            const feats = Array.isArray(p.features) ? p.features : String(p.features || '').split('\n').filter(Boolean)
             return (
               <div
                 key={p.id}

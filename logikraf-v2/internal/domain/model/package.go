@@ -9,7 +9,7 @@ type Package struct {
 	Tagline     string    `gorm:"size:255" json:"tagline"`
 	Price       uint      `gorm:"not null" json:"price"`
 	StrikePrice *uint     `json:"strike_price"`
-	Features    string    `gorm:"type:text" json:"features"`
+	Features    StringList `gorm:"type:text;serializer:json" json:"features"`
 	IsFeatured  bool      `gorm:"default:false" json:"is_featured"`
 	IsActive    bool      `gorm:"default:true" json:"is_active"`
 	SortOrder   int       `gorm:"default:0" json:"sort_order"`

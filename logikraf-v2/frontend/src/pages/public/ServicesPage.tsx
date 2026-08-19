@@ -6,7 +6,7 @@ interface Pkg {
   id: number
   name: string
   tagline: string
-  features: string
+  features: string | string[]
   price: number
   strike_price?: number
   is_featured: boolean
@@ -56,7 +56,7 @@ export default function ServicesPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-20">
                 {items.map((p, idx) => {
                   const color = p.is_featured ? '#0052FF' : colorFor(p.name)
-                  const feats = p.features.split('\n').filter(Boolean)
+                  const feats = Array.isArray(p.features) ? p.features : String(p.features || '').split('\n').filter(Boolean)
                   return (
                     <div
                       key={p.id || idx}
