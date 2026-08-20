@@ -174,7 +174,7 @@ export default function ClientLayout() {
               <OpenInNewIcon />
             </a>
             <a
-              href="https://wa.me/6281234567890"
+              href="https://wa.me/628983342429"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold border border-emerald-200 transition-colors"

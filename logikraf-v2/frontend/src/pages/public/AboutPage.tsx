@@ -13,7 +13,7 @@ export default function AboutPage() {
   const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
   const companyAddress = settings.company_address || settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
   const companyEmail = settings.company_email || 'support@logikraf.id'
-  const companyPhone = settings.company_phone || settings.contact_phone || '+62 812-3456-7890'
+  const companyPhone = settings.company_phone || settings.contact_phone || '+62 898 3342 429'
   const stats = [
     { num: '50+', label: 'Proyek Selesai & Rilis', desc: 'Solusi website, aplikasi mobile, dan platform enterprise.' },
     { num: '30+', label: 'Klien Terpercaya', desc: 'Mulai dari UMKM, startup, hingga institusi korporasi.' },

@@ -78,7 +78,7 @@ export default function PrivacyPage() {
               </p>
               <ul className="list-disc pl-6 space-y-1 text-sm">
                 <li><strong>Email:</strong> support@logikraf.id / halo@logikraf.id</li>
-                <li><strong>WhatsApp:</strong> +62 812-3456-7890</li>
+                <li><strong>WhatsApp:</strong> +62 898 3342 429</li>
                 <li><strong>Alamat:</strong> PT. Logika Kreatif Indonesia, Jakarta, Indonesia</li>
               </ul>
             </div>

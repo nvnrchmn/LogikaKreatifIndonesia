@@ -289,7 +289,7 @@ export default function PackagesPage() {
                         <span>Pesan Paket via QRIS Instan ⚡</span>
                       </button>
                       <a
-                        href={`https://wa.me/6281234567890?text=Halo%20Logikraf,%20saya%20tertarik%20dengan%20Paket%20${encodeURIComponent(
+                        href={`https://wa.me/628983342429?text=Halo%20Logikraf,%20saya%20tertarik%20dengan%20Paket%20${encodeURIComponent(
                           pkg.name
                         )}`}
                         target="_blank"

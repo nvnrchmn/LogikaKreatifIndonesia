@@ -70,7 +70,7 @@ export default function PricingSection() {
                     Pesan Sekarang
                   </Link>
                   <a
-                    href="https://wa.me/628128760434?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
+                    href="https://wa.me/628983342429?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
                     target="_blank"
                     rel="noopener"
                     className="block text-center text-sm font-medium py-2 rounded-xl border"

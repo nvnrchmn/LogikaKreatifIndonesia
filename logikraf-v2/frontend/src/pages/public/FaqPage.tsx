@@ -115,7 +115,7 @@ export default function FaqPage() {
                 <p className="text-xs text-text-muted mt-0.5">Tim helpdesk kami siap membantu kendala transaksi atau konsultasi proyek.</p>
               </div>
               <a
-                href="https://wa.me/6281234567890"
+                href="https://wa.me/628983342429"
                 target="_blank"
                 rel="noreferrer"
                 className="btn-primary text-xs py-2 px-4 shrink-0 whitespace-nowrap"

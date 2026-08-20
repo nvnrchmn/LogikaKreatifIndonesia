@@ -218,7 +218,7 @@ export default function ClientDashboardPage() {
           <p className="text-xs text-text-muted mt-1">Konsultasikan langsung dengan tim engineer Logikraf via WhatsApp resmi.</p>
         </div>
         <a
-          href="https://wa.me/6281234567890"
+          href="https://wa.me/628983342429"
           target="_blank"
           rel="noreferrer"
           className="btn-primary text-xs py-2.5 px-5 shadow-sm whitespace-nowrap"

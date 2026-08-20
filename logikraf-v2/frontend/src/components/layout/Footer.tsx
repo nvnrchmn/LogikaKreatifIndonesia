@@ -13,7 +13,7 @@ export default function Footer() {
 
   const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
   const contactEmail = settings.contact_email || 'support@logikraf.id'
-  const contactWhatsapp = settings.contact_whatsapp || '+62 812-3456-7890'
+  const contactWhatsapp = settings.contact_whatsapp || '+62 898 3342 429'
   const contactAddress = settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
   const cleanWaNumber = contactWhatsapp.replace(/[^0-9]/g, '')
 
@@ -90,12 +90,12 @@ export default function Footer() {
             </h4>
             <div className="space-y-2.5 text-xs text-text-light/70">
               <p>Email: <a href={`mailto:${contactEmail}`} className="text-white hover:underline font-mono">{contactEmail}</a></p>
-              <p>WhatsApp: <a href={`https://wa.me/${cleanWaNumber || '6281234567890'}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">{contactWhatsapp}</a></p>
+              <p>WhatsApp: <a href={`https://wa.me/${cleanWaNumber || '628983342429'}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">{contactWhatsapp}</a></p>
               <p className="leading-relaxed">Kantor: {contactAddress}</p>
             </div>
             <div className="pt-2">
               <a
-                href={`https://wa.me/${cleanWaNumber || '6281234567890'}`}
+                href={`https://wa.me/${cleanWaNumber || '628983342429'}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-md"

@@ -84,7 +84,7 @@ export default function TermsPage() {
               <p className="text-sm">Jika Anda membutuhkan bantuan terkait transaksi QRIS, silakan hubungi saluran resmi kami:</p>
               <ul className="list-disc pl-6 space-y-1 text-sm">
                 <li><strong>Email:</strong> support@logikraf.id</li>
-                <li><strong>WhatsApp Helpdesk:</strong> +62 812-3456-7890</li>
+                <li><strong>WhatsApp Helpdesk:</strong> +62 898 3342 429</li>
                 <li><strong>Website:</strong> https://logikraf.id</li>
               </ul>
             </div>
