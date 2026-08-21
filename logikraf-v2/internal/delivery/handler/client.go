@@ -45,7 +45,7 @@ func CreateClient(c fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
-	input.InviteCode = code
+	input.InviteCode = &code
 	if err := model.DB.Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
@@ -56,7 +56,7 @@ func CreateClient(c fiber.Ctx) error {
 		"email":        input.Email,
 		"phone":        input.Phone,
 		"city":         input.City,
-		"invite_code":  input.InviteCode,
+		"invite_code":  *input.InviteCode,
 	})
 }
 
@@ -145,13 +145,19 @@ func RegisterClient(c fiber.Ctx) error {
 		tx.Rollback()
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
-	if err := tx.Model(&model.Client{}).Where("id = ?", client.ID).Updates(map[string]any{
-		"user_id":     user.ID,
-		"invite_code": "",
-		"email":       req.Email,
-	}).Error; err != nil {
+	// Atomically consume the invite code: only succeeds if still unused.
+	// Setting the code to NULL (not '') avoids the MySQL unique-index
+	// single-empty-string collision.
+	res := tx.Model(&model.Client{}).
+		Where("id = ? AND user_id = 0", client.ID).
+		Updates(map[string]any{"user_id": user.ID, "invite_code": nil, "email": req.Email})
+	if res.Error != nil {
 		tx.Rollback()
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	if res.RowsAffected != 1 {
+		tx.Rollback()
+		return c.Status(400).JSON(fiber.Map{"error": "invite code already used"})
 	}
 	if err := tx.Commit().Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})

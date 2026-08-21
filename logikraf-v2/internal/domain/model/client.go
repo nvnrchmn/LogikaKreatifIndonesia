@@ -5,7 +5,7 @@ import "time"
 type Client struct {
 	ID          uint       `gorm:"primaryKey" json:"id"`
 	UserID      uint       `gorm:"index" json:"user_id"`
-	InviteCode  string     `gorm:"size:32;uniqueIndex" json:"-"`
+	InviteCode  *string    `gorm:"size:32;uniqueIndex" json:"-"`
 	CompanyName string     `gorm:"size:255" json:"company_name"`
 	PICName     string     `gorm:"size:255" json:"pic_name"`
 	Email       string     `gorm:"size:255" json:"email"`

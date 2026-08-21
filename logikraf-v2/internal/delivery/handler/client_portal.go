@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 )
@@ -111,11 +113,31 @@ func CreateClientTicket(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&input); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
 	}
-	input.UserID = userID
-	input.Status = "open"
-	if input.Priority == "" {
+	input.Subject = strings.TrimSpace(input.Subject)
+	if input.Subject == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "subject required"})
+	}
+	validPriorities := map[string]bool{"low": true, "medium": true, "high": true}
+	if !validPriorities[input.Priority] {
 		input.Priority = "medium"
 	}
+	if input.OrderID != nil && *input.OrderID != 0 {
+		clientID, _, err := clientIDForUser(c)
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "client not found"})
+		}
+		var cnt int64
+		model.DB.Model(&model.Order{}).
+			Where("id = ? AND client_id = ?", *input.OrderID, clientID).
+			Count(&cnt)
+		if cnt == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "invalid order reference"})
+		}
+	} else {
+		input.OrderID = nil
+	}
+	input.UserID = userID
+	input.Status = "open"
 	if err := model.DB.Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}

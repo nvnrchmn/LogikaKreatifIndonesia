@@ -146,7 +146,6 @@ func main() {
 	api.Get("/posts/:slug", handler.GetPostBySlug)
 	api.Get("/testimonials", handler.GetTestimonials)
 	api.Get("/orders", auth.AuthMiddleware(), handler.GetOrders)
-	api.Get("/tickets", handler.GetTickets)
 	api.Post("/auth/login", loginLimiter, auth.Login)
 	// Client self-registration (invite-code based)
 	api.Post("/client/register", registerLimiter, handler.RegisterClient)
