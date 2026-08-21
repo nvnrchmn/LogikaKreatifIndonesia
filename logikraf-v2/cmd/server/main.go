@@ -17,8 +17,8 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 
-	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
+	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/auth"
 )
 
@@ -141,7 +141,7 @@ func main() {
 	api.Get("/posts", handler.GetPosts)
 	api.Get("/posts/:slug", handler.GetPostBySlug)
 	api.Get("/testimonials", handler.GetTestimonials)
-	api.Get("/orders", handler.GetOrders)
+	api.Get("/orders", auth.AuthMiddleware(), handler.GetOrders)
 	api.Get("/tickets", handler.GetTickets)
 	api.Post("/auth/login", loginLimiter, auth.Login)
 
@@ -179,10 +179,15 @@ func main() {
 	admin.Post("/packages", handler.CreatePackage)
 	admin.Put("/packages/:id", handler.UpdatePackage)
 	admin.Delete("/packages/:id", handler.DeletePackage)
-	admin.Get("/orders", handler.GetOrders)
+
 	admin.Post("/orders", handler.CreateOrder)
 	admin.Put("/orders/:id", handler.UpdateOrder)
 	admin.Delete("/orders/:id", handler.DeleteOrder)
+	admin.Get("/projects", handler.GetProjects)
+	admin.Get("/projects/:id", handler.GetProjectByID)
+	admin.Post("/projects", handler.CreateProject)
+	admin.Put("/projects/:id", handler.UpdateProject)
+	admin.Delete("/projects/:id", handler.DeleteProject)
 	admin.Get("/tickets", handler.GetTickets)
 	admin.Post("/tickets", handler.CreateTicket)
 	admin.Put("/tickets/:id", handler.UpdateTicket)

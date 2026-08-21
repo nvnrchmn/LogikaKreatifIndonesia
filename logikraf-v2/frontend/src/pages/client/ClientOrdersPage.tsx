@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { auth } from '../../lib/api'
 
 interface Order {
   id: number
@@ -18,7 +19,7 @@ export default function ClientOrdersPage() {
   const [expanded, setExpanded] = useState<number | null>(null)
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch('/api/orders', { headers: auth() })
       .then(r => (r.ok ? r.json() : []))
       .then((d: Order[]) => {
         setOrders(Array.isArray(d) ? d : [])

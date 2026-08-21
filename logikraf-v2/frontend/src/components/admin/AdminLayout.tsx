@@ -22,6 +22,7 @@ const navSections = [
     title: 'Relasi',
     items: [
       { label: 'Clients', path: '/admin/clients', icon: PeopleIcon },
+      { label: 'Projects', path: '/admin/projects', icon: WorkIcon },
       { label: 'Leads', path: '/admin/leads', icon: FolderIcon },
     ],
   },

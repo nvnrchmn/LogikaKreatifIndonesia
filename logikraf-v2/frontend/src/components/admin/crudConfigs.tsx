@@ -10,7 +10,7 @@ export interface ColumnDef {
 export interface FieldDef {
   name: string
   label: string
-  type?: 'text' | 'number' | 'textarea' | 'select' | 'image'
+  type?: 'text' | 'number' | 'date' | 'textarea' | 'select' | 'image'
   uploadFolder?: string // for type:'image', e.g. "portfolio" | "post"
   required?: boolean
   multiline?: boolean
@@ -372,7 +372,8 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       },
     ],
     formFields: [
-      { name: 'order_number', label: 'Nomor Order / Referensi' },
+      { name: 'order_number', label: 'Nomor Order / Referensi', required: true },
+      { name: 'client_id', label: 'ID Client', type: 'number', required: true, min: 1 },
       { name: 'project_name', label: 'Nama Proyek / Paket', required: true },
       { name: 'total_amount', label: 'Total Nominal (IDR)', type: 'number', required: true, min: 0 },
       {
@@ -507,6 +508,33 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       { name: 'phone', label: 'Nomor WhatsApp / Telepon' },
       { name: 'city', label: 'Kota Domisili' },
       { name: 'address', label: 'Alamat Lengkap', type: 'textarea', rows: 2 },
+    ],
+  },
+  projects: {
+    resource: 'projects',
+    title: 'Projects',
+    endpoint: '/api/projects',
+    emptyRow: 'Belum ada project.',
+    columns: [
+      { id: 'name', label: 'Nama Project', render: (r: any) => <span className="font-bold text-text-main">{r.name}</span> },
+      { id: 'status', label: 'Status', render: (r: any) => <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{String(r.status || '').replace('_', ' ')}</span> },
+      { id: 'deadline', label: 'Deadline', render: (r: any) => r.deadline ? new Date(r.deadline).toLocaleDateString('id-ID') : '—' },
+      { id: 'live_url', label: 'Live URL', render: (r: any) => r.live_url ? <a href={r.live_url} target="_blank" rel="noreferrer" className="text-brand-primary underline">Buka</a> : '—' },
+    ],
+    formFields: [
+      { name: 'name', label: 'Nama Project', required: true },
+      { name: 'description', label: 'Deskripsi', type: 'textarea', rows: 3 },
+      { name: 'status', label: 'Status', type: 'select', options: [
+        { value: 'planning', label: 'Planning' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'review', label: 'Review' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'on_hold', label: 'On Hold' },
+        { value: 'cancelled', label: 'Cancelled' },
+      ] },
+      { name: 'deadline', label: 'Deadline', type: 'date' },
+      { name: 'repo_url', label: 'Repository URL' },
+      { name: 'live_url', label: 'Live URL' },
     ],
   },
   tickets: {

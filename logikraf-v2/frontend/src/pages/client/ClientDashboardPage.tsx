@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { auth } from '../../lib/api'
 
 interface Order {
   id: number
@@ -18,7 +19,7 @@ export default function ClientDashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch('/api/orders', { headers: auth() })
       .then(r => (r.ok ? r.json() : []))
       .then((d: Order[]) => {
         setOrders(Array.isArray(d) ? d : [])
