@@ -4,6 +4,7 @@ import { useState } from 'react'
 const navItems = [
   { label: 'Dashboard', path: '/client/dashboard', icon: DashboardIcon },
   { label: 'Pesanan Saya', path: '/client/orders', icon: ShoppingBagIcon },
+  { label: 'Bantuan / Tiket', path: '/client/tickets', icon: TicketIcon },
   { label: 'Profil Akun', path: '/client/profile', icon: PersonIcon },
 ]
 
@@ -212,6 +213,14 @@ function PersonIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+    </svg>
+  )
+}
+
+function TicketIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-4.5h7.5m-7.5 3h7.5M3.375 6A1.875 1.875 0 015.25 4.125h13.5A1.875 1.875 0 0120.625 6v3.75c0 .622-.42 1.16-.996 1.31a2.25 2.25 0 000 4.38c.576.15.996.688.996 1.31V18a1.875 1.875 0 01-1.875 1.875H5.25A1.875 1.875 0 013.375 18v-3.19c0-.622.42-1.16.996-1.31a2.25 2.25 0 000-4.38c-.576-.15-.996-.688-.996-1.31V6z" />
     </svg>
   )
 }

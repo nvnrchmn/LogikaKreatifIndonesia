@@ -86,6 +86,17 @@ func AdminOnly() fiber.Handler {
 	}
 }
 
+// ClientOnly allows authenticated clients (and admins) to access a route.
+func ClientOnly() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		role := c.Locals("role")
+		if role != "client" && role != "admin" {
+			return c.Status(403).JSON(fiber.Map{"error": "forbidden"})
+		}
+		return c.Next()
+	}
+}
+
 func Login(c fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.Bind().JSON(&req); err != nil {

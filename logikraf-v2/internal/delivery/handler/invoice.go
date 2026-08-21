@@ -69,8 +69,27 @@ func DeleteInvoice(c fiber.Ctx) error {
 
 // DownloadInvoicePDF renders a single invoice as a PDF nota.
 func DownloadInvoicePDF(c fiber.Ctx) error {
+	return downloadInvoicePDF(c, c.Params("id"), false)
+}
+
+// ClientDownloadInvoicePDF lets a client download their own invoice PDF.
+// Scoping: the invoice must belong to an order owned by the logged-in client.
+func ClientDownloadInvoicePDF(c fiber.Ctx) error {
+	return downloadInvoicePDF(c, c.Params("id"), true)
+}
+
+func downloadInvoicePDF(c fiber.Ctx, id string, clientScoped bool) error {
 	var inv model.Invoice
-	if err := model.DB.First(&inv, c.Params("id")).Error; err != nil {
+	q := model.DB.Model(&model.Invoice{})
+	if clientScoped {
+		clientID, _, err := clientIDForUser(c)
+		if err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "client not found"})
+		}
+		q = q.Joins("JOIN orders ON orders.id = invoices.order_id").
+			Where("orders.client_id = ?", clientID)
+	}
+	if err := q.First(&inv, "invoices.id = ?", id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "not found"})
 	}
 
