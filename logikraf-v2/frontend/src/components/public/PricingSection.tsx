@@ -5,7 +5,7 @@ interface Pkg {
   id: number
   name: string
   tagline: string
-  features: string // newline-separated
+  features: string | string[] // newline-separated or JSON array from API
   color: string
   is_featured: boolean
   price: number
@@ -32,7 +32,7 @@ export default function PricingSection() {
         <div className="grid md:grid-cols-3 gap-6">
           {packages.map((p) => {
             const color = p.color || colorFor(p.name)
-            const feats = p.features.split('\n').filter(Boolean)
+            const feats = Array.isArray(p.features) ? p.features : String(p.features || '').split('\n').filter(Boolean)
             return (
               <div
                 key={p.id}
@@ -70,7 +70,7 @@ export default function PricingSection() {
                     Pesan Sekarang
                   </Link>
                   <a
-                    href="https://wa.me/628128760434?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
+                    href="https://wa.me/628983342429?text=Halo,%20saya%20tertarik%20dengan%20paket%20Logikraf"
                     target="_blank"
                     rel="noopener"
                     className="block text-center text-sm font-medium py-2 rounded-xl border"

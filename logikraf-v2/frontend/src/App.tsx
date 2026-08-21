@@ -15,6 +15,7 @@ const PackagesPage = lazy(() => import('./pages/public/PackagesPage'))
 const SearchPage = lazy(() => import('./pages/public/SearchPage'))
 const TermsPage = lazy(() => import('./pages/public/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/public/PrivacyPage'))
+const RefundPolicyPage = lazy(() => import('./pages/public/RefundPolicyPage'))
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 
 // Admin Components & Pages (Lazy Loaded)
@@ -78,6 +79,7 @@ export default function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/syarat-ketentuan" element={<TermsPage />} />
       <Route path="/kebijakan-privasi" element={<PrivacyPage />} />
+      <Route path="/kebijakan-refund" element={<RefundPolicyPage />} />
       <Route path="/faq" element={<FaqPage />} />
       {/* Admin */}
       <Route path="/admin/login" element={<AdminLoginPage />} />

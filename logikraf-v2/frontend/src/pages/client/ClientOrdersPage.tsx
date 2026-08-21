@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { auth } from '../../lib/api'
 
 interface Order {
   id: number
@@ -18,7 +19,7 @@ export default function ClientOrdersPage() {
   const [expanded, setExpanded] = useState<number | null>(null)
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch('/api/orders', { headers: auth() })
       .then(r => (r.ok ? r.json() : []))
       .then((d: Order[]) => {
         setOrders(Array.isArray(d) ? d : [])
@@ -189,7 +190,7 @@ export default function ClientOrdersPage() {
                                   💡 Jika ada perubahan spesifikasi teknis, hubungi Project Manager Anda.
                                 </span>
                                 <a
-                                  href={`https://wa.me/6281234567890?text=Halo%20Logikraf,%20saya%20ingin%20menanyakan%20progres%20order%20${encodeURIComponent(
+                                  href={`https://wa.me/628983342429?text=Halo%20Logikraf,%20saya%20ingin%20menanyakan%20progres%20order%20${encodeURIComponent(
                                     o.order_number || String(o.id)
                                   )}`}
                                   target="_blank"

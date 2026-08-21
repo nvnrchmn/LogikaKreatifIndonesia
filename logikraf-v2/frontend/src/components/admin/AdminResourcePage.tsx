@@ -404,7 +404,9 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg
 
     const payload = { ...form }
     cfg.formFields.forEach((f: FieldDef) => {
-      if (f.type === 'select') {
+      // Select values are strings by default; only boolean selects should be coerced.
+      const isBooleanSelect = f.type === 'select' && f.options?.every(o => o.value === '0' || o.value === '1')
+      if (isBooleanSelect) {
         payload[f.name] = payload[f.name] === '1' || payload[f.name] === true
       }
       if (f.type === 'number' && payload[f.name] !== undefined && payload[f.name] !== '') {

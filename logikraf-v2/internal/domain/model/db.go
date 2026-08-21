@@ -31,7 +31,9 @@ func Connect() error {
 		&Portfolio{},
 		&Post{},
 		&Lead{},
+		&Client{},
 		&Order{},
+		&Project{},
 		&Transaction{},
 		&Invoice{},
 		&Ticket{},
@@ -52,22 +54,35 @@ func Connect() error {
 	return nil
 }
 
+// seedDefaultAdmin bootstraps an initial admin account ONLY when explicitly
+// configured via ADMIN_BOOTSTRAP_EMAIL + ADMIN_BOOTSTRAP_PASSWORD (e.g. during
+// first provisioning). Never seeds a hardcoded password, and never logs secrets.
 func seedDefaultAdmin() {
-	var count int64
-	DB.Model(&User{}).Where("email = ?", "admin@logikraf.id").Count(&count)
-	if count == 0 {
-		hashed, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-		if err == nil {
-			admin := User{
-				Name:     "Admin Logikraf",
-				Email:    "admin@logikraf.id",
-				Password: string(hashed),
-				Role:     "admin",
-				Tenant:   "logikraf",
-			}
-			if err := DB.Create(&admin).Error; err == nil {
-				log.Println("Default admin user seeded: admin@logikraf.id / admin123")
-			}
-		}
+	email := os.Getenv("ADMIN_BOOTSTRAP_EMAIL")
+	password := os.Getenv("ADMIN_BOOTSTRAP_PASSWORD")
+	if email == "" || password == "" {
+		return
 	}
+	var count int64
+	DB.Model(&User{}).Where("email = ?", email).Count(&count)
+	if count > 0 {
+		return
+	}
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("admin bootstrap: hash failed: %v", err)
+		return
+	}
+	admin := User{
+		Name:     "Admin Logikraf",
+		Email:    email,
+		Password: string(hashed),
+		Role:     "admin",
+		Tenant:   "logikraf",
+	}
+	if err := DB.Create(&admin).Error; err != nil {
+		log.Printf("admin bootstrap: create failed: %v", err)
+		return
+	}
+	log.Printf("Admin bootstrap user created: %s", email)
 }

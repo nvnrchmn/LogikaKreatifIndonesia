@@ -11,8 +11,8 @@ func CreatePackage(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&p); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
 	}
-	if p.Features == "" {
-		p.Features = "[]"
+	if len(p.Features) == 0 {
+		p.Features = model.StringList{}
 	}
 	if err := model.DB.Create(&p).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})

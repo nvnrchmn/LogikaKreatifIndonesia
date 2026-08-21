@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { auth } from '../../lib/api'
 
 interface Order {
   id: number
@@ -18,7 +19,7 @@ export default function ClientDashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch('/api/orders', { headers: auth() })
       .then(r => (r.ok ? r.json() : []))
       .then((d: Order[]) => {
         setOrders(Array.isArray(d) ? d : [])
@@ -218,7 +219,7 @@ export default function ClientDashboardPage() {
           <p className="text-xs text-text-muted mt-1">Konsultasikan langsung dengan tim engineer Logikraf via WhatsApp resmi.</p>
         </div>
         <a
-          href="https://wa.me/6281234567890"
+          href="https://wa.me/628983342429"
           target="_blank"
           rel="noreferrer"
           className="btn-primary text-xs py-2.5 px-5 shadow-sm whitespace-nowrap"

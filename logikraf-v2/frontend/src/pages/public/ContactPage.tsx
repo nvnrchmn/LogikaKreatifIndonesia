@@ -38,7 +38,7 @@ export default function ContactPage() {
       .catch(() => {})
   }, [])
 
-  const contactWhatsapp = settings.contact_whatsapp || '+62 812-3456-7890'
+  const contactWhatsapp = settings.contact_whatsapp || '+62 898 3342 429'
   const contactEmail = settings.contact_email || 'support@logikraf.id'
   const contactHours = settings.contact_hours || 'Senin – Jumat, pukul 09:00 – 18:00 WIB'
   const contactAddress = settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
@@ -168,7 +168,7 @@ export default function ContactPage() {
 
                 <div className="relative z-10 pt-8 mt-8 border-t border-white/10">
                   <a
-                    href={`https://wa.me/${cleanWaNumber || '6281234567890'}`}
+                    href={`https://wa.me/${cleanWaNumber || '628983342429'}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-lg text-sm"

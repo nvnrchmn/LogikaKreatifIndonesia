@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofiber/fiber/v3"
 	"github.com/glebarez/sqlite"
+	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
-	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}); err != nil {
+	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}, &model.Project{}, &model.Client{}); err != nil {
 		panic(err)
 	}
 	model.DB = db
@@ -32,6 +32,11 @@ func TestMain(m *testing.M) {
 	app.Get("/api/transactions/:id", GetTransactionByID)
 	app.Post("/api/transactions", CreateTransaction)
 	app.Get("/api/reports/finance", GetFinanceReport)
+	app.Get("/api/projects", GetProjects)
+	app.Get("/api/projects/:id", GetProjectByID)
+	app.Post("/api/projects", CreateProject)
+	app.Put("/api/projects/:id", UpdateProject)
+	app.Delete("/api/projects/:id", DeleteProject)
 
 	os.Exit(m.Run())
 }
