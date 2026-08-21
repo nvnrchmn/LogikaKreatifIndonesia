@@ -17,12 +17,10 @@ services:
     networks: [app]
 
   backend:
-    build:
-      context: .
-      dockerfile: Containerfile
+    image: localhost/logikraf_backend:sprint1
     container_name: logikraf-backend
     restart: unless-stopped
-    env_file: ./src/.env
+    env_file: /srv/sites/logikraf/src/.env
     depends_on:
       db:
         condition: service_healthy
