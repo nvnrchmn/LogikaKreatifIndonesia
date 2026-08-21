@@ -67,6 +67,10 @@ func main() {
 		Max:        15,
 		Expiration: 1 * time.Minute,
 	})
+	registerLimiter := limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 1 * time.Hour,
+	})
 
 	app.Get("/health", func(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
@@ -144,6 +148,16 @@ func main() {
 	api.Get("/orders", auth.AuthMiddleware(), handler.GetOrders)
 	api.Get("/tickets", handler.GetTickets)
 	api.Post("/auth/login", loginLimiter, auth.Login)
+	// Client self-registration (invite-code based)
+	api.Post("/client/register", registerLimiter, handler.RegisterClient)
+
+	// Client Portal API - authenticated, client-or-admin only
+	clientAPI := api.Group("/client", auth.AuthMiddleware(), auth.ClientOnly())
+	clientAPI.Get("/dashboard", handler.ClientDashboard)
+	clientAPI.Get("/projects", handler.ClientProjects)
+	clientAPI.Get("/invoices", handler.ClientInvoices)
+	clientAPI.Get("/tickets", handler.ClientTickets)
+	clientAPI.Post("/tickets", handler.CreateClientTicket)
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans/iPaymu)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)
