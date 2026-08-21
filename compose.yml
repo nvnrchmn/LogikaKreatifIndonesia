@@ -17,7 +17,7 @@ services:
     networks: [app]
 
   backend:
-    image: localhost/logikraf_backend:sprint1
+    image: localhost/logikraf_backend:sprint2
     container_name: logikraf-backend
     restart: unless-stopped
     env_file: /srv/sites/logikraf/src/.env
