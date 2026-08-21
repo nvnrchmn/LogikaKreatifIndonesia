@@ -1,11 +1,25 @@
 package handler
 
 import (
+	"errors"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v3"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 )
+
+// isDuplicateKey reports whether err is a MySQL/SQLite unique-constraint violation.
+func isDuplicateKey(err error) bool {
+	if err == nil {
+		return false
+	}
+	var me *mysql.MySQLError
+	if ok := errors.As(err, &me); ok {
+		return me.Number == 1062
+	}
+	return strings.Contains(strings.ToLower(err.Error()), "unique constraint")
+}
 
 // clientIDForUser resolves the Client record linked to the authenticated user.
 // Admin users may not have a linked client; client users must have one.
@@ -127,9 +141,11 @@ func CreateClientTicket(c fiber.Ctx) error {
 			return c.Status(404).JSON(fiber.Map{"error": "client not found"})
 		}
 		var cnt int64
-		model.DB.Model(&model.Order{}).
+		if err := model.DB.Model(&model.Order{}).
 			Where("id = ? AND client_id = ?", *input.OrderID, clientID).
-			Count(&cnt)
+			Count(&cnt).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 		if cnt == 0 {
 			return c.Status(400).JSON(fiber.Map{"error": "invalid order reference"})
 		}

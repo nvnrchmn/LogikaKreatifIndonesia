@@ -121,7 +121,9 @@ func RegisterClient(c fiber.Ctx) error {
 	}
 
 	var count int64
-	model.DB.Model(&model.User{}).Where("email = ?", req.Email).Count(&count)
+	if err := model.DB.Model(&model.User{}).Where("email = ?", req.Email).Count(&count).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	if count > 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "email already registered"})
 	}
@@ -143,6 +145,9 @@ func RegisterClient(c fiber.Ctx) error {
 	}
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
+		if isDuplicateKey(err) {
+			return c.Status(400).JSON(fiber.Map{"error": "email already registered"})
+		}
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	// Atomically consume the invite code: only succeeds if still unused.
