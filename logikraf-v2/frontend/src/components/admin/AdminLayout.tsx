@@ -14,6 +14,7 @@ const navSections = [
     items: [
       { label: 'Portfolios', path: '/admin/portfolios', icon: WorkIcon },
       { label: 'Packages', path: '/admin/packages', icon: ShoppingBagIcon },
+      { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
       { label: 'Blog', path: '/admin/blog', icon: ArticleIcon },
       { label: 'Testimonials', path: '/admin/testimonials', icon: RateReviewIcon },
     ],

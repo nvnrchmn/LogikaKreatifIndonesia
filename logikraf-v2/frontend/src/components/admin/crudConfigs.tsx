@@ -195,6 +195,59 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       },
     ],
   },
+  templates: {
+    resource: 'templates',
+    title: 'Template Proyek',
+    endpoint: '/api/templates',
+    emptyRow: 'Belum ada template proyek.',
+    columns: [
+      {
+        id: 'name',
+        label: 'Nama Template',
+        render: (r: any) => (
+          <div>
+            <span className="font-bold text-text-main">{r.name}</span>
+            {r.repo_url && (
+              <a href={r.repo_url} target="_blank" rel="noreferrer" className="block text-[11px] text-blue-600 hover:underline">
+                {r.repo_url}
+              </a>
+            )}
+          </div>
+        ),
+      },
+      {
+        id: 'package_id',
+        label: 'ID Paket',
+        render: (r: any) => <span className="font-mono text-xs">{r.package_id || '—'}</span>,
+      },
+      {
+        id: 'artifact_key',
+        label: 'Kunci Artifact S3',
+        render: (r: any) => <span className="font-mono text-[11px] text-text-muted">{r.artifact_key || '—'}</span>,
+      },
+      {
+        id: 'is_active',
+        label: 'Status',
+        render: (r: any) => renderActiveBadge(r.is_active),
+      },
+    ],
+    formFields: [
+      { name: 'name', label: 'Nama Template', required: true },
+      { name: 'package_id', label: 'ID Paket Terkait', type: 'number', min: 0 },
+      { name: 'repo_url', label: 'URL Repositori GitHub' },
+      { name: 'artifact_key', label: 'Kunci Artifact S3 (.tar.gz)', required: true },
+      { name: 'description', label: 'Deskripsi', type: 'textarea', rows: 3 },
+      {
+        name: 'is_active',
+        label: 'Status',
+        type: 'select',
+        options: [
+          { value: '1', label: 'Aktif' },
+          { value: '0', label: 'Nonaktif' },
+        ],
+      },
+    ],
+  },
   blog: {
     resource: 'blog',
     title: 'Blog & Artikel',
