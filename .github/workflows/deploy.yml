@@ -12,17 +12,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.25'
 
+      # Build frontend
+      - name: Build frontend
+        run: |
+          cd logikraf-v2/frontend
+          npm ci
+          npm run build
+
+      # Build Go binary
       - name: Build Go binary
         run: |
           cd logikraf-v2
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/logikraf-server ./cmd/server/
 
-      - name: Deploy to VPS via SSH
+      # Upload artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            logikraf-v2/frontend/dist/
+            logikraf-v2/bin/
+
+      # Deploy to VPS via SSH
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -31,5 +54,4 @@ jobs:
           script: |
             cd /www/wwwroot/logikraf.id
             git pull origin main
-            cd logikraf-v2/frontend && npm ci && npm run build && cd ../..
             sudo systemctl restart logikraf-server
