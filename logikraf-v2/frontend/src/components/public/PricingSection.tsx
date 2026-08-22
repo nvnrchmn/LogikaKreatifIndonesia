@@ -4,21 +4,25 @@ interface Pkg {
   id: number
   name: string
   tagline: string
-  features: string | string[] // newline-separated or JSON array from API
+  features: string | string[]
   color: string
   is_featured: boolean
   price: number
   strike_price?: number
+  formatted_price?: string
 }
 
 const colorFor = (name: string) =>
   name.includes('Starter') ? '#34C759' : name.includes('Business') ? '#0052FF' : '#FF9500'
 
+const fmt = (n: number) => `Rp ${Number(n || 0).toLocaleString('id-ID')}`
+
 export default function PricingSection() {
   const [packages, setPackages] = useState<Pkg[]>([])
-  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [gateways, setGateways] = useState<{ id: string; name: string }[]>([])
   const [selectedPkg, setSelectedPkg] = useState<Pkg | null>(null)
-  const [form, setForm] = useState({ name: '', email: '', phone: '' })
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', note: '' })
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
@@ -27,6 +31,10 @@ export default function PricingSection() {
       .then((r) => r.json())
       .then((d) => setPackages(Array.isArray(d) ? d : []))
       .catch(() => setPackages([]))
+    fetch('/api/payment-gateways')
+      .then((r) => r.json())
+      .then((d) => setGateways(Array.isArray(d) ? d.map((g: any) => ({ id: g.id, name: g.name })) : []))
+      .catch(() => setGateways([]))
   }, [])
 
   const openCheckout = (pkg: Pkg) => {
@@ -40,6 +48,8 @@ export default function PricingSection() {
     if (!selectedPkg) return
     setBusy(true)
     setErr('')
+    const gw = gateways.length > 0 ? gateways[0] : { id: 'ipaymu', name: 'iPaymu' }
+    const endpoint = gw.id === 'xendit' ? '/api/payment/xendit/invoice' : `/api/payment/${gw.id}/snap`
     const payload = {
       order_id: `LK-${Date.now()}-${selectedPkg.id}`,
       amount: Number(selectedPkg.price),
@@ -51,14 +61,14 @@ export default function PricingSection() {
       paymentChannel: 'qris',
     }
     try {
-      const r = await fetch('/api/payment/ipaymu/snap', {
+      const r = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await r.json()
       if (!r.ok) throw new Error(data?.error || data?.Message || 'Gagal memproses pembayaran.')
-      const url = data.redirect_url || data.invoice_url || data.payment_url || data.url
+      const url = data.redirect_url || data.invoice_url || data.payment_url || data.Data?.Url || data.url
       if (url) window.location.href = url
       else throw new Error('Tautan pembayaran tidak ditemukan.')
     } catch (e: any) {
@@ -100,9 +110,9 @@ export default function PricingSection() {
                 </ul>
                 {p.price > 0 && (
                   <div className="mt-4 text-center">
-                    <span className="text-2xl font-bold text-gray-900">Rp{p.price.toLocaleString('id-ID')}</span>
+                    <span className="text-2xl font-bold text-gray-900">{p.formatted_price || fmt(p.price)}</span>
                     {p.strike_price > 0 && (
-                      <span className="ml-2 text-sm text-gray-400 line-through">Rp{p.strike_price.toLocaleString('id-ID')}</span>
+                      <span className="ml-2 text-sm text-gray-400 line-through">{fmt(p.strike_price)}</span>
                     )}
                   </div>
                 )}
@@ -131,44 +141,100 @@ export default function PricingSection() {
       </div>
 
       {checkoutOpen && selectedPkg && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setCheckoutOpen(false)}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-1">Pesan {selectedPkg.name}</h3>
-            <p className="text-sm text-gray-500 mb-4">Rp{selectedPkg.price.toLocaleString('id-ID')} · Pembayaran QRIS</p>
-            <form onSubmit={handlePay} className="space-y-3">
-              <input
-                required placeholder="Nama Lengkap"
-                className="w-full border rounded-xl px-3 py-2 text-sm"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-              <input
-                required type="email" placeholder="Email"
-                className="w-full border rounded-xl px-3 py-2 text-sm"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-              <input
-                required placeholder="No. WhatsApp"
-                className="w-full border rounded-xl px-3 py-2 text-sm"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
-              {err && <p className="text-xs text-red-600">{err}</p>}
-              <button
-                type="submit"
-                disabled={busy}
-                className="w-full bg-blue-600 text-white font-semibold py-2 rounded-xl disabled:opacity-60"
-              >
-                {busy ? 'Memproses…' : 'Bayar Sekarang'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setCheckoutOpen(false)}
-                className="w-full text-sm text-gray-500 py-1"
-              >
-                Batal
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => setCheckoutOpen(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-700 text-lg font-bold p-1"
+            >
+              ✕
+            </button>
+
+            <div className="mb-6">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 block mb-1">
+                Konfirmasi Pembayaran
+              </span>
+              <h3 className="text-xl font-extrabold text-gray-900">Pesan {selectedPkg.name}</h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Lengkapi identitas PIC pemesan untuk penerbitan faktur dan alur pembayaran QRIS.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between mb-6">
+              <div>
+                <p className="text-xs font-bold text-gray-900">{selectedPkg.name}</p>
+                <p className="text-[11px] text-gray-500 font-mono">Metode: QRIS Nasional (iPaymu)</p>
+              </div>
+              <div className="text-right">
+                <p className="font-mono font-extrabold text-base text-emerald-700">
+                  {selectedPkg.formatted_price || fmt(selectedPkg.price)}
+                </p>
+                <span className="text-[10px] text-gray-500">Termasuk PPN &amp; Server</span>
+              </div>
+            </div>
+
+            {err && (
+              <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">{err}</div>
+            )}
+
+            <form onSubmit={handlePay} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-900 mb-1 block">Nama Lengkap PIC *</label>
+                <input
+                  type="text" required
+                  className="w-full border rounded-xl px-3 py-2 text-sm"
+                  placeholder="Budi Santoso"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-900 mb-1 block">Email Aktif *</label>
+                  <input
+                    type="email" required
+                    className="w-full border rounded-xl px-3 py-2 text-sm"
+                    placeholder="budi@perusahaan.com"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-900 mb-1 block">WhatsApp / No HP *</label>
+                  <input
+                    type="tel" required
+                    className="w-full border rounded-xl px-3 py-2 text-sm font-mono"
+                    placeholder="08123456789"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-900 mb-1 block">Catatan (opsional)</label>
+                <input
+                  type="text"
+                  className="w-full border rounded-xl px-3 py-2 text-sm"
+                  placeholder="Tambahan informasi pesanan"
+                  value={form.note}
+                  onChange={(e) => setForm({ ...form, note: e.target.value })}
+                />
+              </div>
+
+              <div className="pt-4 border-t border-gray-200 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
+                  <span>🔒</span>
+                  <span>Transaksi Terenkripsi SSL</span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="bg-blue-600 text-white text-xs font-semibold py-2.5 px-6 rounded-xl disabled:opacity-60"
+                >
+                  {busy ? 'Memproses QRIS...' : 'Lanjut Bayar QRIS →'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
