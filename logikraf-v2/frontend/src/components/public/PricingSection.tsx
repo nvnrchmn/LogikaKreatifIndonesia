@@ -17,12 +17,58 @@ const colorFor = (name: string) =>
 
 export default function PricingSection() {
   const [packages, setPackages] = useState<Pkg[]>([])
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
+  const [selectedPkg, setSelectedPkg] = useState<Pkg | null>(null)
+  const [form, setForm] = useState({ name: '', email: '', phone: '' })
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+
   useEffect(() => {
     fetch('/api/packages')
       .then((r) => r.json())
       .then((d) => setPackages(Array.isArray(d) ? d : []))
       .catch(() => setPackages([]))
   }, [])
+
+  const openCheckout = (pkg: Pkg) => {
+    setSelectedPkg(pkg)
+    setErr('')
+    setCheckoutOpen(true)
+  }
+
+  const handlePay = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedPkg) return
+    setBusy(true)
+    setErr('')
+    const payload = {
+      order_id: `LK-${Date.now()}-${selectedPkg.id}`,
+      amount: Number(selectedPkg.price),
+      first_name: form.name,
+      email: form.email,
+      phone: form.phone,
+      description: `Paket ${selectedPkg.name} - Logikraf`,
+      paymentMethod: 'qris',
+      paymentChannel: 'qris',
+    }
+    try {
+      const r = await fetch('/api/payment/ipaymu/snap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await r.json()
+      if (!r.ok) throw new Error(data?.error || data?.Message || 'Gagal memproses pembayaran.')
+      const url = data.redirect_url || data.invoice_url || data.payment_url || data.url
+      if (url) window.location.href = url
+      else throw new Error('Tautan pembayaran tidak ditemukan.')
+    } catch (e: any) {
+      setErr(e.message || 'Gagal memproses pembayaran. Hubungi admin via WhatsApp.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   if (!packages.length) return null
   return (
     <section className="py-16 bg-gray-50">
@@ -62,10 +108,17 @@ export default function PricingSection() {
                   </div>
                 )}
                 <div className="mt-4 flex flex-col gap-2">
+                  <button
+                    onClick={() => openCheckout(p)}
+                    className="block text-center text-white font-semibold py-2 rounded-xl"
+                    style={{ backgroundColor: color }}
+                  >
+                    Lanjut Bayar
+                  </button>
                   <Link
                     to="/kontak"
                     className="block text-center text-white font-semibold py-2 rounded-xl"
-                    style={{ backgroundColor: color }}
+                    style={{ backgroundColor: color, opacity: 0.85 }}
                   >
                     Pesan Sekarang
                   </Link>
@@ -84,6 +137,50 @@ export default function PricingSection() {
           })}
         </div>
       </div>
+
+      {checkoutOpen && selectedPkg && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setCheckoutOpen(false)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-1">Bayar {selectedPkg.name}</h3>
+            <p className="text-sm text-gray-500 mb-4">Rp{selectedPkg.price.toLocaleString('id-ID')} · Pembayaran QRIS</p>
+            <form onSubmit={handlePay} className="space-y-3">
+              <input
+                required placeholder="Nama Lengkap"
+                className="w-full border rounded-xl px-3 py-2 text-sm"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+              <input
+                required type="email" placeholder="Email"
+                className="w-full border rounded-xl px-3 py-2 text-sm"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+              <input
+                required placeholder="No. WhatsApp"
+                className="w-full border rounded-xl px-3 py-2 text-sm"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
+              {err && <p className="text-xs text-red-600">{err}</p>}
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full bg-blue-600 text-white font-semibold py-2 rounded-xl disabled:opacity-60"
+              >
+                {busy ? 'Memproses…' : 'Bayar Sekarang'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCheckoutOpen(false)}
+                className="w-full text-sm text-gray-500 py-1"
+              >
+                Batal
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
