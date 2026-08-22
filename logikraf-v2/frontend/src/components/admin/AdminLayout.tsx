@@ -3,6 +3,12 @@ import { useState, useEffect } from 'react'
 import { NotificationBell } from './NotificationBell'
 
 // Grouped nav — Nielsen #6 (recognition over recall): scannable sections beat a flat 19-item list.
+//
+// The sidebar is split by BUSINESS LINE, not by data type, because this app hosts two
+// different products and mixing them made the menu unreadable:
+//   1. Software house operations — the day-to-day work (sell -> pipeline -> deliver -> get paid)
+//   2. Payment service (multi-tenant) — reselling payment infrastructure to other tenants
+// Grouping by line keeps daily work at the top and parks the second product until it has tenants.
 const navSections = [
   {
     title: 'Utama',
@@ -11,45 +17,60 @@ const navSections = [
     ],
   },
   {
-    title: 'Konten',
+    // Ordered to mirror the real funnel: a lead becomes a client, a client places an
+    // order, an order becomes a project.
+    title: 'Pipeline & Pengerjaan',
+    hint: 'Leads → Clients → Orders → Projects',
+    items: [
+      { label: 'Leads', path: '/admin/leads', icon: FolderIcon },
+      { label: 'Clients', path: '/admin/clients', icon: PeopleIcon },
+      { label: 'Orders', path: '/admin/orders', icon: OrdersNavIcon },
+      { label: 'Projects', path: '/admin/projects', icon: WorkIcon },
+    ],
+  },
+  {
+    title: 'Uang Masuk',
+    hint: 'Tagihan & pembayaran klien',
+    items: [
+      { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
+      { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
+      { label: 'Reports', path: '/admin/reports', icon: ChartIcon },
+    ],
+  },
+  {
+    title: 'Website & Jualan',
+    hint: 'Tampil di situs publik',
     items: [
       { label: 'Portfolios', path: '/admin/portfolios', icon: WorkIcon },
       { label: 'Packages', path: '/admin/packages', icon: ShoppingBagIcon },
-      { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
       { label: 'Blog', path: '/admin/blog', icon: ArticleIcon },
       { label: 'Testimonials', path: '/admin/testimonials', icon: RateReviewIcon },
     ],
   },
   {
-    title: 'Relasi',
+    title: 'Layanan Klien',
     items: [
-      { label: 'Clients', path: '/admin/clients', icon: PeopleIcon },
-      { label: 'Projects', path: '/admin/projects', icon: WorkIcon },
-      { label: 'Leads', path: '/admin/leads', icon: FolderIcon },
+      { label: 'Tickets', path: '/admin/tickets', icon: HelpIcon },
     ],
   },
   {
-    title: 'Keuangan',
+    // Second product line. Kept intact (tenants are planned) but parked below daily work
+    // and collapsed by default so it stops competing for attention while tenants = 0.
+    title: 'Layanan Payment (Multi-Tenant)',
+    hint: 'Produk kedua — untuk tenant lain',
+    defaultCollapsed: true,
     items: [
-      { label: 'Orders', path: '/admin/orders', icon: OrdersNavIcon },
-      { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
-      { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
-      { label: 'Payment Hub', path: '/admin/payment-hub', icon: PaymentHubNavIcon },
       { label: 'Merchant Accounts', path: '/admin/merchant-accounts', icon: MerchantNavIcon },
+      { label: 'Payment Hub', path: '/admin/payment-hub', icon: PaymentHubNavIcon },
       { label: 'Payment Ledger', path: '/admin/payment-ledger', icon: LedgerNavIcon },
       { label: 'Rekonsiliasi', path: '/admin/reconciliation', icon: ReconcileNavIcon },
     ],
   },
   {
-    title: 'Operasional',
-    items: [
-      { label: 'Reports', path: '/admin/reports', icon: ChartIcon },
-      { label: 'Tickets', path: '/admin/tickets', icon: HelpIcon },
-    ],
-  },
-  {
     title: 'Sistem',
+    defaultCollapsed: true,
     items: [
+      { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
       { label: 'Settings', path: '/admin/settings', icon: SettingsIcon },
     ],
   },
@@ -237,8 +258,15 @@ function SidebarContent({ sidebarOpen, collapsed, toggleSection, query, onNaviga
                 onClick={() => toggleSection(section.title)}
                 className="w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-text-light/40 hover:text-text-light/70 transition-colors"
               >
-                <span>{section.title}</span>
-                <svg className={`w-3 h-3 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 9l6 6 6-6" /></svg>
+                <span className="text-left leading-tight">
+                  <span className="block">{section.title}</span>
+                  {section.hint && (
+                    <span className="block normal-case tracking-normal font-normal text-[9px] text-text-light/25 mt-0.5">
+                      {section.hint}
+                    </span>
+                  )}
+                </span>
+                <svg className={`w-3 h-3 shrink-0 transition-transform ${isCollapsed ? '-rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 9l6 6 6-6" /></svg>
               </button>
             )}
             {(!isCollapsed || !sidebarOpen) && (
@@ -265,7 +293,14 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+  // Sections flagged defaultCollapsed start folded so the second product line and
+  // system settings do not compete with daily work. The user can still expand them,
+  // and their choice persists for the session.
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(
+      navSections.filter(s => s.defaultCollapsed).map(s => [s.title, true])
+    )
+  )
   const [query, setQuery] = useState('')
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [paletteQuery, setPaletteQuery] = useState('')
