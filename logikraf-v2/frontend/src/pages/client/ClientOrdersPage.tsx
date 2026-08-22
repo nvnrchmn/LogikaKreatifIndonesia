@@ -19,7 +19,7 @@ export default function ClientOrdersPage() {
   const [expanded, setExpanded] = useState<number | null>(null)
 
   useEffect(() => {
-    fetch('/api/orders', { headers: auth() })
+    fetch('/api/client/orders', { headers: auth() })
       .then(r => (r.ok ? r.json() : []))
       .then((d: Order[]) => {
         setOrders(Array.isArray(d) ? d : [])

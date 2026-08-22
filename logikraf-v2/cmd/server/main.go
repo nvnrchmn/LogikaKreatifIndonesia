@@ -154,6 +154,7 @@ func main() {
 	clientAPI := api.Group("/client", auth.AuthMiddleware(), auth.ClientOnly())
 	clientAPI.Get("/dashboard", handler.ClientDashboard)
 	clientAPI.Get("/projects", handler.ClientProjects)
+	clientAPI.Get("/orders", handler.ClientOrders)
 	clientAPI.Get("/invoices", handler.ClientInvoices)
 	clientAPI.Get("/tickets", handler.ClientTickets)
 	clientAPI.Post("/tickets", handler.CreateClientTicket)

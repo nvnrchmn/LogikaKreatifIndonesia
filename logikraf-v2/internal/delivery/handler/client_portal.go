@@ -87,6 +87,19 @@ func ClientProjects(c fiber.Ctx) error {
 	return c.JSON(items)
 }
 
+// ClientOrders lists only the orders belonging to the logged-in client.
+func ClientOrders(c fiber.Ctx) error {
+	clientID, _, err := clientIDForUser(c)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "client not found"})
+	}
+	var items []model.Order
+	if err := model.DB.Where("client_id = ?", clientID).Order("created_at desc").Find(&items).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	return c.JSON(items)
+}
+
 // ClientInvoices lists only the invoices belonging to the logged-in client's orders.
 func ClientInvoices(c fiber.Ctx) error {
 	clientID, _, err := clientIDForUser(c)
