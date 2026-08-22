@@ -30,7 +30,7 @@ func ClientByUserID(userID uint) (*model.Client, error) {
 
 func GetClients(c fiber.Ctx) error {
 	var items []model.Client
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -76,7 +76,9 @@ func UpdateClient(c fiber.Ctx) error {
 	c1.Phone = input.Phone
 	c1.City = input.City
 	c1.Address = input.Address
-	model.DB.Save(&c1)
+	if err := model.DB.Save(&c1).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(c1)
 }
 

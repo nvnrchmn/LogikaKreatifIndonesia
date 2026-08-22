@@ -77,9 +77,12 @@ func RefundPaymentTransaction(c fiber.Ctx) error {
 	}
 	// ponytail: no provider key (or provider accepted) → record refund in ledger for audit
 	pt.Status = "refunded"
-	model.DB.Save(&pt)
+	if err := model.DB.Save(&pt).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(fiber.Map{"status": "refunded", "order_id": pt.OrderID, "provider": pt.Provider})
 }
+
 // GetReconciliation returns a per-tenant settlement summary from the local ledger.
 // ponytail: provider-side reconciliation (paging API) skipped; this is the
 // authoritative local view Logikraf controls. Add provider pull when audit needs it.
@@ -118,6 +121,7 @@ func ListPaymentTransactions(c fiber.Ctx) error {
 	}
 	return c.JSON(txs)
 }
+
 // the admin's tenant. Logikraf never holds tenant funds; this only records
 // which merchant account is configured and its lifecycle status.
 func ListTenantPaymentAccounts(c fiber.Ctx) error {

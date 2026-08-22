@@ -93,7 +93,9 @@ func CreateXenditInvoice(c fiber.Ctx) error {
 		var acc model.TenantPaymentAccount
 		model.DB.Where("tenant_id = ? AND provider = ?", tenant, "xendit").FirstOrCreate(&acc, model.TenantPaymentAccount{TenantID: tenant, Provider: "xendit"})
 		acc.Status = "ACTIVE"
-		model.DB.Save(&acc)
+		if err := model.DB.Save(&acc).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 		gross := in.Amount
 		providerFee := calcFee(gross, setting("xendit_fee_percent", tenant), setting("xendit_fee_flat", tenant))
 		platformFee := calcFee(gross, setting("platform_fee_percent", tenant), "")
@@ -133,12 +135,12 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 	}
 
 	var in struct {
-		OrderID      string `json:"order_id"`
-		Amount       uint   `json:"amount"`
-		FirstName    string `json:"first_name"`
-		Email        string `json:"email"`
-		Phone        string `json:"phone"`
-		Description  string `json:"description"`
+		OrderID     string `json:"order_id"`
+		Amount      uint   `json:"amount"`
+		FirstName   string `json:"first_name"`
+		Email       string `json:"email"`
+		Phone       string `json:"phone"`
+		Description string `json:"description"`
 	}
 	if err := c.Bind().JSON(&in); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
@@ -163,15 +165,15 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 				"name":     orDefault(in.Description, "Logikraf Package"),
 			},
 		},
-			"customer_details": map[string]any{
-				"first_name": orDefault(in.FirstName, "Customer"),
-				"email":      orDefault(in.Email, "customer@example.com"),
-				"phone":      in.Phone,
-			},
-			"callbacks": map[string]any{
-				"finish_redirect_url": "https://" + c.Host() + "/paket?status=success",
+		"customer_details": map[string]any{
+			"first_name": orDefault(in.FirstName, "Customer"),
+			"email":      orDefault(in.Email, "customer@example.com"),
+			"phone":      in.Phone,
 		},
-		})
+		"callbacks": map[string]any{
+			"finish_redirect_url": "https://" + c.Host() + "/paket?status=success",
+		},
+	})
 
 	req, err := http.NewRequest(http.MethodPost, baseURL+"/snap/v1/transactions", bytes.NewReader(body))
 	if err != nil {
@@ -198,7 +200,9 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 		var acc model.TenantPaymentAccount
 		model.DB.Where("tenant_id = ? AND provider = ?", tenant, "midtrans").FirstOrCreate(&acc, model.TenantPaymentAccount{TenantID: tenant, Provider: "midtrans"})
 		acc.Status = "ACTIVE"
-		model.DB.Save(&acc)
+		if err := model.DB.Save(&acc).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 		// ledger entry
 		gross := in.Amount
 		providerFee := calcFee(gross, setting("midtrans_fee_percent", tenantOf(c)), setting("midtrans_fee_flat", tenantOf(c)))
@@ -218,7 +222,9 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 		if tok, ok := out["token"].(string); ok {
 			pt.ProviderTxID = tok
 		}
-		model.DB.Create(&pt)
+		if err := model.DB.Create(&pt).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 	}
 	return c.Status(resp.StatusCode).JSON(out)
 }
@@ -270,10 +276,14 @@ func upsertTransaction(ref, method, status string, amount uint) {
 		tx.SettledAt = &now
 	}
 	if err != nil {
-		model.DB.Create(&tx)
+		if err := model.DB.Create(&tx).Error; err != nil {
+			return
+		}
 		return
 	}
-	model.DB.Save(&tx)
+	if err := model.DB.Save(&tx).Error; err != nil {
+		return
+	}
 }
 
 // XenditWebhook handles Xendit invoice callbacks.
@@ -313,7 +323,9 @@ func XenditWebhook(c fiber.Ctx) error {
 			pt.Status = "settled"
 			now := time.Now()
 			pt.SettledAt = &now
-			model.DB.Save(&pt)
+			if err := model.DB.Save(&pt).Error; err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "failed"})
+			}
 		}
 		notifySBDigital(ref, "SETTLED")
 	}
@@ -367,7 +379,9 @@ func MidtransWebhook(c fiber.Ctx) error {
 		if status == "settled" {
 			pt.SettledAt = &now
 		}
-		model.DB.Save(&pt)
+		if err := model.DB.Save(&pt).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 	}
 	// legacy generic ledger (kept for backward compat with old orders)
 	upsertTransaction(p.OrderID, "midtrans", status, 0)
@@ -485,7 +499,9 @@ func CreateIpaymuPayment(c fiber.Ctx) error {
 		var acc model.TenantPaymentAccount
 		model.DB.Where("tenant_id = ? AND provider = ?", tenant, "ipaymu").FirstOrCreate(&acc, model.TenantPaymentAccount{TenantID: tenant, Provider: "ipaymu"})
 		acc.Status = "ACTIVE"
-		model.DB.Save(&acc)
+		if err := model.DB.Save(&acc).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 		gross := in.Amount
 		providerFee := calcFee(gross, setting("ipaymu_fee_percent", tenant), setting("ipaymu_fee_flat", tenant))
 		platformFee := calcFee(gross, setting("platform_fee_percent", tenant), "")
@@ -506,7 +522,9 @@ func CreateIpaymuPayment(c fiber.Ctx) error {
 				pt.ProviderTxID = sid
 			}
 		}
-		model.DB.Create(&pt)
+		if err := model.DB.Create(&pt).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
 	}
 	return c.Status(resp.StatusCode).JSON(out)
 }
@@ -545,7 +563,9 @@ func IpaymuWebhook(c fiber.Ctx) error {
 		if err := model.DB.Where("order_id = ? AND tenant_id = ?", p.ReferenceID, tenant).First(&pt).Error; err == nil {
 			pt.Status = "settled"
 			pt.SettledAt = &now
-			model.DB.Save(&pt)
+			if err := model.DB.Save(&pt).Error; err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "failed"})
+			}
 		}
 		model.DB.Model(&model.Order{}).Where("order_number = ?", p.ReferenceID).Update("status", "paid")
 		notifySBDigital(p.ReferenceID, "SETTLED")

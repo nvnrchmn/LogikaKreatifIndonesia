@@ -1,6 +1,14 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiGet } from '../../lib/api'
+import { useQueries } from '@tanstack/react-query'
+import {
+  AppstoreOutlined,
+  FolderOpenOutlined,
+  UsergroupAddOutlined,
+  ShoppingCartOutlined,
+  FileTextOutlined,
+  MessageOutlined
+} from '@ant-design/icons'
 
 type AnyArr = any[]
 
@@ -29,118 +37,47 @@ interface Activity {
 }
 
 export default function AdminDashboardPage() {
-  const [metrics, setMetrics] = useState<Metric[]>([])
-  const [activity, setActivity] = useState<Activity[]>([])
-  const [report, setReport] = useState<any>(null)
-  const [gateways, setGateways] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    setLoading(true)
-    Promise.all([
-      get('/api/packages'),
-      get('/api/portfolios'),
-      get('/api/leads'),
-      get('/api/orders'),
-      get('/api/invoices'),
-      get('/api/testimonials'),
-      apiGet('/api/reports/finance').catch(() => null),
-      apiGet('/api/payment-gateways').catch(() => []),
-    ]).then(([packages, portfolios, leads, orders, invoices, testimonials, finance, gws]) => {
-      setMetrics([
-        {
-          key: 'packages',
-          label: 'Paket',
-          value: len(packages),
-          icon: ServicesIcon,
-          tone: 'text-blue-600',
-          bgTone: 'bg-blue-50 border-blue-100',
-          url: '/admin/packages',
-        },
-        {
-          key: 'portfolios',
-          label: 'Portofolio',
-          value: len(portfolios),
-          icon: PortfoliosIcon,
-          tone: 'text-purple-600',
-          bgTone: 'bg-purple-50 border-purple-100',
-          url: '/admin/portfolios',
-        },
-        {
-          key: 'leads',
-          label: 'Prospek Lead',
-          value: len(leads),
-          icon: LeadsIcon,
-          tone: 'text-amber-600',
-          bgTone: 'bg-amber-50 border-amber-100',
-          url: '/admin/leads',
-        },
-        {
-          key: 'orders',
-          label: 'Pesanan Aktif',
-          value: len(orders),
-          icon: OrdersIcon,
-          tone: 'text-emerald-600',
-          bgTone: 'bg-emerald-50 border-emerald-100',
-          url: '/admin/orders',
-        },
-        {
-          key: 'invoices',
-          label: 'Tagihan Invoice',
-          value: len(invoices),
-          icon: InvoiceIcon,
-          tone: 'text-rose-600',
-          bgTone: 'bg-rose-50 border-rose-100',
-          url: '/admin/invoices',
-        },
-        {
-          key: 'testimonials',
-          label: 'Testimoni',
-          value: len(testimonials),
-          icon: TestimonialsIcon,
-          tone: 'text-cyan-600',
-          bgTone: 'bg-cyan-50 border-cyan-100',
-          url: '/admin/testimonials',
-        },
-      ])
-
-      const acts: Activity[] = []
-      if (Array.isArray(leads)) {
-        leads.slice(0, 3).forEach((l: any) =>
-          acts.push({
-            id: `lead-${l.id}`,
-            type: 'lead',
-            text: `Prospek: ${l.name || l.email || 'Klien Baru'}`,
-            sub: l.company ? `${l.company} • ${l.phone || '-'}` : l.status || 'Baru Masuk',
-            url: '/admin/leads',
-          })
-        )
-      }
-      if (Array.isArray(orders)) {
-        orders.slice(0, 3).forEach((o: any) =>
-          acts.push({
-            id: `ord-${o.id}`,
-            type: 'order',
-            text: `Pesanan #${o.order_number || o.id}`,
-            sub: `${o.project_name || 'Paket Digital'} • Rp ${Number(o.total_amount || 0).toLocaleString('id-ID')}`,
-            url: '/admin/orders',
-          })
-        )
-      }
-      setActivity(acts.slice(0, 6))
-      setReport(finance)
-      setGateways(Array.isArray(gws) ? gws : [])
-      setLoading(false)
-    }).catch(() => setLoading(false))
-  }, [])
-
-  const today = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  const queries = useQueries({
+    queries: [
+      { queryKey: ['adminDash', 'packages'], queryFn: () => get('/api/packages') },
+      { queryKey: ['adminDash', 'portfolios'], queryFn: () => get('/api/portfolios') },
+      { queryKey: ['adminDash', 'leads'], queryFn: () => get('/api/leads') },
+      { queryKey: ['adminDash', 'orders'], queryFn: () => get('/api/orders') },
+      { queryKey: ['adminDash', 'invoices'], queryFn: () => get('/api/invoices') },
+      { queryKey: ['adminDash', 'testimonials'], queryFn: () => get('/api/testimonials') },
+      { queryKey: ['adminDash', 'finance'], queryFn: () => apiGet('/api/reports/finance').catch(() => null) },
+      { queryKey: ['adminDash', 'gateways'], queryFn: () => get('/api/payment-gateways') },
+    ]
   })
 
+  const loading = queries.some(q => q.isLoading)
+  const [pkgQ, portQ, leadsQ, ordQ, invQ, testQ, finQ, gwQ] = queries
+
+  const metrics: Metric[] = [
+    { key: 'packages', label: 'Paket', value: len(pkgQ.data), icon: AppstoreOutlined, tone: 'text-blue-600', bgTone: 'bg-blue-50 border-blue-100', url: '/admin/packages' },
+    { key: 'portfolios', label: 'Portofolio', value: len(portQ.data), icon: FolderOpenOutlined, tone: 'text-purple-600', bgTone: 'bg-purple-50 border-purple-100', url: '/admin/portfolios' },
+    { key: 'leads', label: 'Prospek Lead', value: len(leadsQ.data), icon: UsergroupAddOutlined, tone: 'text-amber-600', bgTone: 'bg-amber-50 border-amber-100', url: '/admin/leads' },
+    { key: 'orders', label: 'Pesanan Aktif', value: len(ordQ.data), icon: ShoppingCartOutlined, tone: 'text-emerald-600', bgTone: 'bg-emerald-50 border-emerald-100', url: '/admin/orders' },
+    { key: 'invoices', label: 'Tagihan Invoice', value: len(invQ.data), icon: FileTextOutlined, tone: 'text-rose-600', bgTone: 'bg-rose-50 border-rose-100', url: '/admin/invoices' },
+    { key: 'testimonials', label: 'Testimoni', value: len(testQ.data), icon: MessageOutlined, tone: 'text-cyan-600', bgTone: 'bg-cyan-50 border-cyan-100', url: '/admin/testimonials' },
+  ]
+
+  const acts: Activity[] = []
+  if (Array.isArray(leadsQ.data)) {
+    leadsQ.data.slice(0, 3).forEach((l: any) => acts.push({
+      id: `lead-${l.id}`, type: 'lead', text: `Prospek: ${l.name || l.email || 'Klien Baru'}`, sub: l.company ? `${l.company} • ${l.phone || '-'}` : l.status || 'Baru Masuk', url: '/admin/leads'
+    }))
+  }
+  if (Array.isArray(ordQ.data)) {
+    ordQ.data.slice(0, 3).forEach((o: any) => acts.push({
+      id: `ord-${o.id}`, type: 'order', text: `Pesanan #${o.order_number || o.id}`, sub: `${o.project_name || 'Paket Digital'} • Rp ${Number(o.total_amount || 0).toLocaleString('id-ID')}`, url: '/admin/orders'
+    }))
+  }
+  const activity = acts.slice(0, 6)
+  const report = finQ.data as any
+  const gateways = (Array.isArray(gwQ.data) ? gwQ.data : []) as any[]
+
+  const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const maxMetric = Math.max(1, ...metrics.map(m => m.value))
   const totalRevenue = report?.total_revenue || 0
 
@@ -354,53 +291,5 @@ export default function AdminDashboardPage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function ServicesIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  )
-}
-
-function PortfoliosIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-2.794 0-5.3-.632-7.274-1.746m0 0A23.987 23.987 0 013 12.255M15 21h-2m-2 0h10M12 17v4m-7.5-3.5l-1.5-1.5m15 1.5l1.5-1.5" />
-    </svg>
-  )
-}
-
-function LeadsIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v14a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-    </svg>
-  )
-}
-
-function OrdersIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-    </svg>
-  )
-}
-
-function InvoiceIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-  )
-}
-
-function TestimonialsIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-    </svg>
   )
 }

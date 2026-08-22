@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('admin@logikraf.id')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login, token, loading: authLoading } = useAuth()

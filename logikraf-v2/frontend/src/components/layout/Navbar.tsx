@@ -12,6 +12,9 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
   const [scrolled, setScrolled] = useState(!isHome || !transparent || forceScrolled)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // H3: Close mobile menu on route change (browser back/forward)
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+
   const isActive = (to: string) => {
     if (to === '/') return pathname === '/'
     return pathname === to || pathname.startsWith(to + '/')
@@ -37,6 +40,9 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
   ]
 
   return (
+    <>
+    {/* H7: Skip-to-content link for keyboard/screen-reader users */}
+    <a href="#main-content" className="skip-to-content">Lewati ke konten utama</a>
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled
         ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-border-minimal'
@@ -186,5 +192,6 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
         </div>
       )}
     </nav>
+    </>
   )
 }

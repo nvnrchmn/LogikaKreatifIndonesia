@@ -53,7 +53,9 @@ func UpdateTemplate(c fiber.Ctx) error {
 	if body.PackageID != 0 {
 		t.PackageID = body.PackageID
 	}
-	model.DB.Save(&t)
+	if err := model.DB.Save(&t).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(t)
 }
 

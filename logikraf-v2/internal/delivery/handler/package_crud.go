@@ -39,12 +39,16 @@ func UpdatePackage(c fiber.Ctx) error {
 	p.IsFeatured = body.IsFeatured
 	p.IsActive = body.IsActive
 	p.SortOrder = body.SortOrder
-	model.DB.Save(&p)
+	if err := model.DB.Save(&p).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(p)
 }
 
 func DeletePackage(c fiber.Ctx) error {
 	id := c.Params("id")
-	model.DB.Delete(&model.Package{}, id)
+	if err := model.DB.Delete(&model.Package{}, id).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.SendStatus(204)
 }

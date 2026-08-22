@@ -23,7 +23,7 @@ export default function Footer() {
       <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-3/4 h-48 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container-narrow py-16 lg:py-20 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
           {/* Company Brand Column */}
           <div className="lg:col-span-5 space-y-6">
             <Link to="/" className="inline-flex items-center gap-3">
@@ -115,7 +115,7 @@ export default function Footer() {
             <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
             <Link to="/syarat-ketentuan" className="hover:text-white transition-colors">Syarat &amp; Ketentuan</Link>
             <Link to="/kebijakan-privasi" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
-            <Link to="/syarat-ketentuan" className="hover:text-white transition-colors">Kebijakan Pengembalian Dana (Refund)</Link>
+            <Link to="/kebijakan-refund" className="hover:text-white transition-colors">Kebijakan Pengembalian Dana (Refund)</Link>
           </div>
         </div>
       </div>

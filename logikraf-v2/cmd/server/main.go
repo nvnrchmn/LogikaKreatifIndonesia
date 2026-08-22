@@ -140,7 +140,6 @@ func main() {
 	api := app.Group("/api")
 	api.Get("/portfolios", handler.GetPortfolios)
 	api.Get("/packages", handler.GetPackages)
-	api.Get("/leads", handler.GetLeads)
 	api.Post("/leads", leadLimiter, handler.CreateLead)
 	api.Get("/posts", handler.GetPosts)
 	api.Get("/posts/:slug", handler.GetPostBySlug)

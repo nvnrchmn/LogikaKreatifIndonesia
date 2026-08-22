@@ -8,7 +8,7 @@ import (
 
 func GetLeads(c fiber.Ctx) error {
 	var items []model.Lead
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -42,7 +42,9 @@ func UpdateLead(c fiber.Ctx) error {
 	l.Notes = input.Notes
 	l.Status = input.Status
 	l.LeadScore = input.LeadScore
-	model.DB.Save(&l)
+	if err := model.DB.Save(&l).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(l)
 }
 

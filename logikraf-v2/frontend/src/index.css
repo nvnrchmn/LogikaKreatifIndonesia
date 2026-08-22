@@ -89,6 +89,16 @@
   .animate-slide-in-left { animation: slideInLeft 0.6s ease-out forwards; }
   .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
   .animate-slide-in-right { animation: slideInRight 0.28s ease-out forwards; }
+
+  /* H1: Loading skeleton pulse */
+  .skeleton {
+    @apply bg-border-minimal/60 rounded-xl animate-pulse;
+  }
+
+  /* H7: Skip-to-content (accessibility) */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-brand-primary focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold;
+  }
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Hero */}
         <section id="beranda" className="relative min-h-[90vh] flex items-center bg-canvas-dark overflow-hidden">
           <div className="absolute inset-0 gradient-radial-hero" />
@@ -26,7 +26,7 @@ export default function HomePage() {
                 </span>
               </div>
 
-              <h1 className="animate-slide-up font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-8">
+              <h1 className="animate-slide-up font-display text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-8">
                 Wujudkan ide digital Anda dengan <span className="text-brand-primary">teknologi terbaik</span>
               </h1>
 
@@ -36,10 +36,10 @@ export default function HomePage() {
 
               <div className="animate-slide-up flex flex-col sm:flex-row items-start gap-4">
                 <a href="#konsultasi" className="btn-primary text-base px-8 py-4 shadow-lg shadow-brand-primary/25">Mulai Proyek Anda</a>
-                <a href="#portofolio" className="btn-secondary !border-white/20 !text-white/80 hover:!bg-white/10 hover:!text-white hover:!border-white/30 text-base px-8 py-4">Lihat Portofolio</a>
+                <a href="#portofolio" className="btn-secondary border-white/20 text-white/80 hover:bg-white/10 hover:text-white hover:border-white/30 text-base px-8 py-4">Lihat Portofolio</a>
               </div>
 
-              <div className="animate-fade-in mt-20 flex flex-wrap items-center gap-x-12 gap-y-6">
+              <div className="animate-fade-in mt-20 flex flex-wrap items-center gap-x-6 sm:gap-x-12 gap-y-6">
                 <div>
                   <span className="block font-display text-3xl font-bold text-white">50+</span>
                   <span className="font-body text-sm text-white/40">Proyek Selesai</span>

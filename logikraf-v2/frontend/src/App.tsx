@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
+import { useEffect } from 'react'
 
 // Public Pages
 import HomePage from './pages/public/HomePage'
@@ -47,6 +48,13 @@ function PageLoader() {
   )
 }
 
+// H1: Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuth()
   if (loading) return <PageLoader />
@@ -66,9 +74,22 @@ function RequireClient({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
+// H10: 404 page
+function NotFoundPage() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-canvas-light text-center p-6">
+      <h1 className="font-display text-7xl font-black text-brand-primary mb-4">404</h1>
+      <p className="text-xl font-semibold text-text-main mb-2">Halaman Tidak Ditemukan</p>
+      <p className="text-text-muted mb-8 max-w-md">Halaman yang Anda cari tidak ada atau telah dipindahkan.</p>
+      <a href="/" className="btn-primary">Kembali ke Beranda</a>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <Suspense fallback={<PageLoader />}>
+      <ScrollToTop />
       <Routes>
       {/* Public */}
       <Route path="/" element={<HomePage />} />
@@ -114,6 +135,8 @@ export default function App() {
         <Route path="tickets" element={<ClientTicketsPage />} />
         <Route path="profile" element={<ClientProfilePage />} />
       </Route>
+      {/* H10: 404 catch-all */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
     </Suspense>
   )

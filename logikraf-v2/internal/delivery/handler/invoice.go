@@ -12,7 +12,7 @@ import (
 
 func GetInvoices(c fiber.Ctx) error {
 	var items []model.Invoice
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -55,7 +55,9 @@ func UpdateInvoice(c fiber.Ctx) error {
 	inv.OrderID = input.OrderID
 	inv.IssueDate = input.IssueDate
 	inv.DueDate = input.DueDate
-	model.DB.Save(&inv)
+	if err := model.DB.Save(&inv).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(inv)
 }
 

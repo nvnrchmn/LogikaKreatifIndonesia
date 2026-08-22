@@ -8,7 +8,7 @@ import (
 
 func GetTransactions(c fiber.Ctx) error {
 	var items []model.Transaction
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -49,7 +49,9 @@ func UpdateTransaction(c fiber.Ctx) error {
 	tx.PaymentMethod = input.PaymentMethod
 	tx.Status = input.Status
 	tx.SettledAt = input.SettledAt
-	model.DB.Save(&tx)
+	if err := model.DB.Save(&tx).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(tx)
 }
 

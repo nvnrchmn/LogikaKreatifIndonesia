@@ -8,7 +8,7 @@ import (
 
 func GetPosts(c fiber.Ctx) error {
 	var items []model.Post
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -61,7 +61,9 @@ func UpdatePost(c fiber.Ctx) error {
 	p.Body = input.Body
 	p.FeaturedImage = input.FeaturedImage
 	p.IsPublished = input.IsPublished
-	model.DB.Save(&p)
+	if err := model.DB.Save(&p).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(p)
 }
 

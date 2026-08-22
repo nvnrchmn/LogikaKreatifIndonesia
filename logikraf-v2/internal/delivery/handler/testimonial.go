@@ -8,7 +8,7 @@ import (
 
 func GetTestimonials(c fiber.Ctx) error {
 	var items []model.Testimonial
-	if err := model.DB.Order("sort_order desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("sort_order desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -41,7 +41,9 @@ func UpdateTestimonial(c fiber.Ctx) error {
 	t.Avatar = input.Avatar
 	t.IsApproved = input.IsApproved
 	t.SortOrder = input.SortOrder
-	model.DB.Save(&t)
+	if err := model.DB.Save(&t).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(t)
 }
 

@@ -8,7 +8,7 @@ import (
 
 func GetTickets(c fiber.Ctx) error {
 	var items []model.Ticket
-	if err := model.DB.Order("created_at desc").Find(&items).Error; err != nil {
+	if err := model.DB.Order("created_at desc").Limit(1000).Find(&items).Error; err != nil { // Max 1000 rows. If dataset grows, implement pagination.
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(items)
@@ -48,7 +48,9 @@ func UpdateTicket(c fiber.Ctx) error {
 	t.Description = input.Description
 	t.Priority = input.Priority
 	t.Status = input.Status
-	model.DB.Save(&t)
+	if err := model.DB.Save(&t).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
 	return c.JSON(t)
 }
 

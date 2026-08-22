@@ -13,7 +13,7 @@ var gatewayPolicies = map[string]string{
 		"Verifikasi pembayaran berlangsung secara otomatis dan real-time dalam hitungan detik. " +
 		"Semua transaksi aman terenkripsi SSL 256-bit dan proses pengembalian dana (refund) diproses sesuai Kebijakan Refund resmi Logikraf.",
 	"midtrans": "Midtrans adalah payment aggregator berlisensi Bank Indonesia yang memproses pembayaran instan melalui QRIS (GoPay, ShopeePay, & seluruh aplikasi perbankan berstandar QRIS).",
-	"xendit": "Xendit adalah penyelenggara sistem pembayaran berlisensi Bank Indonesia yang memproses pembayaran digital melalui QRIS real-time.",
+	"xendit":   "Xendit adalah penyelenggara sistem pembayaran berlisensi Bank Indonesia yang memproses pembayaran digital melalui QRIS real-time.",
 }
 
 func activeGatewayIDs(tenant string) []string {
