@@ -193,6 +193,10 @@ func main() {
 	admin.Post("/packages", handler.CreatePackage)
 	admin.Put("/packages/:id", handler.UpdatePackage)
 	admin.Delete("/packages/:id", handler.DeletePackage)
+	admin.Get("/templates", handler.GetTemplates)
+	admin.Post("/templates", handler.CreateTemplate)
+	admin.Put("/templates/:id", handler.UpdateTemplate)
+	admin.Delete("/templates/:id", handler.DeleteTemplate)
 
 	admin.Post("/orders", handler.CreateOrder)
 	admin.Put("/orders/:id", handler.UpdateOrder)
