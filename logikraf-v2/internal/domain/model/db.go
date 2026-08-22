@@ -41,6 +41,7 @@ func Connect() error {
 		&Setting{},
 		&TenantPaymentAccount{},
 		&Tenant{},
+		&ProjectTemplate{},
 		&Plan{},
 		&Entitlement{},
 		&Page{},
