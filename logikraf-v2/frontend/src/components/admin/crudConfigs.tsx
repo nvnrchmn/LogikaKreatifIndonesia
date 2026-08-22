@@ -47,7 +47,11 @@ export interface RowActionDef {
 export interface ResourceConfig {
   resource: string // url slug, e.g. "services"
   title: string // human title, e.g. "Layanan"
-  endpoint: string // api base, e.g. "/api/services"
+  endpoint: string // api base used for LIST, e.g. "/api/services"
+  // Optional separate base for create/update/delete/detail. Use when the list
+  // endpoint is a read-only enriched view (e.g. /api/invoices/enriched) that has
+  // no write handlers of its own.
+  writeEndpoint?: string
   columns: ColumnDef[]
   formFields: FieldDef[]
   emptyRow: string
@@ -515,26 +519,74 @@ export const crudConfigs: Record<string, ResourceConfig> = {
   invoices: {
     resource: 'invoices',
     title: 'Invoices Tagihan',
-    endpoint: '/api/invoices',
+    // Uses the enriched endpoint so each row already carries outstanding balance,
+    // days overdue and the client name computed server-side.
+    endpoint: '/api/invoices/enriched',
+    writeEndpoint: '/api/invoices',
     emptyRow: 'Belum ada invoice dibuat.',
     columns: [
       {
-        id: 'number',
+        id: 'invoice_number',
         label: 'Nomor Invoice',
         render: (r: any) => (
-          <span className="font-mono font-bold text-xs text-text-main px-2.5 py-1 rounded-md bg-canvas-overlay border border-border-minimal">
-            {r.number}
-          </span>
+          <div>
+            <span className="font-mono font-bold text-xs text-text-main px-2.5 py-1 rounded-md bg-canvas-overlay border border-border-minimal">
+              {r.invoice_number}
+            </span>
+            {r.client_name && (
+              <span className="block text-[11px] text-text-muted mt-1">{r.client_name}</span>
+            )}
+          </div>
         ),
       },
       {
-        id: 'amount',
-        label: 'Jumlah Tagihan',
-        render: (r: any) => (
-          <span className="font-mono font-bold text-emerald-700 text-sm">
-            Rp {Number(r.amount || 0).toLocaleString('id-ID')}
-          </span>
-        ),
+        id: 'total',
+        label: 'Tagihan / Terbayar',
+        render: (r: any) => {
+          const total = Number(r.total || 0)
+          const paid = Number(r.paid_amount || 0)
+          const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0
+          return (
+            <div className="min-w-[150px]">
+              <span className="font-mono font-bold text-text-main text-sm">
+                Rp {total.toLocaleString('id-ID')}
+              </span>
+              <span className="block text-[11px] text-text-muted font-mono">
+                terbayar Rp {paid.toLocaleString('id-ID')} ({pct}%)
+              </span>
+              {/* Progress bar makes a partial payment readable at a glance. */}
+              <div className="h-1 mt-1 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${pct >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        id: 'outstanding',
+        label: 'Sisa Tagihan',
+        render: (r: any) => {
+          const out = Number(r.outstanding ?? 0)
+          const late = Number(r.days_overdue ?? 0)
+          if (out === 0) {
+            return <span className="text-emerald-700 font-bold text-xs">Lunas</span>
+          }
+          return (
+            <div>
+              <span className="font-mono font-bold text-rose-700 text-sm">
+                Rp {out.toLocaleString('id-ID')}
+              </span>
+              {late > 0 && (
+                <span className="block text-[11px] font-bold text-rose-600 mt-0.5">
+                  telat {late} hari
+                </span>
+              )}
+            </div>
+          )
+        },
       },
       {
         id: 'status',
@@ -542,21 +594,33 @@ export const crudConfigs: Record<string, ResourceConfig> = {
         render: (r: any) => {
           const st = String(r.status || 'draft').toLowerCase()
           const colorMap: Record<string, string> = {
-            paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            sent: 'bg-blue-50 text-blue-700 border-blue-200',
             draft: 'bg-gray-100 text-gray-700 border-gray-200',
+            sent: 'bg-blue-50 text-blue-700 border-blue-200',
+            partial: 'bg-amber-50 text-amber-700 border-amber-200',
+            paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
             overdue: 'bg-rose-50 text-rose-700 border-rose-200',
+          }
+          const labelMap: Record<string, string> = {
+            partial: 'dibayar sebagian',
+            paid: 'lunas',
+            overdue: 'jatuh tempo',
           }
           return (
             <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border capitalize ${
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
                 colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
               }`}
             >
-              {r.status || 'draft'}
+              {labelMap[st] || st}
             </span>
           )
         },
+      },
+      {
+        id: 'due_date',
+        label: 'Jatuh Tempo',
+        render: (r: any) =>
+          r.due_date ? new Date(r.due_date).toLocaleDateString('id-ID') : '—',
       },
       {
         id: 'id',
@@ -567,28 +631,64 @@ export const crudConfigs: Record<string, ResourceConfig> = {
             onClick={() => window.open(`/api/invoices/${r.id}/pdf`, '_blank')}
             className="inline-flex items-center gap-1 text-xs font-bold text-brand-primary hover:underline"
           >
-            <span>📄 Unduh PDF</span>
+            <span>Unduh PDF</span>
           </button>
         ),
       },
     ],
+    // Field names must match the Go model json tags (invoice_number/total/notes).
+    // They previously read number/amount, so every manual invoice save failed
+    // validation with "invoice_number required".
     formFields: [
-      { name: 'number', label: 'Nomor Invoice', required: true },
+      { name: 'invoice_number', label: 'Nomor Invoice', required: true },
       { name: 'type', label: 'Jenis Tagihan / Termin' },
-      { name: 'amount', label: 'Jumlah Nominal (IDR)', type: 'number', required: true },
+      { name: 'total', label: 'Jumlah Nominal (IDR)', type: 'number', required: true, min: 0 },
+      { name: 'order_id', label: 'ID Order Terkait', type: 'number', min: 1 },
       {
         name: 'status',
         label: 'Status Pembayaran',
         type: 'select',
+        // partial/paid are omitted on purpose: those are derived from money
+        // received via "Catat Pembayaran", not set by hand.
         options: [
-          { value: 'draft', label: 'Draft' },
+          { value: 'draft', label: 'Draft (Belum dikirim)' },
           { value: 'sent', label: 'Sent (Terkirim ke Klien)' },
-          { value: 'paid', label: 'Paid (Lunas)' },
-          { value: 'overdue', label: 'Overdue (Jatuh Tempo)' },
         ],
       },
-      { name: 'due_date', label: 'Batas Pembayaran (Due Date)' },
+      { name: 'issue_date', label: 'Tanggal Terbit', type: 'date' },
+      { name: 'due_date', label: 'Batas Pembayaran (Due Date)', type: 'date' },
       { name: 'notes', label: 'Catatan Rekening / Instruksi Transfer', type: 'textarea', rows: 3 },
+    ],
+    rowActions: [
+      {
+        id: 'payment',
+        label: 'Catat Pembayaran',
+        // Hidden once nothing is left to collect.
+        visible: (r: any) => Number(r.outstanding ?? 0) > 0,
+        endpoint: '/api/invoices/:id/payment',
+        method: 'POST',
+        tone: 'primary',
+        confirmTitle: 'Catat Pembayaran Masuk',
+        confirmBody: (r: any) =>
+          `Invoice ${r.invoice_number}: tagihan Rp ${Number(r.total || 0).toLocaleString('id-ID')}, sudah terbayar Rp ${Number(r.paid_amount || 0).toLocaleString('id-ID')}. Sisa Rp ${Number(r.outstanding || 0).toLocaleString('id-ID')}. Masukkan nominal yang diterima (boleh sebagian untuk DP).`,
+        fields: [
+          { name: 'amount', label: 'Nominal Diterima (IDR)', type: 'number', required: true, min: 1 },
+          {
+            name: 'payment_method',
+            label: 'Metode Pembayaran',
+            type: 'select',
+            options: [
+              { value: 'transfer', label: 'Transfer Bank' },
+              { value: 'qris', label: 'QRIS' },
+              { value: 'cash', label: 'Tunai' },
+              { value: 'other', label: 'Lainnya' },
+            ],
+          },
+          { name: 'reference', label: 'Referensi / No. Bukti (opsional)' },
+          { name: 'note', label: 'Keterangan (mis. "DP 30%")' },
+        ],
+        successMessage: 'Pembayaran dicatat dan masuk ke ledger transaksi.',
+      },
     ],
   },
   clients: {

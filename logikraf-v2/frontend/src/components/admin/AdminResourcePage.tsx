@@ -98,7 +98,7 @@ function ResourceList({ cfg }: { cfg: any }) {
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`${cfg.endpoint}/${id}`, { method: 'DELETE', headers: auth() })
+      const res = await fetch(`${cfg.writeEndpoint || cfg.endpoint}/${id}`, { method: 'DELETE', headers: auth() })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data?.error || data?.message || 'Gagal menghapus data')
       setDeleteId(null)
@@ -620,15 +620,18 @@ function ResourceForm({ cfg, id, onDone }: { cfg: any; id?: string; onDone: (msg
     })
 
     try {
+      // Writes must target writeEndpoint when the list endpoint is a read-only
+      // enriched view; otherwise POST/PUT would hit a GET-only route.
+      const writeBase = cfg.writeEndpoint || cfg.endpoint
       let res: Response
       if (id) {
-        res = await fetch(`${cfg.endpoint}/${id}`, {
+        res = await fetch(`${writeBase}/${id}`, {
           method: 'PUT',
           headers: auth(),
           body: JSON.stringify(payload),
         })
       } else {
-        res = await fetch(cfg.endpoint, {
+        res = await fetch(writeBase, {
           method: 'POST',
           headers: auth(),
           body: JSON.stringify(payload),

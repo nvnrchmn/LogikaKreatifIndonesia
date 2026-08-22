@@ -618,13 +618,17 @@ func IpaymuWebhook(c fiber.Ctx) error {
 			}
 			model.DB.Create(&tx)
 
-			// Auto-create Invoice (receipt)
+			// Auto-create Invoice (receipt). PaidAmount is set to the full
+			// amount because a QRIS settlement is money already received —
+			// leaving it at 0 would make a settled payment look outstanding
+			// in the receivables report.
 			if orderID > 0 {
 				inv := model.Invoice{
 					OrderID:       &orderID,
 					InvoiceNumber: "INV-" + pt.ProviderTxID[:8] + "-" + strconv.FormatInt(now.Unix(), 10),
 					Type:          "receipt",
 					Total:         pt.GrossAmount,
+					PaidAmount:    pt.GrossAmount,
 					Status:        "paid",
 					IssueDate:     &now,
 					DueDate:       &now,

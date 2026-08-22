@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"fmt"
+	"time"
 
 	"github.com/go-pdf/fpdf"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
@@ -50,11 +51,17 @@ func UpdateInvoice(c fiber.Ctx) error {
 	}
 	inv.InvoiceNumber = input.InvoiceNumber
 	inv.Type = input.Type
-	inv.Status = input.Status
 	inv.Total = input.Total
+	inv.Notes = input.Notes
 	inv.OrderID = input.OrderID
 	inv.IssueDate = input.IssueDate
 	inv.DueDate = input.DueDate
+	// Status is derived from money received, not taken from the form: a manual
+	// edit must not be able to mark an invoice "paid" while a balance remains.
+	// paid_amount is deliberately not writable here — it only moves through
+	// RecordInvoicePayment so every change has a matching ledger entry.
+	inv.Status = input.Status
+	inv.Status = inv.DeriveStatus(time.Now())
 	if err := model.DB.Save(&inv).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
