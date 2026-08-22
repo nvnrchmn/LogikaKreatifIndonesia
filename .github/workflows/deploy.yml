@@ -1,35 +1,38 @@
-name: Deploy logikraf.id
-
+name: Deploy to VPS
 on:
   push:
     branches: [main]
-  workflow_dispatch:
-
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: SSH deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
+          node-version: '20'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+      - name: Build Go binary
+        run: |
+          cd ../backend
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/server ./cmd/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: go-binary
+          path: backend/bin/
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            set -e
-            cd /srv/sites/logikraf/src
+            cd /www/wwwroot/logikraf.id
             git pull origin main
-            # Build the backend+frontend image from source. The Containerfile
-            # compiles both the Go API and the React dist into one image, so no
-            # systemd unit or /www folder is needed — the site is served from
-            # inside the container (podman rootless, no docker daemon).
-            podman build -f Containerfile -t localhost/logikraf_backend:sprint2 logikraf-v2/
-            # Recreate the running container with the new image.
-            podman stop logikraf-backend || true
-            podman rm logikraf-backend || true
-            podman run -d --name logikraf-backend --restart unless-stopped \
-              --network src_app \
-              -p 127.0.0.1:8081:8080 \
-              --env-file /srv/sites/logikraf/src/.env \
-              localhost/logikraf_backend:sprint2
+            sudo systemctl restart logikraf-server
