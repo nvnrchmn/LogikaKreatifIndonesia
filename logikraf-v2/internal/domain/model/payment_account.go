@@ -27,6 +27,9 @@ type PaymentTransaction struct {
 	Provider          string    `gorm:"size:50" json:"provider"`
 	ProviderTxID      string    `gorm:"size:255;index" json:"provider_tx_id"`
 	OrderID           string    `gorm:"size:255" json:"order_id"`
+	ClientName        string    `gorm:"size:255" json:"client_name"`
+	ClientEmail       string    `gorm:"size:255" json:"client_email"`
+	ClientPhone       string    `gorm:"size:50" json:"client_phone"`
 	GrossAmount       uint      `json:"gross_amount"`
 	ProviderFee       uint      `json:"provider_fee"`
 	PlatformFee       uint      `json:"platform_fee"`
