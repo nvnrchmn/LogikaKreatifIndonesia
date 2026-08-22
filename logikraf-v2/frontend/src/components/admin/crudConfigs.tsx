@@ -20,6 +20,30 @@ export interface FieldDef {
   pattern?: string
 }
 
+// A custom per-row action rendered next to Edit/Hapus.
+// Used for workflow transitions that are more than a plain field edit,
+// e.g. moving a project through its status state machine or converting a lead.
+export interface RowActionDef {
+  id: string
+  label: string | ((row: any) => string)
+  // Hide the action for rows where it does not apply (e.g. already converted).
+  visible?: (row: any) => boolean
+  // POST/PUT target. `:id` is replaced with the row id.
+  endpoint: string
+  method?: 'POST' | 'PUT'
+  // Visual weight. 'primary' = brand colour, 'neutral' = subdued.
+  tone?: 'primary' | 'neutral'
+  // Short confirmation copy shown in the modal before firing.
+  confirmTitle: string
+  confirmBody?: string | ((row: any) => string)
+  // Optional fields collected in the modal and sent as the JSON body.
+  fields?: FieldDef[]
+  // Fetch selectable values for a field at open time (e.g. legal next statuses).
+  optionsEndpoint?: string
+  optionsField?: string
+  successMessage?: string
+}
+
 export interface ResourceConfig {
   resource: string // url slug, e.g. "services"
   title: string // human title, e.g. "Layanan"
@@ -27,6 +51,7 @@ export interface ResourceConfig {
   columns: ColumnDef[]
   formFields: FieldDef[]
   emptyRow: string
+  rowActions?: RowActionDef[]
 }
 
 const renderActiveBadge = (val: any) => {
@@ -335,6 +360,7 @@ export const crudConfigs: Record<string, ResourceConfig> = {
             contacted: 'bg-amber-50 text-amber-700 border-amber-200',
             qualified: 'bg-purple-50 text-purple-700 border-purple-200',
             closing: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            converted: 'bg-emerald-100 text-emerald-800 border-emerald-300',
             lost: 'bg-rose-50 text-rose-700 border-rose-200',
           }
           return (
@@ -370,6 +396,21 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       },
       { name: 'lead_score', label: 'Skor Prospek (1 - 100)', type: 'number', min: 0 },
       { name: 'notes', label: 'Catatan Kebutuhan Klien', type: 'textarea', rows: 3 },
+    ],
+    rowActions: [
+      {
+        id: 'convert',
+        label: 'Jadikan Klien',
+        // A lead can only be converted once; the backend also returns 409 on retry.
+        visible: (r: any) => String(r.status || '').toLowerCase() !== 'converted',
+        endpoint: '/api/leads/:id/convert',
+        method: 'POST',
+        tone: 'primary',
+        confirmTitle: 'Konversi Prospek ke Klien',
+        confirmBody: (r: any) =>
+          `Prospek "${r.name}" akan dibuatkan data Klien, dan status lead menjadi "converted". Jika email sudah terdaftar sebagai klien, data yang ada akan dipakai (tidak duplikat).`,
+        successMessage: 'Prospek berhasil dikonversi menjadi klien.',
+      },
     ],
   },
   orders: {
@@ -570,7 +611,31 @@ export const crudConfigs: Record<string, ResourceConfig> = {
     emptyRow: 'Belum ada project.',
     columns: [
       { id: 'name', label: 'Nama Project', render: (r: any) => <span className="font-bold text-text-main">{r.name}</span> },
-      { id: 'status', label: 'Status', render: (r: any) => <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">{String(r.status || '').replace('_', ' ')}</span> },
+      {
+        id: 'status',
+        label: 'Status',
+        render: (r: any) => {
+          const st = String(r.status || 'planning').toLowerCase()
+          const colorMap: Record<string, string> = {
+            planning: 'bg-gray-100 text-gray-700 border-gray-200',
+            in_progress: 'bg-blue-50 text-blue-700 border-blue-200',
+            review: 'bg-purple-50 text-purple-700 border-purple-200',
+            on_hold: 'bg-amber-50 text-amber-700 border-amber-200',
+            completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
+          }
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border capitalize ${
+                colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              {st.replace('_', ' ')}
+            </span>
+          )
+        },
+      },
       { id: 'deadline', label: 'Deadline', render: (r: any) => r.deadline ? new Date(r.deadline).toLocaleDateString('id-ID') : '—' },
       { id: 'live_url', label: 'Live URL', render: (r: any) => r.live_url ? <a href={r.live_url} target="_blank" rel="noreferrer" className="text-brand-primary underline">Buka</a> : '—' },
     ],
@@ -588,6 +653,29 @@ export const crudConfigs: Record<string, ResourceConfig> = {
       { name: 'deadline', label: 'Deadline', type: 'date' },
       { name: 'repo_url', label: 'Repository URL' },
       { name: 'live_url', label: 'Live URL' },
+    ],
+    rowActions: [
+      {
+        id: 'status',
+        label: 'Ubah Status',
+        // Terminal states have no legal next step, so hide the action entirely.
+        visible: (r: any) => !['completed', 'cancelled'].includes(String(r.status || '').toLowerCase()),
+        endpoint: '/api/projects/:id/status',
+        method: 'PUT',
+        tone: 'primary',
+        confirmTitle: 'Ubah Status Project',
+        confirmBody: (r: any) =>
+          `Status sekarang: ${String(r.status || 'planning').replace('_', ' ')}. Pilih status berikutnya yang diizinkan alur kerja.`,
+        // Legal next statuses come from the backend state machine, not a hardcoded list,
+        // so the UI can never offer an illegal transition.
+        optionsEndpoint: '/api/projects/:id/status-options',
+        optionsField: 'status',
+        fields: [
+          { name: 'status', label: 'Status Berikutnya', type: 'select', required: true, options: [] },
+          { name: 'note', label: 'Catatan (opsional)', type: 'textarea', rows: 2 },
+        ],
+        successMessage: 'Status project berhasil diperbarui.',
+      },
     ],
   },
   tickets: {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { crudConfigs, type FieldDef, type ColumnDef } from './crudConfigs'
+import { crudConfigs, type FieldDef, type ColumnDef, type RowActionDef } from './crudConfigs'
 
 const auth = () => ({
   'Content-Type': 'application/json',
@@ -46,6 +46,7 @@ function ResourceList({ cfg }: { cfg: any }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [actionTarget, setActionTarget] = useState<{ action: RowActionDef; row: any } | null>(null)
   const [toast, setToast] = useState(sessionStorage.getItem('crud_toast') || '')
   const [q, setQ] = useState('')
 
@@ -239,6 +240,19 @@ function ResourceList({ cfg }: { cfg: any }) {
                       </td>
                     ))}
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      {(cfg.rowActions || [])
+                        .filter((a: RowActionDef) => (a.visible ? a.visible(item) : true))
+                        .map((a: RowActionDef) => (
+                          <button
+                            key={a.id}
+                            onClick={() => setActionTarget({ action: a, row: item })}
+                            className={`font-semibold text-xs mr-3 active:scale-[0.98] hover:underline ${
+                              a.tone === 'neutral' ? 'text-text-muted' : 'text-emerald-700'
+                            }`}
+                          >
+                            {typeof a.label === 'function' ? a.label(item) : a.label}
+                          </button>
+                        ))}
                       <button
                         onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)}
                         className="text-brand-primary hover:underline font-semibold text-xs mr-3 active:scale-[0.98]"
@@ -291,7 +305,18 @@ function ResourceList({ cfg }: { cfg: any }) {
                     <span className="text-text-main text-right font-medium">{formatCell(c, item)}</span>
                   </div>
                 ))}
-              <div className="flex gap-3 pt-3 mt-1 border-t border-border-minimal justify-end">
+              <div className="flex flex-wrap gap-3 pt-3 mt-1 border-t border-border-minimal justify-end">
+                {(cfg.rowActions || [])
+                  .filter((a: RowActionDef) => (a.visible ? a.visible(item) : true))
+                  .map((a: RowActionDef) => (
+                    <button
+                      key={a.id}
+                      onClick={() => setActionTarget({ action: a, row: item })}
+                      className="bg-emerald-50 text-emerald-700 font-semibold text-xs py-1.5 px-3 rounded-xl hover:bg-emerald-100"
+                    >
+                      {typeof a.label === 'function' ? a.label(item) : a.label}
+                    </button>
+                  ))}
                 <button
                   onClick={() => navigate(`/admin/${cfg.resource}/${item.id}/edit`)}
                   className="btn-secondary text-xs py-1.5 px-3"
@@ -309,6 +334,20 @@ function ResourceList({ cfg }: { cfg: any }) {
           ))
         )}
       </div>
+
+      {/* Row action modal (workflow transitions) */}
+      {actionTarget && (
+        <RowActionModal
+          action={actionTarget.action}
+          row={actionTarget.row}
+          onClose={() => setActionTarget(null)}
+          onDone={(msg: string) => {
+            setActionTarget(null)
+            setToast(msg)
+            load()
+          }}
+        />
+      )}
 
       {/* Confirmation Modal */}
       {deleteId !== null && (
@@ -335,6 +374,172 @@ function ResourceList({ cfg }: { cfg: any }) {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// Modal for a workflow row action. When the action declares `optionsEndpoint`,
+// the selectable values are fetched from the backend at open time so the UI only
+// ever offers transitions the server will actually accept.
+function RowActionModal({
+  action,
+  row,
+  onClose,
+  onDone,
+}: {
+  action: RowActionDef
+  row: any
+  onClose: () => void
+  onDone: (msg: string) => void
+}) {
+  const [form, setForm] = useState<Record<string, any>>({})
+  const [dynamicOptions, setDynamicOptions] = useState<string[] | null>(null)
+  const [loadingOptions, setLoadingOptions] = useState(Boolean(action.optionsEndpoint))
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const url = (tpl: string) => tpl.replace(':id', String(row.id))
+
+  useEffect(() => {
+    if (!action.optionsEndpoint) return
+    let alive = true
+    ;(async () => {
+      try {
+        const res = await fetch(url(action.optionsEndpoint!), { headers: auth() })
+        const data = await res.json().catch(() => ({}))
+        if (!alive) return
+        if (!res.ok) throw new Error(data?.error || 'Gagal memuat pilihan status')
+        const allowed: string[] = Array.isArray(data?.allowed) ? data.allowed : []
+        setDynamicOptions(allowed)
+        if (action.optionsField && allowed.length > 0) {
+          setForm(f => ({ ...f, [action.optionsField!]: allowed[0] }))
+        }
+      } catch (err: any) {
+        if (alive) setError(err?.message || 'Gagal memuat pilihan')
+      } finally {
+        if (alive) setLoadingOptions(false)
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [action.optionsEndpoint, row.id])
+
+  const fieldOptions = (f: FieldDef) => {
+    if (action.optionsField === f.name && dynamicOptions) {
+      return dynamicOptions.map(v => ({ value: v, label: v.replace('_', ' ') }))
+    }
+    return f.options || []
+  }
+
+  const submit = async () => {
+    setBusy(true)
+    setError('')
+    try {
+      const res = await fetch(url(action.endpoint), {
+        method: action.method || 'POST',
+        headers: auth(),
+        body: action.fields && action.fields.length > 0 ? JSON.stringify(form) : undefined,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        // Surface the server's own reason (e.g. illegal transition) instead of a generic failure.
+        const detail = data?.allowed ? ` Status yang diizinkan: ${data.allowed.join(', ')}.` : ''
+        throw new Error((data?.error || 'Aksi gagal dijalankan.') + detail)
+      }
+      onDone(action.successMessage || 'Aksi berhasil dijalankan.')
+    } catch (err: any) {
+      setError(err?.message || 'Aksi gagal dijalankan.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const body =
+    typeof action.confirmBody === 'function' ? action.confirmBody(row) : action.confirmBody
+
+  const noOptionsLeft =
+    Boolean(action.optionsEndpoint) && !loadingOptions && (dynamicOptions?.length ?? 0) === 0
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4 animate-scale-in">
+        <h3 className="font-display font-bold text-text-main text-lg">{action.confirmTitle}</h3>
+        {body && <p className="text-text-muted text-xs leading-relaxed">{body}</p>}
+
+        {loadingOptions && (
+          <p className="text-text-muted text-xs">Memuat pilihan yang tersedia…</p>
+        )}
+
+        {noOptionsLeft && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
+            Tidak ada transisi lanjutan untuk status ini.
+          </p>
+        )}
+
+        {!loadingOptions && !noOptionsLeft &&
+          (action.fields || []).map((f: FieldDef) => (
+            <div key={f.name} className="space-y-1.5">
+              <label htmlFor={`ra-${f.name}`} className="block text-xs font-semibold text-text-main">
+                {f.label}
+                {f.required && <span className="text-red-600"> *</span>}
+              </label>
+              {f.type === 'select' ? (
+                <select
+                  id={`ra-${f.name}`}
+                  value={form[f.name] ?? ''}
+                  onChange={e => setForm({ ...form, [f.name]: e.target.value })}
+                  className="w-full text-sm border border-border-minimal rounded-xl px-3 py-2 bg-white capitalize focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                >
+                  <option value="">— Pilih —</option>
+                  {fieldOptions(f).map(o => (
+                    <option key={o.value} value={o.value} className="capitalize">
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              ) : f.type === 'textarea' ? (
+                <textarea
+                  id={`ra-${f.name}`}
+                  rows={f.rows || 2}
+                  value={form[f.name] ?? ''}
+                  onChange={e => setForm({ ...form, [f.name]: e.target.value })}
+                  className="w-full text-sm border border-border-minimal rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                />
+              ) : (
+                <input
+                  id={`ra-${f.name}`}
+                  type={f.type || 'text'}
+                  value={form[f.name] ?? ''}
+                  onChange={e => setForm({ ...form, [f.name]: e.target.value })}
+                  className="w-full text-sm border border-border-minimal rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                />
+              )}
+            </div>
+          ))}
+
+        {error && (
+          <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>
+        )}
+
+        <div className="flex gap-3 justify-end pt-1">
+          <button onClick={onClose} className="btn-secondary text-xs py-2 px-4" disabled={busy}>
+            Batal
+          </button>
+          <button
+            onClick={submit}
+            disabled={
+              busy ||
+              loadingOptions ||
+              noOptionsLeft ||
+              (action.fields || []).some((f: FieldDef) => f.required && !form[f.name])
+            }
+            className="btn-primary text-xs py-2 px-4 disabled:opacity-50"
+          >
+            {busy ? 'Memproses…' : 'Konfirmasi'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
