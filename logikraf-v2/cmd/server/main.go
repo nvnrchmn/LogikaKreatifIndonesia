@@ -198,6 +198,15 @@ func main() {
 	admin.Put("/templates/:id", handler.UpdateTemplate)
 	admin.Delete("/templates/:id", handler.DeleteTemplate)
 
+	// Payment & Transaction Admin API
+	admin.Get("/payment-transactions", handler.GetPaymentTransactions)
+	admin.Get("/payment-transactions/summary", handler.GetPaymentSummary)
+	admin.Get("/payment-transactions/ledger", handler.GetPaymentLedger)
+	admin.Get("/payment-transactions/:id", handler.GetPaymentTransaction)
+	admin.Post("/payment-transactions/:id/settle", handler.SettlePaymentTransaction)
+	admin.Post("/payment-transactions/:id/create-client", handler.CreateClientFromPayment)
+	admin.Post("/payment-transactions/:id/create-order", handler.CreateOrderFromPayment)
+
 	admin.Post("/orders", handler.CreateOrder)
 	admin.Put("/orders/:id", handler.UpdateOrder)
 	admin.Delete("/orders/:id", handler.DeleteOrder)
