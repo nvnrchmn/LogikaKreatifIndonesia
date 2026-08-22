@@ -16,6 +16,8 @@ type S3Client interface {
 	UploadFile(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, contentType string) (string, error)
 	GetPresignedURL(ctx context.Context, bucketName, objectName string) (string, error)
 	SetPublicReadPolicy(ctx context.Context, bucketName, prefix string) error
+	// DownloadTo fetches objectName from bucketName and writes it to destPath.
+	DownloadTo(ctx context.Context, bucketName, objectName, destPath string) error
 }
 
 type minioClient struct {
@@ -71,6 +73,23 @@ func (m *minioClient) GetPresignedURL(ctx context.Context, bucketName, objectNam
 		return "", err
 	}
 	return url.String(), nil
+}
+
+func (m *minioClient) DownloadTo(ctx context.Context, bucketName, objectName, destPath string) error {
+	obj, err := m.client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		return err
+	}
+	defer obj.Close()
+	f, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(f, obj); err != nil {
+		return err
+	}
+	return nil
 }
 
 // SetPublicReadPolicy makes objects under `prefix` in `bucketName` publicly

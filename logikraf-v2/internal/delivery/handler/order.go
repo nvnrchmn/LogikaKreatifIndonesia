@@ -77,6 +77,9 @@ func CreateOrder(c fiber.Ctx) error {
 	if err := tx.Commit().Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
+	// Best-effort template provisioning; runs async so it never blocks the
+	// order response or rolls back a successful order.
+	go provisionTemplateForOrder(input, project)
 	return c.Status(201).JSON(input)
 }
 
