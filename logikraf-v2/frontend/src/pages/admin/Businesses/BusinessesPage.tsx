@@ -42,12 +42,12 @@ export default function BusinessesPage() {
   const { data: businesses = mockBusinesses, isLoading } = useQuery(['businesses'], () => Promise.resolve(mockBusinesses))
 
   const createMutation = useMutation(
-    async (data: Business) => { console.log('create', data) },
+    async (data: Business) => { /* TODO: wire to API */ },
     { onSuccess: () => { message.success('Created'); setIsModalOpen(false); form.resetFields() } }
   )
 
   const updateMutation = useMutation(
-    async (data: Business) => { console.log('update', data) },
+    async (data: Business) => { /* TODO: wire to API */ },
     { onSuccess: () => { message.success('Updated'); setIsModalOpen(false); setEditingBusiness(null); form.resetFields() } }
   )
 
@@ -70,7 +70,7 @@ export default function BusinessesPage() {
   }
 
   const handleDelete = (id: string) => {
-    console.log('delete', id)
+    /* TODO: wire to DELETE /api/businesses/:id */
     message.success('Deleted')
   }
 

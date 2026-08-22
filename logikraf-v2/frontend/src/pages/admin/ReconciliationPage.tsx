@@ -19,7 +19,7 @@ export default function ReconciliationPage() {
 
   useEffect(() => {
     apiGet('/api/payment-reconciliation')
-      .then(d => setData(d as Recon))
+      .then(d => setData(d as unknown as Recon))
       .catch(() => setData(null))
       .finally(() => setLoading(false))
   }, [])

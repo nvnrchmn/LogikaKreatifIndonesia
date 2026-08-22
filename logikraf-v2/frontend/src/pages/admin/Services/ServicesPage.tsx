@@ -47,12 +47,12 @@ export default function ServicesPage() {
   const { data: services = mockServices, isLoading } = useQuery(['services'], () => Promise.resolve(mockServices))
 
   const createMutation = useMutation({
-    mutationFn: async () => { console.log('create') },
+    mutationFn: async () => { /* TODO: wire to API */ },
     onSuccess: () => { message.success('Created'); setIsModalOpen(false); form.resetFields() },
   })
 
   const updateMutation = useMutation({
-    mutationFn: async () => { console.log('update') },
+    mutationFn: async () => { /* TODO: wire to API */ },
     onSuccess: () => { message.success('Updated'); setIsModalOpen(false); setEditingService(null); form.resetFields() },
   })
 
