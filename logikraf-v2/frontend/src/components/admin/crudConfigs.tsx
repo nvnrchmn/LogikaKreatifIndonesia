@@ -449,9 +449,12 @@ export const crudConfigs: Record<string, ResourceConfig> = {
           const st = String(r.status || 'pending').toLowerCase()
           const colorMap: Record<string, string> = {
             pending: 'bg-amber-50 text-amber-700 border-amber-200',
+            paid: 'bg-teal-50 text-teal-700 border-teal-200',
             active: 'bg-blue-50 text-blue-700 border-blue-200',
+            on_hold: 'bg-orange-50 text-orange-700 border-orange-200',
             completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
             cancelled: 'bg-rose-50 text-rose-700 border-rose-200',
+            refunded: 'bg-purple-50 text-purple-700 border-purple-200',
           }
           return (
             <span
@@ -459,7 +462,7 @@ export const crudConfigs: Record<string, ResourceConfig> = {
                 colorMap[st] || 'bg-gray-100 text-gray-700 border-gray-200'
               }`}
             >
-              {r.status || 'pending'}
+              {st.replace('_', ' ')}
             </span>
           )
         },
@@ -476,12 +479,37 @@ export const crudConfigs: Record<string, ResourceConfig> = {
         type: 'select',
         options: [
           { value: 'pending', label: 'Pending (Menunggu Bayar)' },
+          { value: 'paid', label: 'Paid (Sudah Dibayar)' },
           { value: 'active', label: 'Active (Dalam Pengerjaan)' },
+          { value: 'on_hold', label: 'On Hold (Ditahan)' },
           { value: 'completed', label: 'Completed (Selesai)' },
           { value: 'cancelled', label: 'Cancelled (Dibatalkan)' },
+          { value: 'refunded', label: 'Refunded (Dana Dikembalikan)' },
         ],
       },
       { name: 'milestone_status', label: 'Status Milestone / Termin Pengerjaan' },
+    ],
+    rowActions: [
+      {
+        id: 'status',
+        label: 'Ubah Status',
+        visible: (r: any) =>
+          !['completed', 'cancelled', 'refunded'].includes(String(r.status || '').toLowerCase()),
+        endpoint: '/api/orders/:id/status',
+        method: 'PUT',
+        tone: 'primary',
+        confirmTitle: 'Ubah Status Order',
+        confirmBody: (r: any) =>
+          `Order ${r.order_number || '#' + r.id} sekarang berstatus "${String(r.status || 'pending').replace('_', ' ')}". Memindahkan ke "active" ikut menjalankan project terkait; "cancelled" ikut membatalkannya.`,
+        optionsEndpoint: '/api/orders/:id/status-options',
+        optionsField: 'status',
+        fields: [
+          { name: 'status', label: 'Status Berikutnya', type: 'select', required: true, options: [] },
+          { name: 'milestone_status', label: 'Milestone / Termin (opsional)' },
+          { name: 'note', label: 'Catatan (opsional)', type: 'textarea', rows: 2 },
+        ],
+        successMessage: 'Status order berhasil diperbarui.',
+      },
     ],
   },
   invoices: {
@@ -753,6 +781,27 @@ export const crudConfigs: Record<string, ResourceConfig> = {
           { value: 'pending', label: 'Pending (Sedang Dikerjakan)' },
           { value: 'closed', label: 'Closed (Selesai Diselesaikan)' },
         ],
+      },
+    ],
+    rowActions: [
+      {
+        id: 'status',
+        // A closed ticket can be reopened, so the label reflects what the click will do.
+        label: (r: any) =>
+          String(r.status || '').toLowerCase() === 'closed' ? 'Buka Ulang' : 'Ubah Status',
+        endpoint: '/api/tickets/:id/status',
+        method: 'PUT',
+        tone: 'primary',
+        confirmTitle: 'Ubah Status Tiket',
+        confirmBody: (r: any) =>
+          `Tiket "${r.subject}" sekarang berstatus "${r.status || 'open'}". Pilih status penanganan berikutnya.`,
+        optionsEndpoint: '/api/tickets/:id/status-options',
+        optionsField: 'status',
+        fields: [
+          { name: 'status', label: 'Status Berikutnya', type: 'select', required: true, options: [] },
+          { name: 'note', label: 'Catatan Penanganan (opsional)', type: 'textarea', rows: 2 },
+        ],
+        successMessage: 'Status tiket berhasil diperbarui.',
       },
     ],
   },

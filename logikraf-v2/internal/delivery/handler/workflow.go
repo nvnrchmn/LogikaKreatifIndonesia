@@ -167,3 +167,201 @@ func ConvertLeadToClient(c fiber.Ctx) error {
 		"lead":   lead,
 	})
 }
+
+// orderStatusTransitions maps each order status to the statuses it may move into.
+// "paid" is included because the iPaymu webhook writes it directly on settlement,
+// so it is a real state the admin panel has to be able to move out of.
+var orderStatusTransitions = map[string][]string{
+	"pending":   {"paid", "cancelled"},
+	"paid":      {"active", "refunded", "cancelled"},
+	"active":    {"completed", "on_hold", "cancelled"},
+	"on_hold":   {"active", "cancelled"},
+	"completed": {},
+	"cancelled": {},
+	"refunded":  {},
+}
+
+// GetOrderStatusOptions returns the legal next statuses for an order.
+func GetOrderStatusOptions(c fiber.Ctx) error {
+	id := c.Params("id")
+	var order model.Order
+	if err := model.DB.First(&order, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+	allowed, ok := orderStatusTransitions[order.Status]
+	if !ok {
+		allowed = []string{"pending", "paid", "active", "on_hold", "completed", "cancelled", "refunded"}
+	}
+	return c.JSON(fiber.Map{"current": order.Status, "allowed": allowed})
+}
+
+// UpdateOrderStatus moves an order to a new status, enforcing legal transitions,
+// and keeps the linked project in step when the order becomes active or ends.
+func UpdateOrderStatus(c fiber.Ctx) error {
+	id := c.Params("id")
+	var in struct {
+		Status    string `json:"status"`
+		Milestone string `json:"milestone_status"`
+		Note      string `json:"note"`
+	}
+	if err := c.Bind().JSON(&in); err != nil || in.Status == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "status required"})
+	}
+
+	var order model.Order
+	if err := model.DB.First(&order, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+
+	allowed, known := orderStatusTransitions[order.Status]
+	if !known {
+		if _, ok := orderStatusTransitions[in.Status]; !ok {
+			return c.Status(400).JSON(fiber.Map{"error": "invalid status"})
+		}
+	} else {
+		ok := false
+		for _, s := range allowed {
+			if s == in.Status {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return c.Status(409).JSON(fiber.Map{
+				"error":   "illegal transition",
+				"from":    order.Status,
+				"allowed": allowed,
+			})
+		}
+	}
+
+	prev := order.Status
+	order.Status = in.Status
+	if in.Milestone != "" {
+		order.MilestoneStatus = in.Milestone
+	}
+	if err := model.DB.Save(&order).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+
+	// Keep the linked project consistent with the order lifecycle so the two
+	// modules cannot drift apart (an active order with a project still in planning).
+	var project model.Project
+	if err := model.DB.Where("order_id = ?", order.ID).First(&project).Error; err == nil {
+		now := time.Now()
+		switch in.Status {
+		case "active":
+			if project.Status == "planning" {
+				project.Status = "in_progress"
+				if project.StartDate == nil {
+					project.StartDate = &now
+				}
+				model.DB.Save(&project)
+			}
+		case "cancelled":
+			if project.Status != "completed" {
+				project.Status = "cancelled"
+				model.DB.Save(&project)
+			}
+		}
+	}
+
+	msg := "Order " + order.OrderNumber + " berubah dari " + prev + " ke " + in.Status
+	if in.Note != "" {
+		msg += ". Catatan: " + in.Note
+	}
+	model.DB.Create(&model.Notification{
+		TenantID: "logikraf",
+		Type:     "order_status_changed",
+		Title:    "Status Order Diperbarui",
+		Message:  msg,
+		RefTable: "orders",
+		RefID:    order.ID,
+		IsRead:   true,
+	})
+
+	return c.JSON(order)
+}
+
+// ticketStatusTransitions maps each ticket status to the statuses it may move into.
+// Closed is not terminal: a reopened complaint is a normal support case.
+var ticketStatusTransitions = map[string][]string{
+	"open":     {"pending", "closed"},
+	"pending":  {"open", "closed"},
+	"closed":   {"open"},
+}
+
+// GetTicketStatusOptions returns the legal next statuses for a ticket.
+func GetTicketStatusOptions(c fiber.Ctx) error {
+	id := c.Params("id")
+	var ticket model.Ticket
+	if err := model.DB.First(&ticket, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+	allowed, ok := ticketStatusTransitions[ticket.Status]
+	if !ok {
+		allowed = []string{"open", "pending", "closed"}
+	}
+	return c.JSON(fiber.Map{"current": ticket.Status, "allowed": allowed})
+}
+
+// UpdateTicketStatus moves a ticket to a new status, enforcing legal transitions.
+func UpdateTicketStatus(c fiber.Ctx) error {
+	id := c.Params("id")
+	var in struct {
+		Status string `json:"status"`
+		Note   string `json:"note"`
+	}
+	if err := c.Bind().JSON(&in); err != nil || in.Status == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "status required"})
+	}
+
+	var ticket model.Ticket
+	if err := model.DB.First(&ticket, id).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+	}
+
+	allowed, known := ticketStatusTransitions[ticket.Status]
+	if !known {
+		if _, ok := ticketStatusTransitions[in.Status]; !ok {
+			return c.Status(400).JSON(fiber.Map{"error": "invalid status"})
+		}
+	} else {
+		ok := false
+		for _, s := range allowed {
+			if s == in.Status {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return c.Status(409).JSON(fiber.Map{
+				"error":   "illegal transition",
+				"from":    ticket.Status,
+				"allowed": allowed,
+			})
+		}
+	}
+
+	prev := ticket.Status
+	ticket.Status = in.Status
+	if err := model.DB.Save(&ticket).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+
+	msg := "Tiket \"" + ticket.Subject + "\" berubah dari " + prev + " ke " + in.Status
+	if in.Note != "" {
+		msg += ". Catatan: " + in.Note
+	}
+	model.DB.Create(&model.Notification{
+		TenantID: "logikraf",
+		Type:     "ticket_status_changed",
+		Title:    "Status Tiket Diperbarui",
+		Message:  msg,
+		RefTable: "tickets",
+		RefID:    ticket.ID,
+		IsRead:   true,
+	})
+
+	return c.JSON(ticket)
+}
