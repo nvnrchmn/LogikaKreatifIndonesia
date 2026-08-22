@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { NotificationBell } from './NotificationBell'
 
 // Grouped nav — Nielsen #6 (recognition over recall): scannable sections beat a flat 19-item list.
 const navSections = [
@@ -426,6 +427,9 @@ export default function AdminLayout() {
               <kbd className="text-[10px] font-semibold bg-white text-text-muted px-1.5 py-0.5 rounded border border-border-minimal shadow-2xs">Ctrl K</kbd>
             </button>
             <a href="/" target="_blank" rel="noreferrer" className="p-2 rounded-lg hover:bg-gray-100 text-text-muted" title="Lihat Website"><OpenInNewIcon /></a>
+            
+            {/* Notification Bell */}
+            <NotificationBell />
 
             {/* User dropdown — Nielsen #1: always show who is logged in */}
             <div className="relative">

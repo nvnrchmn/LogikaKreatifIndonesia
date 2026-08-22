@@ -246,6 +246,13 @@ func main() {
 	admin.Put("/settings/:key", handler.SetSetting)
 	admin.Get("/payment-transactions", handler.ListPaymentTransactions)
 
+	// Notification Admin API
+	admin.Get("/notifications", handler.GetNotifications)
+	admin.Get("/notifications/count", handler.GetNotificationCount)
+	admin.Put("/notifications/:id/read", handler.MarkNotificationRead)
+	admin.Put("/notifications/read-all", handler.MarkAllNotificationsRead)
+	admin.Post("/notifications/:id/create-project", handler.CreateProjectFromPayment)
+
 	app.Get("/*", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {

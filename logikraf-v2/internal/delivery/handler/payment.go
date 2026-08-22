@@ -564,20 +564,64 @@ func IpaymuWebhook(c fiber.Ctx) error {
 	}
 	c.Bind().JSON(&p)
 
-	if p.Status == "berhasil" && p.ReferenceID != "" {
-		now := time.Now()
-		var pt model.PaymentTransaction
-		if err := model.DB.Where("order_id = ? AND tenant_id = ?", p.ReferenceID, tenant).First(&pt).Error; err == nil {
-			pt.Status = "settled"
-			pt.SettledAt = &now
-			if err := model.DB.Save(&pt).Error; err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		if p.Status == "berhasil" && p.ReferenceID != "" {
+			now := time.Now()
+			var pt model.PaymentTransaction
+			if err := model.DB.Where("order_id = ? AND tenant_id = ?", p.ReferenceID, tenant).First(&pt).Error; err == nil {
+				pt.Status = "settled"
+				pt.SettledAt = &now
+				if err := model.DB.Save(&pt).Error; err != nil {
+					return c.Status(500).JSON(fiber.Map{"error": "failed"})
+				}
+
+				// Find the Order record (created via CreateOrderFromPayment or manually)
+				var order model.Order
+				orderID := uint(0)
+				if err := model.DB.Where("order_number = ?", p.ReferenceID).First(&order).Error; err == nil {
+					orderID = order.ID
+				}
+
+				// Auto-create Transaction (ledger entry)
+				tx := model.Transaction{
+					OrderID:             orderID,
+					TransactionReference: pt.ProviderTxID,
+					MilestoneName:       pt.InvoiceRef,
+					Amount:              pt.GrossAmount,
+					PaymentMethod:       pt.Provider,
+					Status:              "settled",
+					SettledAt:           &now,
+				}
+				model.DB.Create(&tx)
+
+				// Auto-create Invoice (receipt)
+				if orderID > 0 {
+					inv := model.Invoice{
+						OrderID:       &orderID,
+						InvoiceNumber: "INV-" + pt.ProviderTxID[:8] + "-" + strconv.FormatInt(now.Unix(), 10),
+						Type:          "receipt",
+						Total:         pt.GrossAmount,
+						Status:        "paid",
+						IssueDate:     &now,
+						DueDate:       &now,
+					}
+					model.DB.Create(&inv)
+				}
+
+				// Create Notification for admin
+				notif := model.Notification{
+					TenantID: tenant,
+					Type:     "payment_settled",
+					Title:    "Pembayaran Diterima: " + pt.InvoiceRef,
+					Message:  "Pembayaran " + pt.Provider + " sebesar Rp " + strconv.Itoa(int(pt.GrossAmount)) + " dari " + pt.ClientName + " (" + pt.ClientEmail + ") telah diterima. Buat project sekarang?",
+					RefTable: "payment_transactions",
+					RefID:    pt.ID,
+				}
+				model.DB.Create(&notif)
 			}
+			model.DB.Model(&model.Order{}).Where("order_number = ?", p.ReferenceID).Update("status", "paid")
+			notifySBDigital(p.ReferenceID, "SETTLED")
 		}
-		model.DB.Model(&model.Order{}).Where("order_number = ?", p.ReferenceID).Update("status", "paid")
-		notifySBDigital(p.ReferenceID, "SETTLED")
-	}
-	return c.JSON(fiber.Map{"status": "ok"})
+		return c.JSON(fiber.Map{"status": "ok"})
 }
 
 // ForcePasswordReset resets a user's password to the onboarding default.
