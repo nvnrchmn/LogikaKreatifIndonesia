@@ -19,6 +19,7 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
+	sched "github.com/logikraf/logikraf-v2/pkg/scheduler"
 	"github.com/logikraf/logikraf-v2/pkg/auth"
 )
 
@@ -267,6 +268,19 @@ func main() {
 	admin.Put("/notifications/:id/read", handler.MarkNotificationRead)
 	admin.Put("/notifications/read-all", handler.MarkAllNotificationsRead)
 	admin.Post("/notifications/:id/create-project", handler.CreateProjectFromPayment)
+
+	// Cron Job Management
+	backgroundScheduler := sched.New(model.DB)
+	backgroundScheduler.Register(&sched.InvoiceReminderJob{})
+	backgroundScheduler.Register(&sched.InvoiceStatusRefreshJob{})
+	cronHandler := handler.NewCronHandler(backgroundScheduler)
+	go backgroundScheduler.Start()
+
+	// Admin cron routes
+	admin.Get("/cron/jobs", cronHandler.ListCronJobs)
+	admin.Put("/cron/jobs/:id", cronHandler.UpdateCronJob)
+	admin.Get("/cron/jobs/:id/logs", cronHandler.ListCronJobLogs)
+	admin.Post("/cron/jobs/:key/run", cronHandler.RunCronJob)
 
 	app.Get("/*", func(c fiber.Ctx) error {
 		host := c.Hostname()

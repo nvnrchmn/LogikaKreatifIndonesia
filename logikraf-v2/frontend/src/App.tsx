@@ -31,6 +31,7 @@ const AdminReconciliationPage = lazy(() => import('./pages/admin/ReconciliationP
 const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
 const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
 const AdminReceivablesPage = lazy(() => import('./pages/admin/ReceivablesPage'))
+const AdminCronJobsPage = lazy(() => import('./pages/admin/CronJobsPage'))
 
 // Client Pages (Lazy Loaded)
 const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
@@ -115,6 +116,7 @@ export default function App() {
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="reports" element={<AdminReportsPage />} />
         <Route path="receivables" element={<AdminReceivablesPage />} />
+        <Route path="cron" element={<AdminCronJobsPage />} />
         <Route path="payment-hub" element={<AdminPaymentHubPage />} />
         <Route path="merchant-accounts" element={<AdminTenantPaymentAccountsPage />} />
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
