@@ -47,6 +47,8 @@ export default function ReceivablesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendResult, setSendResult] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -76,6 +78,26 @@ export default function ReceivablesPage() {
       await load()
     } finally {
       setRefreshing(false)
+    }
+  }
+
+  // Sends reminders only for invoices whose cadence falls due today
+  // (3 days before due, on due, then day 1/3/7/14 and every 14 days after).
+  const sendReminders = async () => {
+    setSending(true)
+    setSendResult('')
+    try {
+      const res = await fetch('/api/invoices/send-reminders', { method: 'POST', headers: auth() })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(d?.error || 'Gagal mengirim pengingat')
+      setSendResult(
+        `${d.sent} terkirim, ${d.skipped} dilewati, ${d.failed} gagal (dari ${d.checked} invoice belum lunas).`
+      )
+      await load()
+    } catch (err: any) {
+      setSendResult(err?.message || 'Gagal mengirim pengingat')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -114,14 +136,29 @@ export default function ReceivablesPage() {
             Tagihan yang belum lunas, dikelompokkan berdasarkan lama keterlambatan.
           </p>
         </div>
-        <button
-          onClick={refreshStatuses}
-          disabled={refreshing}
-          className="btn-secondary text-xs py-2 px-4 disabled:opacity-50"
-        >
-          {refreshing ? 'Memperbarui…' : 'Perbarui Status Jatuh Tempo'}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={sendReminders}
+            disabled={sending || d.invoice_count === 0}
+            className="btn-primary text-xs py-2 px-4 disabled:opacity-50"
+          >
+            {sending ? 'Mengirim…' : 'Kirim Pengingat Jatuh Tempo'}
+          </button>
+          <button
+            onClick={refreshStatuses}
+            disabled={refreshing}
+            className="btn-secondary text-xs py-2 px-4 disabled:opacity-50"
+          >
+            {refreshing ? 'Memperbarui…' : 'Perbarui Status Jatuh Tempo'}
+          </button>
+        </div>
       </div>
+
+      {sendResult && (
+        <p className="text-xs bg-blue-50 border border-blue-200 text-blue-800 rounded-xl px-4 py-2.5">
+          {sendResult}
+        </p>
+      )}
 
       {/* Summary: total owed, how much is already late, how much is still on time */}
       <div className="grid gap-4 sm:grid-cols-3">

@@ -689,6 +689,31 @@ export const crudConfigs: Record<string, ResourceConfig> = {
         ],
         successMessage: 'Pembayaran dicatat dan masuk ke ledger transaksi.',
       },
+      {
+        id: 'reminder',
+        label: 'Kirim Pengingat',
+        // Only meaningful for an issued invoice that still owes money.
+        visible: (r: any) =>
+          Number(r.outstanding ?? 0) > 0 && String(r.status || '').toLowerCase() !== 'draft',
+        endpoint: '/api/invoices/:id/reminder',
+        method: 'POST',
+        tone: 'neutral',
+        confirmTitle: 'Kirim Pengingat Tagihan',
+        confirmBody: (r: any) =>
+          `Email pengingat akan dikirim ke klien untuk invoice ${r.invoice_number} dengan sisa Rp ${Number(r.outstanding || 0).toLocaleString('id-ID')}${Number(r.days_overdue || 0) > 0 ? ` (telat ${r.days_overdue} hari)` : ''}. Nada email menyesuaikan lama keterlambatan.`,
+        fields: [
+          {
+            name: 'force',
+            label: 'Kirim ulang meski hari ini sudah dikirim?',
+            type: 'select',
+            options: [
+              { value: '', label: 'Tidak (default)' },
+              { value: 'true', label: 'Ya, kirim ulang' },
+            ],
+          },
+        ],
+        successMessage: 'Pengingat tagihan terkirim ke email klien.',
+      },
     ],
   },
   clients: {

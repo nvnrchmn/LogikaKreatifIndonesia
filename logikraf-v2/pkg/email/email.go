@@ -17,7 +17,10 @@ type Config struct {
 
 // DefaultConfig returns default email config from environment
 func DefaultConfig() Config {
-	host := getEnv("SMTP_HOST", "127.0.0.1")
+	// Default to the mail hostname, NOT 127.0.0.1: the SMTP server presents a
+	// certificate for mail.logikraf.id, so connecting by IP fails STARTTLS
+	// verification with "doesn't contain any IP SANs".
+	host := getEnv("SMTP_HOST", "mail.logikraf.id")
 	port := getEnv("SMTP_PORT", "587")
 	user := getEnv("SMTP_USER", "")
 	pass := getEnv("SMTP_PASS", "")
@@ -89,4 +92,82 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+// SendInvoiceReminder emails a client about an unpaid invoice.
+//
+// The copy adapts to the situation because a polite pre-due nudge and a chase on
+// a 60-day-late invoice should not read the same. amountDue is the OUTSTANDING
+// balance, not the invoice total, so a client who already paid a deposit is
+// never asked for the full amount again.
+func SendInvoiceReminder(
+	cfg Config,
+	to, clientName, invoiceNumber string,
+	amountDue, total, alreadyPaid string,
+	dueDate string,
+	daysOverdue int,
+) error {
+	var subject, headline, tone string
+	switch {
+	case daysOverdue <= 0:
+		subject = "Pengingat Tagihan " + invoiceNumber
+		headline = "Pengingat Pembayaran"
+		tone = "Kami ingin mengingatkan bahwa tagihan berikut akan jatuh tempo pada <strong>" + dueDate + "</strong>."
+	case daysOverdue <= 30:
+		subject = "Tagihan " + invoiceNumber + " Telah Jatuh Tempo"
+		headline = "Tagihan Jatuh Tempo"
+		tone = "Tagihan berikut telah melewati batas pembayaran <strong>" + dueDate +
+			"</strong> (" + itoa(daysOverdue) + " hari). Mohon segera diselesaikan."
+	default:
+		subject = "Mohon Perhatian: Tagihan " + invoiceNumber + " Tertunggak " + itoa(daysOverdue) + " Hari"
+		headline = "Tagihan Tertunggak"
+		tone = "Tagihan berikut telah tertunggak <strong>" + itoa(daysOverdue) +
+			" hari</strong> sejak jatuh tempo " + dueDate +
+			". Mohon konfirmasi rencana pembayaran agar pengerjaan tidak terhambat."
+	}
+
+	partial := ""
+	if alreadyPaid != "" && alreadyPaid != "0" {
+		partial = `<tr><td style="padding:8px;border:1px solid #ddd;">Sudah dibayar</td>` +
+			`<td style="padding:8px;border:1px solid #ddd;">Rp ` + alreadyPaid + `</td></tr>`
+	}
+
+	body := `<html><body style="font-family:Arial,sans-serif;color:#333;">
+<div style="max-width:600px;margin:0 auto;padding:20px;">
+<h2 style="color:#1a73e8;margin-bottom:4px;">` + headline + `</h2>
+<p>Halo <strong>` + clientName + `</strong>,</p>
+<p>` + tone + `</p>
+<table style="width:100%;border-collapse:collapse;margin:20px 0;">
+<tr><td style="padding:8px;border:1px solid #ddd;">No. Invoice</td><td style="padding:8px;border:1px solid #ddd;"><strong>` + invoiceNumber + `</strong></td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">Total tagihan</td><td style="padding:8px;border:1px solid #ddd;">Rp ` + total + `</td></tr>` + partial + `
+<tr style="background:#fff8e1;"><td style="padding:8px;border:1px solid #ddd;"><strong>Sisa yang harus dibayar</strong></td><td style="padding:8px;border:1px solid #ddd;"><strong>Rp ` + amountDue + `</strong></td></tr>
+<tr><td style="padding:8px;border:1px solid #ddd;">Jatuh tempo</td><td style="padding:8px;border:1px solid #ddd;">` + dueDate + `</td></tr>
+</table>
+<p style="font-size:12px;color:#777;">Jika pembayaran sudah dilakukan, mohon abaikan email ini dan kirimkan bukti transfer kepada kami.</p>
+<p>Terima kasih,<br><strong>Tim Logikraf</strong></p>
+</div></body></html>`
+
+	return Send(cfg, []string{to}, subject, body)
+}
+
+func itoa(n int) string {
+	if n == 0 {
+		return "0"
+	}
+	neg := n < 0
+	if neg {
+		n = -n
+	}
+	var b [20]byte
+	i := len(b)
+	for n > 0 {
+		i--
+		b[i] = byte('0' + n%10)
+		n /= 10
+	}
+	if neg {
+		i--
+		b[i] = '-'
+	}
+	return string(b[i:])
 }
