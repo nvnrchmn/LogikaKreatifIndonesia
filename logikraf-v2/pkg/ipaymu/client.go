@@ -21,14 +21,15 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/logikraf/logikraf-v2/internal/domain/model"
+	"gorm.io/gorm"
 )
 
-// Config holds the master iPaymu credentials. In a multi-tenant deployment,
-// the master account belongs to Logikraf, and sub-merchants are created per
-// tenant via the submerchant API.
+// Config holds the master iPaymu credentials.
 type Config struct {
-	Env      string // "sandbox" or "production"
-	MasterVA string
+	Env       string // "sandbox" or "production"
+	MasterVA  string
 	MasterKey string
 }
 
@@ -39,10 +40,39 @@ func LoadConfigFromEnv() Config {
 		env = "sandbox"
 	}
 	return Config{
-		Env:      env,
-		MasterVA: os.Getenv("IPAYMU_MASTER_VA"),
+		Env:       env,
+		MasterVA:  os.Getenv("IPAYMU_MASTER_VA"),
 		MasterKey: os.Getenv("IPAYMU_MASTER_KEY"),
 	}
+}
+
+// LoadConfigFromSettings builds Config from the settings table. Falls back
+// to env vars if the setting is not found — this allows the admin to manage
+// credentials from the admin panel without touching the .env file.
+func LoadConfigFromSettings(db *gorm.DB) Config {
+	cfg := LoadConfigFromEnv()
+	if db == nil {
+		return cfg
+	}
+
+	get := func(key, fallback string) string {
+		var s model.Setting
+		if err := db.Where("`key` = ?", key).First(&s).Error; err == nil && s.Value != "" {
+			return s.Value
+		}
+		return fallback
+	}
+
+	if v := get("ipaymu_env", ""); v != "" {
+		cfg.Env = strings.ToLower(v)
+	}
+	if v := get("ipaymu_master_va", ""); v != "" {
+		cfg.MasterVA = v
+	}
+	if v := get("ipaymu_master_key", ""); v != "" {
+		cfg.MasterKey = v
+	}
+	return cfg
 }
 
 // BaseURL returns the iPaymu base URL for the current environment.
@@ -70,6 +100,11 @@ func NewClientWithConfig(cfg Config) *Client {
 		Config: cfg,
 		HTTP:   &http.Client{Timeout: 15 * time.Second},
 	}
+}
+
+// NewClientFromSettings builds a Client from database settings.
+func NewClientFromSettings(db *gorm.DB) *Client {
+	return NewClientWithConfig(LoadConfigFromSettings(db))
 }
 
 // Sign produces the iPaymu v2 signature for a given method + body.

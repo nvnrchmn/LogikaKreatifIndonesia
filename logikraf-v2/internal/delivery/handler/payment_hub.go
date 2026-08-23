@@ -68,6 +68,8 @@ type PaymentResponse struct {
 
 // RegisterPaymentHubRoutes mount semua route Payment Hub.
 func RegisterPaymentHubRoutes(app fiber.Router, admin fiber.Router, public fiber.Router) {
+	// Initialize iPaymu client from settings.
+	ipaymuClient = ipaymu.NewClientFromSettings(model.DB)
 	// Middleware autentikasi API Key untuk tenant.
 	auth := func(c fiber.Ctx) error {
 		key := c.Get("X-Logikraf-API-Key")
