@@ -22,7 +22,14 @@ type invoiceView struct {
 func decorateInvoice(inv model.Invoice, now time.Time) invoiceView {
 	v := invoiceView{Invoice: inv, Outstanding: inv.Outstanding()}
 	if inv.DueDate != nil && inv.Outstanding() > 0 && now.After(*inv.DueDate) {
-		v.DaysOverdue = int(now.Sub(*inv.DueDate).Hours() / 24)
+		// Compare calendar dates, not raw duration: an invoice due 10 days ago is
+		// "telat 10 hari" regardless of the time of day it was stored, whereas
+		// truncating the hour difference reports 9.
+		due := time.Date(inv.DueDate.Year(), inv.DueDate.Month(), inv.DueDate.Day(), 0, 0, 0, 0, now.Location())
+		today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+		if days := int(today.Sub(due).Hours() / 24); days > 0 {
+			v.DaysOverdue = days
+		}
 	}
 	if inv.OrderID != nil {
 		var order model.Order

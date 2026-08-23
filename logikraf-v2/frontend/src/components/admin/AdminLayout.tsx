@@ -32,6 +32,7 @@ const navSections = [
     title: 'Uang Masuk',
     hint: 'Tagihan & pembayaran klien',
     items: [
+      { label: 'Piutang', path: '/admin/receivables', icon: LedgerNavIcon },
       { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
       { label: 'Reports', path: '/admin/reports', icon: ChartIcon },

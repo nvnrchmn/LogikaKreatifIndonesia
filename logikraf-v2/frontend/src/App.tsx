@@ -30,6 +30,7 @@ const AdminPaymentLedgerPage = lazy(() => import('./pages/admin/PaymentLedgerPag
 const AdminReconciliationPage = lazy(() => import('./pages/admin/ReconciliationPage'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
 const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
+const AdminReceivablesPage = lazy(() => import('./pages/admin/ReceivablesPage'))
 
 // Client Pages (Lazy Loaded)
 const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
@@ -113,6 +114,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="reports" element={<AdminReportsPage />} />
+        <Route path="receivables" element={<AdminReceivablesPage />} />
         <Route path="payment-hub" element={<AdminPaymentHubPage />} />
         <Route path="merchant-accounts" element={<AdminTenantPaymentAccountsPage />} />
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
