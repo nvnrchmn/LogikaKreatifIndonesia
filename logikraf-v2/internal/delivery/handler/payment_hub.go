@@ -97,6 +97,7 @@ func RegisterPaymentHubRoutes(app fiber.Router, admin fiber.Router, public fiber
 	hub.Post("/split-payments", handleCreateSplitPayment)
 	hub.Get("/payments/:id", handleGetPaymentStatus)
 	hub.Get("/payments", handleListPayments)
+	hub.Post("/invoices", handleCreateInvoice)
 
 	// Admin API (kelola API keys & lihat semua pembayaran)
 	admin.Get("/payment-hub/transactions", handleAdminListAllTransactions)
@@ -357,6 +358,78 @@ func handleAdminListAPIKeys(c fiber.Ctx) error {
 	var keys []model.APIKey
 	model.DB.Order("created_at desc").Find(&keys)
 	return c.JSON(keys)
+}
+
+// handleCreateInvoice creates a payment invoice (redirect-based checkout).
+// Used by smarthub for langganan & iuran payments.
+func handleCreateInvoice(c fiber.Ctx) error {
+	tenantID := c.Locals("tenant_id").(string)
+
+	var req struct {
+		ExternalID          string  `json:"external_id"`
+		ExternalReferenceID string  `json:"external_reference_id"`
+		Amount              float64 `json:"amount"`
+		PayerEmail          string  `json:"payer_email"`
+		Description         string  `json:"description"`
+		SuccessRedirectURL  string  `json:"success_redirect_url"`
+	}
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid payload"})
+	}
+
+	if req.ExternalID == "" || req.Amount <= 0 || req.PayerEmail == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "external_id, amount, payer_email required"})
+	}
+
+	var account model.TenantPaymentAccount
+	if err := model.DB.Where("tenant_id = ? AND provider = ?", tenantID, "ipaymu").First(&account).Error; err != nil {
+		return c.Status(403).JSON(fiber.Map{"error": "tenant belum punya sub-account"})
+	}
+
+	paymentBody := map[string]interface{}{
+		"amount":      req.Amount,
+		"description": req.Description,
+		"orderId":     req.ExternalID,
+		"buyerEmail":  req.PayerEmail,
+		"returnUrl":   req.SuccessRedirectURL,
+	}
+	bodyBytes, _ := json.Marshal(paymentBody)
+	respBody, status, err := ipaymuClient.Do("POST", "/api/v2/payment", bodyBytes)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "gagal menghubungi iPaymu"})
+	}
+
+	var apiResp ipaymu.APIResponse
+	if json.Unmarshal(respBody, &apiResp); err != nil || !apiResp.Status {
+		return c.Status(502).JSON(fiber.Map{"error": fmt.Sprintf("iPaymu error (HTTP %d)", status)})
+	}
+
+	var paymentData struct {
+		SessionID  string `json:"sessionId"`
+		VANumber   string `json:"vaNumber"`
+		PaymentURL string `json:"url"`
+	}
+	json.Unmarshal(apiResp.Data, &paymentData)
+
+	tx := model.PaymentTransaction{
+		TenantID:         tenantID,
+		PaymentAccountID: account.ID,
+		InvoiceRef:       req.Description,
+		Provider:         "ipaymu",
+		OrderID:          req.ExternalID,
+		GrossAmount:      uint(req.Amount),
+		Status:           "pending",
+	}
+	model.DB.Create(&tx)
+
+	return c.JSON(fiber.Map{
+		"message": "invoice created",
+		"data": fiber.Map{
+			"checkout_url": paymentData.PaymentURL,
+			"va_number":    paymentData.VANumber,
+			"session_id":   paymentData.SessionID,
+		},
+	})
 }
 
 func handleIpaymuWebhook(c fiber.Ctx) error {
