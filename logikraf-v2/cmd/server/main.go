@@ -269,10 +269,16 @@ func main() {
 	admin.Put("/notifications/read-all", handler.MarkAllNotificationsRead)
 	admin.Post("/notifications/:id/create-project", handler.CreateProjectFromPayment)
 
-	// Cron Job Management
+	// Cron Job Management + Payment Hub
+	// Initialize and start background scheduler (cron job engine)
 	backgroundScheduler := sched.New(model.DB)
 	backgroundScheduler.Register(&sched.InvoiceReminderJob{})
 	backgroundScheduler.Register(&sched.InvoiceStatusRefreshJob{})
+
+	// Payment Hub (Server for multi-tenant products)
+	handler.RegisterPaymentHubRoutes(api, admin, app)
+
+	// Cron handler needs the scheduler for "Run Now" button
 	cronHandler := handler.NewCronHandler(backgroundScheduler)
 	go backgroundScheduler.Start()
 
