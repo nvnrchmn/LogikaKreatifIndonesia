@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Build and Deploy
 
 on:
   push:
@@ -7,35 +7,29 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version: '1.25'
 
-      # Build frontend
       - name: Build frontend
         run: |
           cd logikraf-v2/frontend
           npm ci
           npm run build
 
-      # Build Go binary
       - name: Build Go binary
         run: |
           cd logikraf-v2
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/logikraf-server ./cmd/server/
 
-      # Upload artifacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -44,14 +38,35 @@ jobs:
             logikraf-v2/frontend/dist/
             logikraf-v2/bin/
 
-      # Deploy to VPS via SSH
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@master
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /www/wwwroot/logikraf.id
-            git pull origin main
-            sudo systemctl restart logikraf-server
+          name: build-artifacts
+          path: artifacts/
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Copy frontend to VPS
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            artifacts/logikraf-v2/frontend/dist/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/www/wwwroot/logikraf.id/logikraf-v2/frontend/dist/
+
+      - name: Copy Go binary to VPS
+        run: |
+          rsync -avz --chmod=F755 --rsync-path="sudo rsync" \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            artifacts/logikraf-v2/bin/logikraf-server \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/www/wwwroot/logikraf.id/logikraf-v2/bin/logikraf-server
+
+      - name: Restart service
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "sudo systemctl restart logikraf-server && echo 'Deployment successful!'"
