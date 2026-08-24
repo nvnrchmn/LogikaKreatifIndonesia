@@ -54,44 +54,15 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Navigation Links */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
-              Navigasi
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Layanan</Link></li>
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Paket Website</Link></li>
-              <li><Link to="/#portfolio" className="text-text-light/70 hover:text-white transition-colors">Portofolio</Link></li>
-              <li><Link to="/blog" className="text-text-light/70 hover:text-white transition-colors">Artikel &amp; Blog</Link></li>
-              <li><Link to="/tentang-kami" className="text-text-light/70 hover:text-white transition-colors">Tentang Kami</Link></li>
-              <li><Link to="/kontak" className="text-text-light/70 hover:text-white transition-colors">Hubungi Kami</Link></li>
-            </ul>
-          </div>
-
-          {/* Solution & Services */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
-              Layanan Utama
-            </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm">
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Web Application</Link></li>
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Mobile App (iOS/Android)</Link></li>
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">UI/UX Design</Link></li>
-              <li><Link to="/paket" className="text-text-light/70 hover:text-white transition-colors">Digital Branding</Link></li>
-              <li><Link to="/search" className="text-text-light/70 hover:text-white transition-colors">Cari Direktori</Link></li>
-            </ul>
-          </div>
-
           {/* Direct Support Column */}
-          <div className="lg:col-span-3 space-y-4">
+          <div className="lg:col-span-7 space-y-4">
             <h4 className="font-display font-bold text-white text-xs uppercase tracking-wider text-brand-accent">
               Helpdesk &amp; Legal
             </h4>
             <div className="space-y-2.5 text-xs text-text-light/70">
               <p>Email: <a href={`mailto:${contactEmail}`} className="text-white hover:underline font-mono">{contactEmail}</a></p>
               <p>WhatsApp: <a href={`https://wa.me/${cleanWaNumber || '628983342429'}`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline font-mono">{contactWhatsapp}</a></p>
-              <p className="leading-relaxed">Kantor: {contactAddress}</p>
+              <p className="leading-relaxed whitespace-pre-line">Kantor: {contactAddress}</p>
             </div>
             <div className="pt-2">
               <a
