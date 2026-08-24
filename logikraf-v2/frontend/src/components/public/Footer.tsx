@@ -1,17 +1,9 @@
 import { Link } from 'react-router-dom'
 
-const footerLinks = [
-  { label: 'Beranda', path: '/' },
-  { label: 'Paket', path: '/paket' },
-  { label: 'Blog', path: '/blog' },
-  { label: 'Tentang Kami', path: '/tentang-kami' },
-  { label: 'Kontak', path: '/kontak' },
-]
-
 const legalLinks = [
-  { label: 'Ketentuan Layanan', path: '/tos', external: false },
-  { label: 'Kebijakan Privasi', path: '/privacy', external: false },
-  { label: 'FAQ', path: '/faq', external: false },
+  { label: 'Ketentuan Layanan', path: '/tos' },
+  { label: 'Kebijakan Privasi', path: '/privacy' },
+  { label: 'FAQ', path: '/faq' },
 ]
 
 export default function Footer() {
@@ -20,7 +12,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <h3 className="font-display font-bold text-white text-lg mb-2">Logikraf</h3>
             <p className="text-white/60 text-xs leading-relaxed mb-4">
               Digital agency Indonesia. Membangun website, aplikasi, dan solusi digital
@@ -40,22 +32,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Navigation */}
-          <div>
-            <h4 className="font-bold text-white text-sm mb-3">Navigasi</h4>
-            <ul className="space-y-2">
-              {footerLinks.map((l) => (
-                <li key={l.path}>
-                  <Link to={l.path} className="text-white/60 hover:text-white text-xs transition-colors">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Legal */}
-          <div>
+          <div className="md:col-span-1">
             <h4 className="font-bold text-white text-sm mb-3">Legal</h4>
             <ul className="space-y-2">
               {legalLinks.map((l) => (
