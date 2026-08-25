@@ -101,6 +101,9 @@ func main() {
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 	app.Get("/blog/:slug", func(c fiber.Ctx) error {
+		if m := blogMeta(c.Params("slug")); m != nil {
+			return serveSPAWithMeta(c, frontendDir, m)
+		}
 		return c.SendFile(filepath.Join(frontendDir, "index.html"))
 	})
 	app.Get("/tentang-kami", func(c fiber.Ctx) error {
