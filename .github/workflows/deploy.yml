@@ -30,19 +30,31 @@ jobs:
           cd logikraf-v2
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/logikraf-server ./cmd/server/
 
-      - name: Upload artifacts
+      - name: Upload frontend dist
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: |
-            logikraf-v2/frontend/dist/
-            logikraf-v2/bin/
+          name: frontend-dist
+          path: logikraf-v2/frontend/dist
+          retention-days: 1
 
-      - name: Download artifacts
+      - name: Upload Go binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-binary
+          path: logikraf-v2/bin/logikraf-server
+          retention-days: 1
+
+      - name: Download frontend dist
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts
-          path: artifacts/
+          name: frontend-dist
+          path: artifacts/frontend-dist
+
+      - name: Download Go binary
+        uses: actions/download-artifact@v4
+        with:
+          name: go-binary
+          path: artifacts/bin
 
       - name: Setup SSH
         run: |
@@ -55,14 +67,14 @@ jobs:
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            artifacts/logikraf-v2/frontend/dist/ \
+            artifacts/frontend-dist/ \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/www/wwwroot/logikraf.id/logikraf-v2/frontend/dist/
 
       - name: Copy Go binary to VPS
         run: |
           rsync -avz --chmod=F755 --rsync-path="sudo rsync" \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            artifacts/logikraf-v2/bin/logikraf-server \
+            artifacts/bin/logikraf-server \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/www/wwwroot/logikraf.id/logikraf-v2/bin/logikraf-server
 
       - name: Restart service
