@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import Footer from '../../components/layout/Footer'
 import PricingSection from '../../components/public/PricingSection'
@@ -5,7 +6,42 @@ import PortfolioGallery from '../../components/public/PortfolioGallery'
 import TestimonialsSection from '../../components/public/TestimonialsSection'
 import ProjectBriefForm from '../../components/public/ProjectBriefForm'
 
+interface HeroStat {
+  value: string
+  label: string
+}
+
 export default function HomePage() {
+  const [stats, setStats] = useState<HeroStat[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/hero-stats')
+      .then(r => (r.ok ? r.json() : []))
+      .then(d => {
+        if (Array.isArray(d) && d.length > 0) {
+          setStats(d)
+        } else {
+          // Fallback defaults
+          setStats([
+            { value: '50+', label: 'Proyek Selesai' },
+            { value: '30+', label: 'Klien Terpercaya' },
+            { value: '4', label: 'Layanan Utama' },
+            { value: '99%', label: 'Kepuasan Klien' },
+          ])
+        }
+      })
+      .catch(() => {
+        setStats([
+          { value: '50+', label: 'Proyek Selesai' },
+          { value: '30+', label: 'Klien Terpercaya' },
+          { value: '4', label: 'Layanan Utama' },
+          { value: '99%', label: 'Kepuasan Klien' },
+        ])
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -36,29 +72,28 @@ export default function HomePage() {
 
               <div className="animate-slide-up flex flex-col sm:flex-row items-start gap-4">
                 <a href="#konsultasi" className="btn-primary text-base px-8 py-4 shadow-lg shadow-brand-primary/25">Mulai Proyek Anda</a>
-                <a href="#portofolio" className="btn-secondary border-white/20 text-white/80 hover:bg-white/10 hover:text-white hover:border-white/30 text-base px-8 py-4">Lihat Portofolio</a>
+                <a href="#portofolio" className="btn-primary bg-transparent border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base px-8 py-4">Lihat Portofolio</a>
               </div>
 
               <div className="animate-fade-in mt-20 flex flex-wrap items-center gap-x-6 sm:gap-x-12 gap-y-6">
-                <div>
-                  <span className="block font-display text-3xl font-bold text-white">50+</span>
-                  <span className="font-body text-sm text-white/40">Proyek Selesai</span>
-                </div>
-                <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                <div>
-                  <span className="block font-display text-3xl font-bold text-white">30+</span>
-                  <span className="font-body text-sm text-white/40">Klien Terpercaya</span>
-                </div>
-                <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                <div>
-                  <span className="block font-display text-3xl font-bold text-white">4</span>
-                  <span className="font-body text-sm text-white/40">Layanan Utama</span>
-                </div>
-                <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                <div>
-                  <span className="block font-display text-3xl font-bold text-brand-accent">99%</span>
-                  <span className="font-body text-sm text-white/40">Kepuasan Klien</span>
-                </div>
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="h-9 w-20 bg-white/10 rounded animate-pulse" />
+                      <div className="h-4 w-24 bg-white/5 rounded animate-pulse" />
+                    </div>
+                  ))
+                ) : (
+                  stats.map((stat, i) => (
+                    <div key={i} className="contents">
+                      {i > 0 && <div className="w-px h-10 bg-white/10 hidden sm:block" />}
+                      <div>
+                        <span className={`block font-display text-3xl font-bold ${stat.label === 'Kepuasan Klien' ? 'text-brand-accent' : 'text-white'}`}>{stat.value}</span>
+                        <span className="font-body text-sm text-white/40">{stat.label}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

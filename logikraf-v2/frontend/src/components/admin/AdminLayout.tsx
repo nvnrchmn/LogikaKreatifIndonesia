@@ -46,6 +46,7 @@ const navSections = [
       { label: 'Packages', path: '/admin/packages', icon: ShoppingBagIcon },
       { label: 'Blog', path: '/admin/blog', icon: ArticleIcon },
       { label: 'Testimonials', path: '/admin/testimonials', icon: RateReviewIcon },
+      { label: 'Hero Stats', path: '/admin/hero-stats', icon: ExtensionIcon },
     ],
   },
   {

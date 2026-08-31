@@ -87,6 +87,7 @@ export default function Footer() {
             <Link to="/syarat-ketentuan" className="hover:text-white transition-colors">Syarat &amp; Ketentuan</Link>
             <Link to="/kebijakan-privasi" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
             <Link to="/kebijakan-refund" className="hover:text-white transition-colors">Kebijakan Pengembalian Dana (Refund)</Link>
+            <Link to="/admin/login" className="hover:text-white transition-colors">Admin Login</Link>
           </div>
         </div>
       </div>

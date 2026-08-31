@@ -102,17 +102,6 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
             </Link>
 
             <Link
-              to="/admin/login"
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                scrolled
-                  ? 'text-text-muted hover:text-text-main hover:bg-canvas-light border border-border-minimal'
-                  : 'text-white/90 hover:text-white hover:bg-white/15 border border-white/20'
-              }`}
-            >
-              Admin Portal
-            </Link>
-
-            <Link
               to="/kontak"
               className="btn-primary text-xs py-2 px-4 shadow-md shadow-brand-primary/20 hover:shadow-brand-primary/40 active:scale-[0.98] transition-all"
             >
@@ -179,13 +168,6 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
                 onClick={() => setMobileOpen(false)}
               >
                 Mulai Proyek 🚀
-              </Link>
-              <Link
-                to="/admin/login"
-                className="w-full text-center text-xs font-semibold py-2 rounded-xl text-text-muted hover:text-text-main bg-canvas-light"
-                onClick={() => setMobileOpen(false)}
-              >
-                Login Admin
               </Link>
             </div>
           </div>

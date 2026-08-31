@@ -144,6 +144,7 @@ func main() {
 	api := app.Group("/api")
 	api.Get("/portfolios", handler.GetPortfolios)
 	api.Get("/packages", handler.GetPackages)
+	api.Get("/hero-stats", handler.GetHeroStats)
 	api.Post("/leads", leadLimiter, handler.CreateLead)
 	api.Get("/posts", handler.GetPosts)
 	api.Get("/posts/:slug", handler.GetPostBySlug)
@@ -179,6 +180,8 @@ func main() {
 
 	// Admin API - protected
 	admin := api.Group("", auth.AuthMiddleware(), auth.AdminOnly())
+	admin.Get("/hero-stats", handler.GetHeroStats)
+	admin.Put("/hero-stats", handler.UpdateHeroStats)
 	admin.Get("/clients", handler.GetClients)
 	admin.Post("/clients", handler.CreateClient)
 	admin.Put("/clients/:id", handler.UpdateClient)
@@ -278,7 +281,10 @@ func main() {
 	backgroundScheduler.Register(&sched.InvoiceReminderJob{})
 	backgroundScheduler.Register(&sched.InvoiceStatusRefreshJob{})
 
-	// Payment Hub (Server for multi-tenant products)
+	// Hero stats (public + admin)
+	api.Get("/hero-stats", handler.GetHeroStats)
+	admin.Get("/hero-stats", handler.GetHeroStats)
+	admin.Put("/hero-stats", handler.UpdateHeroStats)
 	handler.RegisterPaymentHubRoutes(api, admin, app)
 
 	// Cron handler needs the scheduler for "Run Now" button

@@ -30,6 +30,7 @@ const AdminPaymentLedgerPage = lazy(() => import('./pages/admin/PaymentLedgerPag
 const AdminReconciliationPage = lazy(() => import('./pages/admin/ReconciliationPage'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
 const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
+const AdminHeroStatsPage = lazy(() => import('./pages/admin/HeroStatsPage'))
 const AdminReceivablesPage = lazy(() => import('./pages/admin/ReceivablesPage'))
 const AdminCronJobsPage = lazy(() => import('./pages/admin/CronJobsPage'))
 const AdminWorkflowDocsPage = lazy(() => import('./pages/admin/WorkflowDocsPage'))
@@ -124,6 +125,7 @@ export default function App() {
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
         <Route path="reconciliation" element={<AdminReconciliationPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
+        <Route path="hero-stats" element={<AdminHeroStatsPage />} />
         {/* Generic CRUD resources: list / new / edit */}
         <Route path=":resource/new" element={<AdminResourcePage />} />
         <Route path=":resource/:id/edit" element={<AdminResourcePage />} />

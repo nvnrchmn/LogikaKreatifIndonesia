@@ -39,6 +39,7 @@ func Connect() error {
 		&Ticket{},
 		&Testimonial{},
 		&Setting{},
+		&HeroStat{},
 		&TenantPaymentAccount{},
 		&Tenant{},
 		&ProjectTemplate{},
