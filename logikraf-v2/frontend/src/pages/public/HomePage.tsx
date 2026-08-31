@@ -11,34 +11,30 @@ interface HeroStat {
   label: string
 }
 
+const DEFAULT_STATS: HeroStat[] = [
+  { value: '50+', label: 'Proyek Selesai' },
+  { value: '30+', label: 'Klien Terpercaya' },
+  { value: '4', label: 'Layanan Utama' },
+  { value: '99%', label: 'Kepuasan Klien' },
+]
+
 export default function HomePage() {
   const [stats, setStats] = useState<HeroStat[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/hero-stats')
-      .then(r => (r.ok ? r.json() : []))
+      .then(r => (r.ok ? r.json() : { data: [] }))
       .then(d => {
-        if (Array.isArray(d) && d.length > 0) {
-          setStats(d)
+        const list = Array.isArray(d) ? d : d?.data
+        if (Array.isArray(list) && list.length > 0) {
+          // API returns { id, num, label, sort_order } → map to { value, label }
+          setStats(list.map((s: { num: string; label: string }) => ({ value: s.num, label: s.label })))
         } else {
-          // Fallback defaults
-          setStats([
-            { value: '50+', label: 'Proyek Selesai' },
-            { value: '30+', label: 'Klien Terpercaya' },
-            { value: '4', label: 'Layanan Utama' },
-            { value: '99%', label: 'Kepuasan Klien' },
-          ])
+          setStats(DEFAULT_STATS)
         }
       })
-      .catch(() => {
-        setStats([
-          { value: '50+', label: 'Proyek Selesai' },
-          { value: '30+', label: 'Klien Terpercaya' },
-          { value: '4', label: 'Layanan Utama' },
-          { value: '99%', label: 'Kepuasan Klien' },
-        ])
-      })
+      .catch(() => setStats(DEFAULT_STATS))
       .finally(() => setLoading(false))
   }, [])
 

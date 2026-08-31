@@ -281,10 +281,6 @@ func main() {
 	backgroundScheduler.Register(&sched.InvoiceReminderJob{})
 	backgroundScheduler.Register(&sched.InvoiceStatusRefreshJob{})
 
-	// Hero stats (public + admin)
-	api.Get("/hero-stats", handler.GetHeroStats)
-	admin.Get("/hero-stats", handler.GetHeroStats)
-	admin.Put("/hero-stats", handler.UpdateHeroStats)
 	handler.RegisterPaymentHubRoutes(api, admin, app)
 
 	// Cron handler needs the scheduler for "Run Now" button
