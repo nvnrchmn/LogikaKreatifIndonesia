@@ -1,0 +1,21 @@
+# .hermesrules — logikraf.id (PT. Logika Kreatif Indonesia)
+
+## Tech Stack
+- Backend: Go 1.25+ + GoFiber v3 + GORM (MySQL/SQLite) + JWT, port 8081 (systemd: `logikraf-server`), app di `logikraf-v2/`
+- Frontend: React 19 + TypeScript + Vite + Ant Design + Tailwind CSS v4 + TanStack Query
+- Database: MySQL `logikraf_v2`
+- Deploy: `git push origin main` → GitHub Actions (`.github/workflows/deploy.yml`, SSH ke VPS) → systemd restart. **JANGAN build di server.**
+- Serving: nginx → Go API; statis frontend dari Vite build
+
+## Arsitektur
+- `logikraf-v2/` — aplikasi utama (backend Go + frontend React)
+- `docs/` — Architecture Blueprint, ADR, dokumentasi bisnis
+- `infra/` — konfigurasi infrastruktur/deploy
+- **Knowledge graph (WAJIB):** repo pakai graphify — sebelum tanya struktur kode jalankan `graphify query "<pertanyaan>"`, relasi pakai `graphify path A B`, navigasi via `graphify-out/wiki/index.md`. Setelah modifikasi kode: `graphify update .` (aturan di `.agents/rules/graphify.md`)
+
+## Status Terakhir (cek 2026-09-01)
+- ✅ HEAD 2026-08-31: fix hero stats frontend parsing + duplicate routes
+- ✅ CI/CD GitHub Actions SSH ke VPS (systemd `logikraf-server`)
+- ⚠️ `.env` di repo default PORT=8080 (dev); prod = 8081 via systemd
+- Ponytail config FULL untuk review/audit
+- Selalu update file ini saat ada perubahan struktur/status
