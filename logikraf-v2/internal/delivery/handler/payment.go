@@ -64,14 +64,30 @@ func tenantOf(c fiber.Ctx) string {
 
 type xenditInvoiceRequest struct {
 	ExternalID  string `json:"external_id"`
+	OrderID     string `json:"order_id"` // alias dari CheckoutModal (format iPaymu)
 	Amount      uint   `json:"amount"`
 	PayerEmail  string `json:"payer_email"`
+	Email       string `json:"email"` // alias dari CheckoutModal
+	ClientName  string `json:"first_name"`
+	ClientPhone string `json:"phone"`
 	Description string `json:"description"`
+}
+
+// normalized maps CheckoutModal-style payload (order_id/email/first_name/phone)
+// onto the Xendit invoice fields so both gateway payloads share one shape.
+func (x *xenditInvoiceRequest) normalized() {
+	if x.ExternalID == "" {
+		x.ExternalID = x.OrderID
+	}
+	if x.PayerEmail == "" {
+		x.PayerEmail = x.Email
+	}
 }
 
 // CreateXenditInvoice proxies an invoice creation to Xendit.
 func CreateXenditInvoice(c fiber.Ctx) error {
-	secret := setting("xendit_secret_key", tenantOf(c))
+	tenant := tenantOf(c)
+	secret := setting("xendit_secret_key", tenant)
 	if secret == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "xendit_secret_key not configured"})
 	}
@@ -80,11 +96,22 @@ func CreateXenditInvoice(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&in); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
 	}
+	in.normalized()
 	if in.ExternalID == "" || in.Amount == 0 || in.PayerEmail == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "external_id, amount, payer_email required"})
 	}
 
-	body, _ := json.Marshal(in)
+	// Payload resmi Xendit v2 — field ekstra (payment_method/channel) tidak dikirim.
+	bodyMap := map[string]any{
+		"external_id":          in.ExternalID,
+		"amount":               in.Amount,
+		"payer_email":          in.PayerEmail,
+		"description":          orDefault(in.Description, "Logikraf Package"),
+		"currency":             "IDR",
+		"success_redirect_url": "https://" + c.Host() + "/paket?status=success",
+		"failure_redirect_url": "https://" + c.Host() + "/paket",
+	}
+	body, _ := json.Marshal(bodyMap)
 	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v2/invoices", bytes.NewReader(body))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
@@ -104,7 +131,6 @@ func CreateXenditInvoice(c fiber.Ctx) error {
 		return c.Status(502).JSON(fiber.Map{"error": "bad xendit response"})
 	}
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		tenant := tenantOf(c)
 		var acc model.TenantPaymentAccount
 		model.DB.Where("tenant_id = ? AND provider = ?", tenant, "xendit").FirstOrCreate(&acc, model.TenantPaymentAccount{TenantID: tenant, Provider: "xendit"})
 		acc.Status = "ACTIVE"
@@ -115,18 +141,22 @@ func CreateXenditInvoice(c fiber.Ctx) error {
 		providerFee := calcFee(gross, setting("xendit_fee_percent", tenant), setting("xendit_fee_flat", tenant))
 		platformFee := calcFee(gross, setting("platform_fee_percent", tenant), "")
 		outMap, _ := out.(map[string]any)
-		orderID := in.ExternalID
+		// OrderID = external_id (order number) — dipakai lookup webhook & update Order.
+		// ProviderTxID = invoice id Xendit.
+		providerTxID := ""
 		if id, ok := outMap["id"].(string); ok {
-			orderID = id
+			providerTxID = id
 		}
 		model.DB.Create(&model.PaymentTransaction{
 			TenantID:         tenant,
 			PaymentAccountID: acc.ID,
 			InvoiceRef:       in.Description,
 			Provider:         "xendit",
-			OrderID:          orderID,
+			OrderID:          in.ExternalID,
+			ClientName:       in.ClientName,
 			ClientEmail:      in.PayerEmail,
-			ProviderTxID:     orderID,
+			ClientPhone:      in.ClientPhone,
+			ProviderTxID:     providerTxID,
 			GrossAmount:      gross,
 			ProviderFee:      providerFee,
 			PlatformFee:      platformFee,
@@ -335,17 +365,90 @@ func XenditWebhook(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "missing reference"})
 	}
 
+	// Idempotency: skip jika event (invoice+status) sudah diproses.
+	webhookID := p.ID + ":" + p.Status
+	if webhookID != "" && isWebhookProcessed(webhookID, "xendit") {
+		return c.JSON(fiber.Map{"status": "ok", "message": "already processed"})
+	}
+
 	if p.Status == "PAID" {
-		upsertTransaction(ref, "xendit", "settled", p.Amount)
+		now := time.Now()
+		q := model.DB.Where("order_id = ?", ref)
+		if tenant != "" {
+			q = q.Where("tenant_id = ?", tenant)
+		}
 		var pt model.PaymentTransaction
-		if err := model.DB.Where("order_id = ? AND tenant_id = ?", ref, tenant).First(&pt).Error; err == nil {
+		if err := q.First(&pt).Error; err == nil {
+			if tenant == "" {
+				tenant = pt.TenantID
+			}
 			pt.Status = "settled"
-			now := time.Now()
 			pt.SettledAt = &now
 			if err := model.DB.Save(&pt).Error; err != nil {
 				return c.Status(500).JSON(fiber.Map{"error": "failed"})
 			}
+
+			// Find the Order record (dibuat via CreateOrderFromPayment atau manual)
+			var order model.Order
+			orderID := uint(0)
+			if err := model.DB.Where("order_number = ?", ref).First(&order).Error; err == nil {
+				orderID = order.ID
+			}
+
+			txRef := pt.ProviderTxID
+			if txRef == "" {
+				txRef = ref
+			}
+			// Auto-create Transaction (ledger entry)
+			tx := model.Transaction{
+				OrderID:              orderID,
+				TransactionReference: txRef,
+				MilestoneName:        pt.InvoiceRef,
+				Amount:               pt.GrossAmount,
+				PaymentMethod:        pt.Provider,
+				Status:               "settled",
+				SettledAt:            &now,
+			}
+			model.DB.Create(&tx)
+
+			// Auto-create Invoice (receipt). PaidAmount = full amount (QRIS/VA
+			// settlement adalah uang sudah diterima).
+			if orderID > 0 && len(txRef) >= 8 {
+				inv := model.Invoice{
+					OrderID:       &orderID,
+					InvoiceNumber: "INV-" + txRef[:8] + "-" + strconv.FormatInt(now.Unix(), 10),
+					Type:          "receipt",
+					Total:         pt.GrossAmount,
+					PaidAmount:    pt.GrossAmount,
+					Status:        "paid",
+					IssueDate:     &now,
+					DueDate:       &now,
+				}
+				model.DB.Create(&inv)
+			}
+
+			// Notification utk admin
+			notif := model.Notification{
+				TenantID: tenant,
+				Type:     "payment_settled",
+				Title:    "Pembayaran Diterima: " + pt.InvoiceRef,
+				Message:  "Pembayaran " + pt.Provider + " sebesar Rp " + strconv.Itoa(int(pt.GrossAmount)) + " dari " + pt.ClientName + " (" + pt.ClientEmail + ") telah diterima. Buat project sekarang?",
+				RefTable: "payment_transactions",
+				RefID:    pt.ID,
+			}
+			model.DB.Create(&notif)
+
+			// Email receipt ke client (async, jangan gagalkan webhook)
+			go func() {
+				cfg := email.DefaultConfig()
+				if cfg.Host != "" {
+					_ = email.SendPaymentReceipt(cfg, pt.ClientEmail, pt.ClientName, pt.InvoiceRef, strconv.Itoa(int(pt.GrossAmount)), txRef)
+				}
+			}()
+
+			markWebhookProcessed(webhookID, "xendit")
 		}
+		model.DB.Model(&model.Order{}).Where("order_number = ?", ref).Update("status", "paid")
 		notifySBDigital(ref, "SETTLED")
 	}
 	return c.JSON(fiber.Map{"status": "ok"})
@@ -608,13 +711,13 @@ func IpaymuWebhook(c fiber.Ctx) error {
 
 			// Auto-create Transaction (ledger entry)
 			tx := model.Transaction{
-				OrderID:             orderID,
+				OrderID:              orderID,
 				TransactionReference: pt.ProviderTxID,
-				MilestoneName:       pt.InvoiceRef,
-				Amount:              pt.GrossAmount,
-				PaymentMethod:       pt.Provider,
-				Status:              "settled",
-				SettledAt:           &now,
+				MilestoneName:        pt.InvoiceRef,
+				Amount:               pt.GrossAmount,
+				PaymentMethod:        pt.Provider,
+				Status:               "settled",
+				SettledAt:            &now,
 			}
 			model.DB.Create(&tx)
 

@@ -62,11 +62,14 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
     setErr('')
     const gw = gateways.length > 0 ? gateways[0] : { id: 'ipaymu', name: 'iPaymu' }
     const endpoint = gw.id === 'xendit' ? '/api/payment/xendit/invoice' : `/api/payment/${gw.id}/snap`
+    const orderId = `LK-${Date.now()}-${pkg.id}`
     const payload = {
-      order_id: `LK-${Date.now()}-${pkg.id}`,
+      order_id: orderId,
+      external_id: orderId,
       amount: Number(pkg.price),
       first_name: form.name,
       email: form.email,
+      payer_email: form.email,
       phone: form.phone,
       description: `Paket ${pkg.name} - Logikraf`,
       paymentMethod: 'qris',
@@ -90,6 +93,10 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
     }
   }
 
+  const activeGw = gateways.length > 0 ? gateways[0] : { id: 'ipaymu', name: 'iPaymu' }
+  const gatewayLabel = activeGw.id === 'xendit' ? 'Xendit (QRIS / VA / E-Wallet)' : `QRIS Nasional (${activeGw.name})`
+  const gatewayCta = activeGw.id === 'xendit' ? 'via Xendit' : 'QRIS'
+
   return (
     <Modal
       open={open}
@@ -102,7 +109,7 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
             </span>
             <h3 className="text-xl font-extrabold text-text-main">Pesan {pkg.name}</h3>
             <p className="text-xs text-text-muted mt-1">
-              Lengkapi identitas PIC pemesan untuk penerbitan faktur dan alur pembayaran QRIS.
+              Lengkapi identitas PIC pemesan untuk penerbitan faktur dan alur pembayaran.
             </p>
           </div>
         )
@@ -113,7 +120,7 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
           <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between mb-6">
             <div>
               <p className="text-xs font-bold text-gray-900">{pkg.name}</p>
-              <p className="text-[11px] text-gray-500 font-mono">Metode: QRIS Nasional (iPaymu)</p>
+              <p className="text-[11px] text-gray-500 font-mono">Metode: {gatewayLabel}</p>
             </div>
             <div className="text-right">
               <p className="font-mono font-extrabold text-base text-emerald-700">
@@ -166,7 +173,7 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
                 <span>Transaksi Terenkripsi SSL</span>
               </div>
               <Button type="submit" loading={busy}>
-                {busy ? 'Memproses QRIS...' : 'Lanjut Bayar QRIS →'}
+                {busy ? 'Memproses Pembayaran...' : `Lanjut Bayar ${gatewayCta} →`}
               </Button>
             </div>
           </form>
