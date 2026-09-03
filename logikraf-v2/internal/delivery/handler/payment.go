@@ -160,7 +160,7 @@ func CreateXenditInvoice(c fiber.Ctx) error {
 			GrossAmount:      gross,
 			ProviderFee:      providerFee,
 			PlatformFee:      platformFee,
-			NetAmount:        gross - providerFee - platformFee,
+			NetAmount:        netAmount(gross, providerFee, platformFee),
 			Status:           "pending",
 		})
 	}
@@ -265,7 +265,7 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 			GrossAmount:      gross,
 			ProviderFee:      providerFee,
 			PlatformFee:      platformFee,
-			NetAmount:        gross - providerFee - platformFee,
+			NetAmount:        netAmount(gross, providerFee, platformFee),
 			Status:           "pending",
 		}
 		if tok, ok := out["token"].(string); ok {
@@ -276,6 +276,19 @@ func CreateMidtransSnap(c fiber.Ctx) error {
 		}
 	}
 	return c.Status(resp.StatusCode).JSON(out)
+}
+
+// netAmount clamps to 0 so fees exceeding gross never underflow the uint field
+// (underflow previously produced 2^64-N and made the INSERT fail -> HTTP 500).
+func netAmount(gross uint, fees ...uint) uint {
+	total := uint(0)
+	for _, f := range fees {
+		total += f
+	}
+	if total >= gross {
+		return 0
+	}
+	return gross - total
 }
 
 func orDefault(v, def string) string {
@@ -639,7 +652,7 @@ func CreateIpaymuPayment(c fiber.Ctx) error {
 			GrossAmount:      gross,
 			ProviderFee:      providerFee,
 			PlatformFee:      platformFee,
-			NetAmount:        gross - providerFee - platformFee,
+			NetAmount:        netAmount(gross, providerFee, platformFee),
 			Status:           "pending",
 		}
 		if d, ok := out["Data"].(map[string]any); ok {
