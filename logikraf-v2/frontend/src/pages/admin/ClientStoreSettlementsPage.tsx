@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, Card, Col, Row, Space, Spin, Statistic, Table, Tag, Typography } from 'antd'
 import { ReloadOutlined, WalletOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { apiGet } from '../../lib/api'
 
 interface StoreSummary {
   total_revenue: number
@@ -44,10 +45,8 @@ export default function ClientStoreSettlementsPage() {
     setLoading(true)
     setError('')
     try {
-      const r = await fetch('/api/client-store-settlements')
-      const d = await r.json()
-      if (!r.ok) throw new Error(d.error || 'Gagal memuat data')
-      setStores(d.stores || [])
+      const d = await apiGet('/api/client-store-settlements')
+      setStores((d?.stores as StoreView[]) || [])
     } catch (e: any) {
       setError(e.message || 'Gagal memuat data')
     } finally {
