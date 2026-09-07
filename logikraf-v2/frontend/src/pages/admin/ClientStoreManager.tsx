@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Alert, Button, Card, Input, message, Modal, Popconfirm, Space, Table, Tag, Typography } from 'antd'
-import { CopyOutlined, KeyOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Dropdown, Input, message, Modal, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd'
+import type { MenuProps } from 'antd'
+import { CopyOutlined, KeyOutlined, MoreOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons'
 import { apiGet, auth } from '../../lib/api'
 
 interface StoreRow {
@@ -170,17 +171,86 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
     ) },
   ]
 
+  const rowMenu = (r: StoreRow): MenuProps => ({
+    items: [
+      { key: 'key', icon: <KeyOutlined />, label: 'Lihat Key' },
+      { key: 'edit', label: 'Edit' },
+      { key: 'toggle', label: r.is_active ? 'Nonaktifkan' : 'Aktifkan' },
+      { type: 'divider' },
+      { key: 'regenerate', label: 'Regenerate Key', danger: true },
+      { key: 'hapus', label: 'Hapus Store', danger: true },
+    ],
+    onClick: ({ key }) => {
+      if (key === 'key') reveal(r)
+      else if (key === 'edit') openEdit(r)
+      else if (key === 'toggle') toggleActive(r)
+      else if (key === 'regenerate') Modal.confirm({
+        title: `Generate ulang key ${r.name}?`,
+        content: 'Key lama langsung tidak berlaku. Salin key baru & pasang di aplikasi client.',
+        okText: 'Ya, ganti', okButtonProps: { danger: true },
+        onOk: () => regenerate(r),
+      })
+      else if (key === 'hapus') Modal.confirm({
+        title: `Hapus ${r.name}?`,
+        content: 'Data pantauan store ini ikut hilang. Aksi tidak bisa dibatalkan.',
+        okText: 'Hapus', okButtonProps: { danger: true },
+        onOk: () => remove(r),
+      })
+    },
+  })
+
+  const feeTag = (v: number) => v > 0
+    ? <Tag color="gold" style={{ marginInlineEnd: 0 }}>{v}%</Tag>
+    : <Typography.Text type="secondary" style={{ fontSize: 12 }}>Otomatis (Xendit)</Typography.Text>
+
   return (
     <Card
-      title={<Space><Typography.Text strong>Client Store Terdaftar</Typography.Text><Typography.Text type="secondary" style={{ fontSize: 12 }}>kelola toko client yang uangnya ditampung Logikraf</Typography.Text></Space>}
-      extra={<Space>
-        <Button size="small" icon={<ReloadOutlined />} onClick={load}>Muat Ulang</Button>
-        <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => { setCreateOpen(true); setFSlug('') }}>Tambah Client Store</Button>
+      title="Client Store Terdaftar"
+      extra={<Space size={4} wrap>
+        <Button size="small" icon={<ReloadOutlined />} onClick={load} aria-label="Muat ulang" />
+        <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => { setCreateOpen(true); setFSlug('') }}>Tambah</Button>
       </Space>}
       style={{ marginBottom: 16 }}
     >
       {rows.length === 0 && !loading && <Alert type="info" showIcon message="Belum ada client store. Klik 'Tambah Client Store' untuk mendaftarkan toko pertama." />}
-      <Table rowKey="id" size="small" loading={loading} columns={columns} dataSource={rows} pagination={false} scroll={{ x: 900 }} />
+
+      {/* Desktop: tabel */}
+      <div className="hidden md:block">
+        <Table rowKey="id" size="small" loading={loading} columns={columns} dataSource={rows} pagination={false} scroll={{ x: 900 }} />
+      </div>
+
+      {/* Mobile: kartu per store */}
+      <div className="md:hidden space-y-3">
+        {loading && <div className="text-center py-6"><Spin size="small" /></div>}
+        {!loading && rows.map((r) => (
+          <div key={r.id} className="border border-white/10 rounded-lg p-3 space-y-2 bg-white/[0.02]">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Typography.Text strong style={{ fontSize: 14 }}>{r.name}</Typography.Text>
+                  <Tag color={r.is_active ? 'green' : 'default'} style={{ marginInlineEnd: 0 }}>{r.is_active ? 'Aktif' : 'Nonaktif'}</Tag>
+                </div>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>slug: {r.slug}</Typography.Text>
+              </div>
+              <Dropdown menu={rowMenu(r)} trigger={['click']} placement="bottomRight">
+                <Button size="small" type="text" icon={<MoreOutlined />} aria-label="Aksi store" />
+              </Dropdown>
+            </div>
+            <div className="space-y-1 text-[13px]">
+              <div className="flex items-center gap-2">
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>Fee:</Typography.Text>
+                {feeTag(r.fee_pct)}
+              </div>
+              <div className="break-all text-xs text-[#8a8f98]">{r.base_url}</div>
+              <Typography.Text code style={{ fontSize: 11 }}>{r.key_preview || '— belum diisi'}</Typography.Text>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button size="small" type="primary" ghost icon={<KeyOutlined />} onClick={() => reveal(r)}>Lihat Key</Button>
+              <Button size="small" onClick={() => openEdit(r)}>Edit</Button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Modal tambah */}
       <Modal title="Tambah Client Store" open={createOpen} onCancel={() => setCreateOpen(false)} onOk={create} confirmLoading={submitting} okText="Buat & Generate Key">
