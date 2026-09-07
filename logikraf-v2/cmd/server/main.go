@@ -190,6 +190,7 @@ func main() {
 	admin.Get("/invoices/enriched", handler.GetInvoicesEnriched)
 	admin.Get("/receivables", handler.GetReceivables)
 	admin.Get("/client-store-settlements", handler.GetClientStoreSettlements)
+	admin.Post("/client-store-settlements/pay", handler.PayStoreSettlement)
 	admin.Post("/invoices/refresh-status", handler.RefreshInvoiceStatuses)
 	admin.Post("/invoices/send-reminders", handler.SendInvoiceRemindersDue)
 	admin.Post("/invoices/:id/reminder", handler.SendInvoiceReminderOne)

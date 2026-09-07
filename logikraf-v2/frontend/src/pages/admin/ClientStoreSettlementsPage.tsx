@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Alert, Button, Card, Col, Row, Space, Spin, Statistic, Table, Tag, Typography } from 'antd'
-import { ReloadOutlined, WalletOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Col, Input, message, Modal, Row, Space, Spin, Statistic, Table, Tag, Typography, Upload } from 'antd'
+import { CheckCircleOutlined, ClockCircleOutlined, InboxOutlined, ReloadOutlined, UploadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet } from '../../lib/api'
 
 interface StoreSummary {
@@ -20,6 +20,7 @@ interface StoreSettlement {
   note: string
   status: 'pending' | 'paid'
   result_note: string
+  proof_path: string
   created_at: string
   paid_at: string | null
 }
@@ -41,6 +42,14 @@ export default function ClientStoreSettlementsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // mark-paid modal state
+  const [paySlug, setPaySlug] = useState<string | null>(null)
+  const [paySettlement, setPaySettlement] = useState<StoreSettlement | null>(null)
+  const [resultNote, setResultNote] = useState('')
+  const [proofFile, setProofFile] = useState<File | null>(null)
+  const [paying, setPaying] = useState(false)
+  const [payError, setPayError] = useState('')
+
   const load = useCallback(async () => {
     setLoading(true)
     setError('')
@@ -56,13 +65,49 @@ export default function ClientStoreSettlementsPage() {
 
   useEffect(() => { load() }, [load])
 
+  const openPay = (slug: string, st: StoreSettlement) => {
+    setPaySlug(slug)
+    setPaySettlement(st)
+    setResultNote('')
+    setProofFile(null)
+    setPayError('')
+  }
+
+  const submitPay = async () => {
+    if (!paySlug || !paySettlement || !proofFile) return
+    setPaying(true)
+    setPayError('')
+    const fd = new FormData()
+    fd.append('store', paySlug)
+    fd.append('settlement_id', String(paySettlement.id))
+    fd.append('result_note', resultNote)
+    fd.append('proof', proofFile)
+    try {
+      const r = await fetch('/api/client-store-settlements/pay', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+        body: fd,
+      })
+      const d = await r.json().catch(() => null)
+      if (!r.ok) throw new Error(d?.error || 'Gagal menandai dibayar')
+      message.success('Settlement ditandai Dibayar ✓ — bukti terkirim ke client store')
+      setPaySlug(null)
+      setPaySettlement(null)
+      load()
+    } catch (e: any) {
+      setPayError(e.message || 'Gagal menandai dibayar')
+    } finally {
+      setPaying(false)
+    }
+  }
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <Typography.Title level={4} className="!mb-1">Settlement Client Store</Typography.Title>
           <Typography.Text type="secondary">
-            Pantauan uang penjualan client store yang ditampung akun pembayaran Logikraf (contoh: Mystic Glide).
+            Pantauan uang penjualan client store yang ditampung akun pembayaran Logikraf. Setelah transfer manual, tandai Dibayar + upload bukti — owner client bisa mengunduhnya dari aplikasinya.
           </Typography.Text>
         </div>
         <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>Muat Ulang</Button>
@@ -127,6 +172,17 @@ export default function ClientStoreSettlementsPage() {
                     },
                     { title: 'Keterangan Hasil', dataIndex: 'result_note', render: (v: string) => v || '—' },
                     { title: 'Dibayar', dataIndex: 'paid_at', render: (v: string | null) => fmtDate(v) },
+                    {
+                      title: 'Aksi',
+                      key: 'action',
+                      render: (_, st) => st.status === 'pending' ? (
+                        <Button size="small" type="primary" danger={false} icon={<UploadOutlined />} onClick={() => openPay(s.slug, st)}>
+                          Tandai Dibayar
+                        </Button>
+                      ) : (
+                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>selesai</Typography.Text>
+                      ),
+                    },
                   ]}
                 />
               </>
@@ -134,6 +190,56 @@ export default function ClientStoreSettlementsPage() {
           </Card>
         ))}
       </Spin>
+
+      <Modal
+        open={!!paySettlement}
+        title="Tandai Dibayar & Upload Bukti Transfer"
+        okText={paying ? 'Mengirim…' : 'Konfirmasi Dibayar'}
+        cancelText="Batal"
+        confirmLoading={paying}
+        onOk={submitPay}
+        onCancel={() => setPaySettlement(null)}
+        okButtonProps={{ disabled: !proofFile }}
+        destroyOnClose
+      >
+        <div className="mb-3">
+          <Typography.Text type="secondary">
+            Pastikan transfer ke owner sudah benar-benar dilakukan sebelum konfirmasi.
+          </Typography.Text>
+        </div>
+        {paySettlement && (
+          <Alert
+            className="!mb-4"
+            type="info"
+            showIcon
+            message={`Pencairan ${fmtRp(paySettlement.amount)} — ${paySettlement.note || 'tanpa catatan'}`}
+          />
+        )}
+        <div className="mb-3">
+          <Typography.Text strong>File Bukti Transfer (wajib)</Typography.Text>
+          <Upload.Dragger
+            accept="image/*,.pdf"
+            maxCount={1}
+            beforeUpload={(file) => { setProofFile(file); return false }}
+            onRemove={() => setProofFile(null)}
+            fileList={proofFile ? [proofFile as any] : []}
+          >
+            <p className="ant-upload-drag-icon"><InboxOutlined /></p>
+            <p className="ant-upload-text">Klik atau seret bukti ke sini</p>
+            <p className="ant-upload-hint">Screenshot transfer / PDF struk (gambar atau PDF)</p>
+          </Upload.Dragger>
+        </div>
+        <div>
+          <Typography.Text strong>Keterangan Transfer (opsional)</Typography.Text>
+          <Input
+            className="!mt-1"
+            placeholder="mis. BCA 2.000.000 ref #MG-0910"
+            value={resultNote}
+            onChange={(e) => setResultNote(e.target.value)}
+          />
+        </div>
+        {payError && <Alert className="!mt-3" type="error" showIcon message={payError} />}
+      </Modal>
     </div>
   )
 }

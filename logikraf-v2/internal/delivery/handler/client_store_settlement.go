@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -53,6 +56,7 @@ type StoreSettlement struct {
 	Note       string `json:"note"`
 	Status     string `json:"status"`
 	ResultNote string `json:"result_note"`
+	ProofPath  string `json:"proof_path"`
 	CreatedAt  string `json:"created_at"`
 	PaidAt     string `json:"paid_at"`
 }
@@ -154,4 +158,73 @@ func doInternalGET(url, key string) ([]byte, error) {
 		return nil, fmt.Errorf("client store merespons HTTP %d", resp.StatusCode)
 	}
 	return io.ReadAll(resp.Body)
+}
+
+// PayStoreSettlement marks a store's pending settlement as paid and uploads the
+// transfer-proof file — proxied to the store's internal API. Logikraf performs
+// the real bank transfer first (manual), then calls this.
+// POST /api/client-store-settlements/pay (admin, multipart: store, settlement_id, result_note, proof)
+func PayStoreSettlement(c fiber.Ctx) error {
+	key := internalKey()
+	slug := c.FormValue("store")
+	sid := c.FormValue("settlement_id")
+	resultNote := c.FormValue("result_note")
+	if slug == "" || sid == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "store & settlement_id wajib"})
+	}
+	var store *ClientStore
+	for _, st := range loadClientStores() {
+		if st.Slug == slug {
+			store = &st
+			break
+		}
+	}
+	if store == nil {
+		return c.Status(404).JSON(fiber.Map{"error": "client store tidak dikenal"})
+	}
+	if store.BaseURL == "" || key == "" {
+		return c.Status(500).JSON(fiber.Map{"error": "store URL / key belum dikonfigurasi"})
+	}
+
+	src, err := c.FormFile("proof")
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "file bukti transfer wajib diunggah"})
+	}
+	fh, err := src.Open()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "gagal membaca file bukti"})
+	}
+	defer fh.Close()
+
+	var buf bytes.Buffer
+	mw := multipart.NewWriter(&buf)
+	fw, err := mw.CreateFormFile("proof", filepath.Base(src.Filename))
+	if err == nil {
+		_, err = io.Copy(fw, fh)
+	}
+	if err == nil {
+		err = mw.WriteField("result_note", resultNote)
+	}
+	mw.Close()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "gagal menyiapkan upload: " + err.Error()})
+	}
+
+	req, err := http.NewRequest(http.MethodPatch,
+		store.BaseURL+"/settlements/"+sid+"/paid", &buf)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	req.Header.Set("X-Internal-Key", key)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "tidak bisa menghubungi client store: " + err.Error()})
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= 300 {
+		return c.Status(502).JSON(fiber.Map{"error": fmt.Sprintf("client store menolak (HTTP %d): %s", resp.StatusCode, string(body))})
+	}
+	return c.JSON(fiber.Map{"message": "settlement ditandai dibayar ✓", "detail": json.RawMessage(body)})
 }
