@@ -104,14 +104,14 @@ export default function ClientStoreSettlementsPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div className="min-w-0">
           <Typography.Title level={4} className="!mb-1">Settlement Client Store</Typography.Title>
           <Typography.Text type="secondary">
             Pantauan uang penjualan client store yang ditampung akun pembayaran Logikraf. Setelah transfer manual, tandai Dibayar + upload bukti — owner client bisa mengunduhnya dari aplikasinya.
           </Typography.Text>
         </div>
-        <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>Muat Ulang</Button>
+        <Button icon={<ReloadOutlined />} onClick={load} loading={loading} className="self-start md:self-auto">Muat Ulang</Button>
       </div>
 
       {error && <Alert type="error" showIcon message={error} />}
@@ -131,23 +131,23 @@ export default function ClientStoreSettlementsPage() {
             ) : (
               <>
                 <Row gutter={[16, 16]} className="!mb-6">
-                  <Col xs={12} md={6}><Statistic title="Total Pendapatan (pembeli bayar)" value={s.summary?.total_revenue || 0} prefix="Rp" /></Col>
-                  <Col xs={12} md={6}><Statistic title="Dari Produk" value={s.summary?.product_revenue || 0} prefix="Rp" /></Col>
-                  <Col xs={12} md={6}><Statistic title="Dari Ongkir" value={s.summary?.shipping_total || 0} prefix="Rp" /></Col>
-                  <Col xs={12} md={6}><Statistic title="Pesanan Dibayar" value={s.summary?.paid_order_count || 0} suffix={`/ ${s.summary?.order_count || 0}`} /></Col>
+                  <Col xs={24} sm={12} lg={6}><Statistic title="Total Pendapatan (pembeli bayar)" value={s.summary?.total_revenue || 0} prefix="Rp" /></Col>
+                  <Col xs={24} sm={12} lg={6}><Statistic title="Dari Produk" value={s.summary?.product_revenue || 0} prefix="Rp" /></Col>
+                  <Col xs={24} sm={12} lg={6}><Statistic title="Dari Ongkir" value={s.summary?.shipping_total || 0} prefix="Rp" /></Col>
+                  <Col xs={24} sm={12} lg={6}><Statistic title="Pesanan Dibayar" value={s.summary?.paid_order_count || 0} suffix={`/ ${s.summary?.order_count || 0}`} /></Col>
                 </Row>
                 <Row gutter={[16, 16]} className="!mb-6">
-                  <Col xs={12} md={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <Card size="small" style={{ background: 'rgba(250,173,20,0.08)' }}>
                       <Statistic title="Sisa Belum Dicairkan" value={s.summary?.outstanding || 0} prefix="Rp" valueStyle={{ color: '#d48806', fontWeight: 700 }} />
                     </Card>
                   </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <Card size="small" style={{ background: 'rgba(250,173,20,0.05)' }}>
                       <Statistic title="Pengajuan Menunggu" value={s.summary?.pending_total || 0} prefix="Rp" />
                     </Card>
                   </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={24} sm={12} lg={8}>
                     <Card size="small" style={{ background: 'rgba(82,196,26,0.07)' }}>
                       <Statistic title="Sudah Dicairkan" value={s.summary?.settled_total || 0} prefix="Rp" valueStyle={{ color: '#389e0d' }} />
                     </Card>
@@ -155,10 +155,47 @@ export default function ClientStoreSettlementsPage() {
                 </Row>
 
                 <Typography.Title level={5} className="!mb-3">Riwayat Pencairan</Typography.Title>
+
+                {/* Mobile: kartu per pencairan */}
+                <div className="md:hidden space-y-3">
+                  {(s.settlements || []).length === 0 && (
+                    <Typography.Text type="secondary">Belum ada pengajuan pencairan.</Typography.Text>
+                  )}
+                  {(s.settlements || []).map((st) => (
+                    <Card key={st.id} size="small" className="!mb-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <b className="text-[15px]">{fmtRp(st.amount)}</b>
+                            {st.status === 'paid'
+                              ? <Tag icon={<CheckCircleOutlined />} color="green" className="!m-0">Dibayar</Tag>
+                              : <Tag icon={<ClockCircleOutlined />} color="orange" className="!m-0">Menunggu</Tag>}
+                          </div>
+                          <div className="text-[13px] text-gray-500 mt-1 break-words">{st.note || '—'}</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-2 leading-relaxed">
+                        Diajukan {fmtDate(st.created_at)}
+                        {st.status === 'paid' && st.paid_at && <> · Dibayar {fmtDate(st.paid_at)}</>}
+                        {st.result_note && <div className="text-gray-500 mt-0.5">Hasil: {st.result_note}</div>}
+                      </div>
+                      {st.status === 'pending' && (
+                        <Button type="primary" size="small" block icon={<UploadOutlined />}
+                          className="!mt-3" onClick={() => openPay(s.slug, st)}>
+                          Tandai Dibayar & Upload Bukti
+                        </Button>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop: tabel */}
+                <div className="hidden md:block">
                 <Table<StoreSettlement>
                   rowKey="id"
                   size="small"
                   pagination={false}
+                  scroll={{ x: 860 }}
                   dataSource={s.settlements || []}
                   locale={{ emptyText: 'Belum ada pengajuan pencairan.' }}
                   columns={[
@@ -187,6 +224,7 @@ export default function ClientStoreSettlementsPage() {
                     },
                   ]}
                 />
+                </div>
               </>
             )}
           </Card>
