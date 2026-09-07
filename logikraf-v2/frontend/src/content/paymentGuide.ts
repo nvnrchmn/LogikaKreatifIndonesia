@@ -11,10 +11,16 @@ Baca urut agar tidak ada langkah terlewat.
 ## 1. Konsep Alur Dana
 
 \`\`\`
-Pembeli bayar (via aplikasi client / Xendit Logikraf)
+Pembeli checkout di aplikasi client
         │
         ▼
-Uang masuk ke rekening pembayaran Logikraf
+Aplikasi client MINTA INVOICE ke Logikraf Payment Hub (bukan ke Xendit langsung)
+        │  (Logikraf yang memegang kunci Xendit — satu pintu)
+        ▼
+Xendit membuat invoice (atas nama Logikraf) → aplikasi client tampilkan link bayar
+        │
+        ▼
+Pembeli bayar → uang masuk ke rekening pembayaran Logikraf
         │
         ▼
 Owner client lihat saldo di aplikasinya → klik "Ajukan Pencairan"
@@ -32,6 +38,11 @@ Owner client unduh bukti transfer dari aplikasinya (status berubah "Dibayar")
 Poin penting:
 - Uang penjualan client TIDAK pernah langsung ke rekening client.
   Semua masuk rekening Logikraf dulu, lalu disetorkan manual.
+- **Kunci Xendit hanya dipegang Logikraf** — aplikasi client TIDAK perlu
+  (dan tidak boleh) menyimpan kunci Xendit. Pembuatan invoice dilakukan
+  Payment Hub Logikraf via \`POST /api/client-store-invoices\`.
+- Webhook Xendit masuk ke logikraf.id dulu, lalu diteruskan ke aplikasi client
+  berdasarkan prefix \`external_id\` (mis. \`mg-\`).
 - Aplikasi hanya mencatat & menghitung. Transfer tetap manual oleh Logikraf.
 - Saldo yang bisa dicairkan = pendapatan yang sudah dibayar (PAID) −
   yang sudah disetorkan − pengajuan yang masih menunggu.
@@ -63,6 +74,11 @@ Detail kontrak API ada di bagian 3.
    - Slug otomatis dari nama (bisa diubah)
 4. Klik **Buat & Generate Key** → Logikraf otomatis membuat key acak
 5. **Salin key** — key hanya tampil SEKALI di modal ini
+
+Konfigurasi tambahan (di-set Logikraf via DB, bukan di form):
+- **Prefix external_id** (mis. \`mg-\`) — untuk routing webhook Xendit
+- **URL Webhook** aplikasi client (mis. \`http://127.0.0.1:8095/api/v1/webhook/xendit\`)
+- **Webhook secret** — dipakai Payment Hub menandatangani forward (\`X-Logikraf-Signature\`)
 
 ### Langkah C — Pasang key di aplikasi client
 - Simpan key sebagai nilai env aplikasi client, mis. \`MG_INTERNAL_KEY=<key>\`
@@ -114,8 +130,8 @@ Response sukses (200):
     "paid_at": null
 } ] }
 \`\`\`
-Status: \`pending\` (menunggu) atau \`paid\` (sudah ditransfer).
-\`proof_path\` terisi setelah Logikraf upload bukti.
+Status: \`pending\` (menunggu), \`processing\` (terkunci Logikraf saat proses transfer)
+atau \`paid\` (sudah ditransfer). \`proof_path\` terisi setelah Logikraf upload bukti.
 
 ### 3.3 PATCH {base}/settlements/{id}/paid
 Body multipart/form-data:
@@ -131,6 +147,43 @@ Catatan implementasi (Go Fiber + GORM):
 - \`proof_path\` berisi URL path file (mis. \`/uploads/settlements/settlement-8-1725.pdf\`)
 - Kolom settlement minimal: \`id, amount, note, status, result_note, proof_path, created_at, paid_at\`
 
+### 3.4 Membuat invoice pembayaran (satu pintu)
+Saat customer checkout, aplikasi client TIDAK memanggil Xendit. Ia memanggil
+endpoint Payment Hub Logikraf, header wajib sama:
+
+\`\`\`
+POST https://logikraf.id/api/client-store-invoices
+X-Internal-Key: <key yang sama dengan di Langkah C>
+\`\`\`
+
+Body JSON:
+\`\`\`json
+{
+  "external_id": "mg-20260908-001",
+  "amount": 150000,
+  "payer_email": "customer@mail.com",
+  "given_names": "Nama Pembeli",
+  "description": "Pesanan #MG-20260908-001",
+  "success_redirect_url": "https://tokoclient.com/order/sukses",
+  "failure_redirect_url": "https://tokoclient.com/order/gagal"
+}
+\`\`\`
+
+Catatan: \`external_id\` WAJIB diawali prefix store (mis. \`mg-\`) supaya webhook
+bisa dirutekan balik ke aplikasi client.
+
+Response sukses — passthrough dari Xendit, antara lain:
+\`\`\`json
+{
+  "id": "6a9ed6ee3b1f089e74cd4272",
+  "external_id": "mg-20260908-001",
+  "amount": 150000,
+  "status": "PENDING",
+  "invoice_url": "https://checkout.xendit.co/web/6a9ed6ee3b1f089e74cd4272"
+}
+\`\`\`
+\`invoice_url\` itulah link bayar yang ditampilkan ke customer.
+
 ---
 
 ## 4. Operasional Harian
@@ -144,7 +197,7 @@ Catatan implementasi (Go Fiber + GORM):
 
 Aturan saldo:
 - Owner TIDAK bisa mengajukan melebihi saldo tersedia (aplikasi client memblokir)
-- Pengajuan yang masih "Menunggu" ikut mengurangi saldo yang bisa diajukan
+- Pengajuan yang masih "Menunggu"/"Diproses" ikut mengurangi saldo yang bisa diajukan
 
 ---
 
@@ -158,15 +211,19 @@ Aturan saldo:
   data tetap tersimpan) atau **Hapus** bila data boleh dibuang.
 - Bukti transfer tersimpan di aplikasi client (folder upload) — pastikan
   backup mencakup folder tersebut.
+- Key & callback token Xendit hanya hidup di settings logikraf.id — aplikasi
+  client tidak pernah menyimpannya.
 
 ---
 
 ## 6. Catatan Kunci (jangan lupa)
 
 1. Uang client selalu lewat rekening Logikraf dulu — tidak pernah langsung.
-2. Transaksi di ledger logikraf.id (\`payment_transactions\`) hanya mencatat
+2. Semua transaksi Xendit (buat invoice & terima webhook) lewat logikraf.id —
+   satu pintu. Aplikasi client hanya meminta invoice & menerima forward webhook.
+3. Transaksi di ledger logikraf.id (\`payment_transactions\`) hanya mencatat
    penjualan logikraf.id sendiri. Data client store hidup di aplikasi client
    dan ditarik live via API internal — tidak disalin ke DB Logikraf.
-3. Kalau client baru butuh waktu cepat: cukup ikuti Langkah A–D di bagian 2;
+4. Kalau client baru butuh waktu cepat: cukup ikuti Langkah A–D di bagian 2;
    sisa alur settlement otomatis bekerja.
 `
