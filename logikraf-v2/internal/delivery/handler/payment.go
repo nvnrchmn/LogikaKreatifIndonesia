@@ -357,6 +357,16 @@ func XenditWebhook(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
 	}
 
+	// Payment Hub routing: kalau external_id punya prefix client store aktif
+	// (mis. "mg-") → forward seluruh payload ke webhook store.
+	handled, ferr := ForwardToClientStore(c, p.ExternalID)
+	if ferr != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "forward ke client store gagal", "detail": ferr.Error()})
+	}
+	if handled {
+		return c.JSON(fiber.Map{"status": "ok", "message": "forwarded to client store"})
+	}
+
 	ref := p.ExternalID
 	if ref == "" {
 		ref = p.ID

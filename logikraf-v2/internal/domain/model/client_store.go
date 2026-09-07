@@ -8,17 +8,22 @@ import (
 
 // ClientStore adalah toko online client (contoh: MysticGlide) yang uang
 // penjualannya masuk ke akun pembayaran Logikraf. Setiap store punya key
-// internal (X-Internal-Key) utk menarik data finance & menandai settlement.
+// internal (X-Internal-Key) utk menarik data finance & menandai settlement,
+// plus konfigurasi routing webhook (ext_prefix) kalau store menumpang di akun
+// Xendit Logikraf — Xendit callback masuk logikraf.id lalu diforward ke store.
 type ClientStore struct {
-	ID          uint      `gorm:"primaryKey" json:"id"`
-	Slug        string    `gorm:"size:60;uniqueIndex;not null" json:"slug"`
-	Name        string    `gorm:"size:120;not null" json:"name"`
-	BaseURL     string    `gorm:"size:255" json:"base_url"`                   // API internal store, contoh: http://127.0.0.1:8095/api/v1/internal
-	InternalKey string    `gorm:"size:100" json:"-"`                          // X-Internal-Key (tidak pernah diekspos di list JSON)
-	FeePct      float64   `gorm:"type:decimal(5,2);default:0" json:"fee_pct"` // Logikraf Fee % (0 = otomatis dari Xendit, info/tampilan saja)
-	IsActive    bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID            uint      `gorm:"primaryKey" json:"id"`
+	Slug          string    `gorm:"size:60;uniqueIndex;not null" json:"slug"`
+	Name          string    `gorm:"size:120;not null" json:"name"`
+	BaseURL       string    `gorm:"size:255" json:"base_url"` // base API store, contoh: http://127.0.0.1:8095
+	InternalKey   string    `gorm:"size:100" json:"-"`        // X-Internal-Key (tidak pernah diekspos di list JSON)
+	FeePct        float64   `gorm:"type:decimal(5,2);default:0" json:"fee_pct"`
+	IsActive      bool      `gorm:"default:true" json:"is_active"`
+	ExtPrefix     string    `gorm:"size:20" json:"ext_prefix"` // prefix external_id Xendit, contoh "mg-" → route webhook ke store ini
+	WebhookURL    string    `gorm:"size:255" json:"-"`         // endpoint webhook store, kosong = BaseURL + "/api/v1/webhook/xendit"
+	WebhookSecret string    `gorm:"size:100" json:"-"`         // shared secret utk header X-Logikraf-Signature saat forward
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 func (ClientStore) TableName() string { return "client_stores" }
