@@ -34,6 +34,7 @@ const navSections = [
     items: [
       { label: 'Piutang', path: '/admin/receivables', icon: LedgerNavIcon },
       { label: 'Settlement Client', path: '/admin/client-settlements', icon: SettlementNavIcon },
+      { label: 'Panduan Payment', path: '/admin/payment-guide', icon: DocNavIcon },
       { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
       { label: 'Reports', path: '/admin/reports', icon: ChartIcon },
