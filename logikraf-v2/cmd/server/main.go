@@ -19,8 +19,8 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
-	sched "github.com/logikraf/logikraf-v2/pkg/scheduler"
 	"github.com/logikraf/logikraf-v2/pkg/auth"
+	sched "github.com/logikraf/logikraf-v2/pkg/scheduler"
 )
 
 var frontendDir string
@@ -189,6 +189,7 @@ func main() {
 	admin.Get("/invoices", handler.GetInvoices)
 	admin.Get("/invoices/enriched", handler.GetInvoicesEnriched)
 	admin.Get("/receivables", handler.GetReceivables)
+	admin.Get("/client-store-settlements", handler.GetClientStoreSettlements)
 	admin.Post("/invoices/refresh-status", handler.RefreshInvoiceStatuses)
 	admin.Post("/invoices/send-reminders", handler.SendInvoiceRemindersDue)
 	admin.Post("/invoices/:id/reminder", handler.SendInvoiceReminderOne)

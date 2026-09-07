@@ -13,9 +13,10 @@
 - `infra/` — konfigurasi infrastruktur/deploy
 - **Knowledge graph (WAJIB):** repo pakai graphify — sebelum tanya struktur kode jalankan `graphify query "<pertanyaan>"`, relasi pakai `graphify path A B`, navigasi via `graphify-out/wiki/index.md`. Setelah modifikasi kode: `graphify update .` (aturan di `.agents/rules/graphify.md`)
 
-## Status Terakhir (cek 2026-09-01)
-- ✅ HEAD 2026-08-31: fix hero stats frontend parsing + duplicate routes
+## Status Terakhir (cek 2026-09-03)
+- ✅ HEAD 2026-09-03: Xendit aktif utk checkout logikraf.id (Fase 1) — handler `CreateXenditInvoice` + `XenditWebhook` setara iPaymu (payload alias order_id/email, OrderID=external_id, webhook lengkap: Transaction/Invoice/Notification/email/idempotency); frontend CheckoutModal gateway-aware dinamis
 - ✅ CI/CD GitHub Actions SSH ke VPS (systemd `logikraf-server`)
+- ⚠️ Keputusan payment (lintas-proyek, detail di ~/wiki/concepts/payment-gateway-keputusan.md): SaaS→Xendit Logikraf; aliran iuran tenant→iPaymu Split Payment (kode Payment Hub sudah ada: `CreateSubAccount`/`CreateSplitPayment`; menunggu verifikasi akun iPaymu PT Perorangan)
 - ⚠️ `.env` di repo default PORT=8080 (dev); prod = 8081 via systemd
 - Ponytail config FULL untuk review/audit
 - Selalu update file ini saat ada perubahan struktur/status

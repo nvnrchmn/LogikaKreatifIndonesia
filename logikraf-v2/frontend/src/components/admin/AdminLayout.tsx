@@ -33,6 +33,7 @@ const navSections = [
     hint: 'Tagihan & pembayaran klien',
     items: [
       { label: 'Piutang', path: '/admin/receivables', icon: LedgerNavIcon },
+      { label: 'Settlement Client', path: '/admin/client-settlements', icon: SettlementNavIcon },
       { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
       { label: 'Reports', path: '/admin/reports', icon: ChartIcon },
@@ -188,6 +189,14 @@ function MerchantNavIcon() {
   return (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 7l9-4 9 4M4 10h16M6 10v8m4-8v8m4-8v8m4-8v8" />
+    </svg>
+  )
+}
+
+function SettlementNavIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
     </svg>
   )
 }
