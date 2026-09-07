@@ -174,6 +174,7 @@ func main() {
 	api.Post("/payment/ipaymu/snap", handler.CreateIpaymuPayment)
 	api.Post("/payment/ipaymu/invoice", handler.CreateIpaymuPayment)
 	api.Post("/webhooks/xendit", handler.XenditWebhook)
+	api.Post("/client-store-invoices", handler.CreateClientStoreInvoice)
 	api.Post("/webhooks/midtrans", handler.MidtransWebhook)
 	api.Post("/webhooks/ipaymu", handler.IpaymuWebhook)
 	app.Get("/sitemap.xml", handler.GetSitemap)
