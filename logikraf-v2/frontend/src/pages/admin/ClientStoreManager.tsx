@@ -8,6 +8,7 @@ interface StoreRow {
   slug: string
   name: string
   base_url: string
+  fee_pct: number
   is_active: boolean
   key_preview: string
   created_at: string
@@ -38,6 +39,7 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
   const [editTarget, setEditTarget] = useState<StoreRow | null>(null)
   const [eName, setEName] = useState('')
   const [eBase, setEBase] = useState('')
+  const [eFee, setEFee] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -117,13 +119,20 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
   }
 
   const openEdit = (row: StoreRow) => {
-    setEditTarget(row); setEName(row.name); setEBase(row.base_url)
+    setEditTarget(row); setEName(row.name); setEBase(row.base_url); setEFee(row.fee_pct ? String(row.fee_pct) : '')
   }
   const saveEdit = async () => {
     if (!editTarget) return
+    const fee = eFee.replace(',', '.')
+    if (fee !== '' && (isNaN(Number(fee)) || Number(fee) < 0 || Number(fee) > 100)) {
+      message.error('Logikraf Fee harus 0–100 (%)'); return
+    }
     try {
       const r = await fetch(`/api/client-store-settlements/stores/${editTarget.id}`, {
-        method: 'PUT', headers: auth(), body: JSON.stringify({ name: eName.trim(), base_url: eBase.trim().replace(/\/+$/, '') }),
+        method: 'PUT', headers: auth(), body: JSON.stringify({
+          name: eName.trim(), base_url: eBase.trim().replace(/\/+$/, ''),
+          fee_pct: fee === '' ? 0 : Number(fee),
+        }),
       })
       const d = await r.json().catch(() => null)
       if (!r.ok) throw new Error(d?.error || 'Gagal simpan')
@@ -140,6 +149,9 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
       </Space>
     ) },
     { title: 'URL Internal', dataIndex: 'base_url', ellipsis: true },
+    { title: 'Logikraf Fee', dataIndex: 'fee_pct', width: 150, render: (v: number) => v > 0
+      ? <Tag color="gold">{v}%</Tag>
+      : <Typography.Text type="secondary" style={{ fontSize: 12 }}>Otomatis (Xendit)</Typography.Text> },
     { title: 'Key', dataIndex: 'key_preview', render: (v: string) => <Typography.Text code style={{ fontSize: 12 }}>{v || '— belum diisi'}</Typography.Text> },
     { title: 'Status', dataIndex: 'is_active', width: 90, render: (v: boolean) => v
       ? <Tag color="green">Aktif</Tag> : <Tag color="default">Nonaktif</Tag> },
@@ -194,6 +206,11 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
         <Space direction="vertical" style={{ width: '100%' }} size={12}>
           <Input value={eName} onChange={e => setEName(e.target.value)} placeholder="Nama toko" />
           <Input value={eBase} onChange={e => setEBase(e.target.value)} placeholder="URL internal" />
+          <div>
+            <Input addonBefore="Logikraf Fee %" addonAfter="0 = otomatis dari Xendit"
+              value={eFee} onChange={e => setEFee(e.target.value.replace(/[^\d.,]/g, ''))}
+              placeholder="mis. 3.5" />
+          </div>
         </Space>
       </Modal>
 

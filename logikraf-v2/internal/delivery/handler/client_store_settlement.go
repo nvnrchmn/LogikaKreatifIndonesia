@@ -126,6 +126,7 @@ func ListClientStoresAdmin(c fiber.Ctx) error {
 		Slug       string    `json:"slug"`
 		Name       string    `json:"name"`
 		BaseURL    string    `json:"base_url"`
+		FeePct     float64   `json:"fee_pct"`
 		IsActive   bool      `json:"is_active"`
 		KeyPreview string    `json:"key_preview"`
 		CreatedAt  time.Time `json:"created_at"`
@@ -133,15 +134,16 @@ func ListClientStoresAdmin(c fiber.Ctx) error {
 	rows := make([]row, 0, len(stores))
 	for _, s := range stores {
 		rows = append(rows, row{ID: s.ID, Slug: s.Slug, Name: s.Name, BaseURL: s.BaseURL,
-			IsActive: s.IsActive, KeyPreview: storeKeyPreview(s.InternalKey), CreatedAt: s.CreatedAt})
+			FeePct: s.FeePct, IsActive: s.IsActive, KeyPreview: storeKeyPreview(s.InternalKey), CreatedAt: s.CreatedAt})
 	}
 	return c.JSON(fiber.Map{"stores": rows})
 }
 
 type storeInput struct {
-	Slug    string `json:"slug"`
-	Name    string `json:"name"`
-	BaseURL string `json:"base_url"`
+	Slug    string  `json:"slug"`
+	Name    string  `json:"name"`
+	BaseURL string  `json:"base_url"`
+	FeePct  float64 `json:"fee_pct"` // Logikraf Fee % — 0 = otomatis dari Xendit
 }
 
 func slugify(s string) string {
@@ -177,7 +179,7 @@ func CreateClientStoreAdmin(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "slug tidak valid"})
 	}
 	store := model.ClientStore{
-		Slug: in.Slug, Name: in.Name, BaseURL: in.BaseURL,
+		Slug: in.Slug, Name: in.Name, BaseURL: in.BaseURL, FeePct: in.FeePct,
 		InternalKey: model.GenerateInternalKey(), IsActive: true,
 	}
 	if err := model.DB.Create(&store).Error; err != nil {
@@ -203,12 +205,16 @@ func GetClientStoreKeyAdmin(c fiber.Ctx) error {
 func UpdateClientStoreAdmin(c fiber.Ctx) error {
 	id, _ := strconv.Atoi(c.Params("id"))
 	var in struct {
-		Name     string `json:"name"`
-		BaseURL  string `json:"base_url"`
-		IsActive *bool  `json:"is_active"`
+		Name     string   `json:"name"`
+		BaseURL  string   `json:"base_url"`
+		FeePct   *float64 `json:"fee_pct"`
+		IsActive *bool    `json:"is_active"`
 	}
 	if err := c.Bind().JSON(&in); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "payload tidak valid"})
+	}
+	if in.FeePct != nil && (*in.FeePct < 0 || *in.FeePct > 100) {
+		return c.Status(400).JSON(fiber.Map{"error": "fee_pct harus 0–100"})
 	}
 	updates := map[string]interface{}{}
 	if in.Name != "" {
@@ -216,6 +222,9 @@ func UpdateClientStoreAdmin(c fiber.Ctx) error {
 	}
 	if in.BaseURL != "" {
 		updates["base_url"] = strings.TrimSpace(strings.TrimSuffix(in.BaseURL, "/"))
+	}
+	if in.FeePct != nil {
+		updates["fee_pct"] = *in.FeePct
 	}
 	if in.IsActive != nil {
 		updates["is_active"] = *in.IsActive
