@@ -311,6 +311,52 @@ func doInternalGET(url, key string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
+// SetStoreSettlementStatus proxies a status transition to a store's internal API:
+//   - POST /api/client-store-settlements/settlements/status
+//     body JSON: { "store": "<slug>", "settlement_id": 12, "action": "processing" | "unlock" }
+//
+// Logikraf locks ("processing") a payout request while starting the manual bank
+// transfer so the owner client can no longer cancel it mid-transfer; "unlock"
+// returns a locked request to pending when the transfer is aborted.
+func SetStoreSettlementStatus(c fiber.Ctx) error {
+	var body struct {
+		Store        string `json:"store"`
+		SettlementID string `json:"settlement_id"`
+		Action       string `json:"action"`
+	}
+	if err := c.Bind().JSON(&body); err != nil || body.Store == "" || body.SettlementID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "store & settlement_id wajib"})
+	}
+	if body.Action != "processing" && body.Action != "unlock" {
+		return c.Status(400).JSON(fiber.Map{"error": "action harus 'processing' atau 'unlock'"})
+	}
+	var store model.ClientStore
+	if err := model.DB.Where("slug = ? AND is_active = ?", body.Store, true).First(&store).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "client store tidak dikenal / nonaktif"})
+	}
+	if store.BaseURL == "" || store.InternalKey == "" {
+		return c.Status(500).JSON(fiber.Map{"error": "base_url / internal key store belum diisi"})
+	}
+
+	req, err := http.NewRequest(http.MethodPatch,
+		store.BaseURL+"/settlements/"+body.SettlementID+"/"+body.Action, nil)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	req.Header.Set("X-Internal-Key", store.InternalKey)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "tidak bisa menghubungi client store: " + err.Error()})
+	}
+	defer resp.Body.Close()
+	b, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode >= 300 {
+		return c.Status(502).JSON(fiber.Map{"error": fmt.Sprintf("client store menolak (HTTP %d): %s", resp.StatusCode, string(b))})
+	}
+	verb := map[string]string{"processing": "pengajuan dikunci (sedang diproses)", "unlock": "kunci dibuka, pengajuan kembali menunggu"}[body.Action]
+	return c.JSON(fiber.Map{"message": verb + " ✓", "detail": json.RawMessage(b)})
+}
+
 // PayStoreSettlement marks a store's pending settlement as paid and uploads the
 // transfer-proof file — proxied to the store's internal API. Logikraf performs
 // the real bank transfer first (manual), then calls this.

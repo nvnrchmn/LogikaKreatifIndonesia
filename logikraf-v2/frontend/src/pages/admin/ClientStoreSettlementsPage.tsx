@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, Card, Col, Input, message, Modal, Row, Space, Spin, Statistic, Table, Tag, Typography, Upload } from 'antd'
-import { CheckCircleOutlined, ClockCircleOutlined, InboxOutlined, ReloadOutlined, UploadOutlined, WalletOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, ClockCircleOutlined, InboxOutlined, LockOutlined, ReloadOutlined, UnlockOutlined, UploadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet } from '../../lib/api'
 import ClientStoreManager from './ClientStoreManager'
 
@@ -19,7 +19,7 @@ interface StoreSettlement {
   id: number
   amount: number
   note: string
-  status: 'pending' | 'paid'
+  status: 'pending' | 'paid' | 'processing'
   result_note: string
   proof_path: string
   created_at: string
@@ -72,6 +72,26 @@ export default function ClientStoreSettlementsPage() {
     setResultNote('')
     setProofFile(null)
     setPayError('')
+  }
+
+  const setStatus = async (slug: string, st: StoreSettlement, action: 'processing' | 'unlock') => {
+    const ok = action === 'processing'
+      ? window.confirm('Kunci pengajuan ini sebagai "sedang diproses"? Owner client tidak bisa membatalkannya selama proses transfer. Lakukan ini SETELAH kamu mulai transfer manual.')
+      : window.confirm('Buka kunci pengajuan ini? Status kembali ke "Menunggu" — owner client bisa membatalkannya lagi.')
+    if (!ok) return
+    try {
+      const r = await fetch('/api/client-store-settlements/settlements/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+        body: JSON.stringify({ store: slug, settlement_id: String(st.id), action }),
+      })
+      const d = await r.json().catch(() => null)
+      if (!r.ok) throw new Error(d?.error || 'Gagal mengubah status')
+      message.success(d?.message || 'Status diubah ✓')
+      load()
+    } catch (e: any) {
+      message.error(e.message || 'Gagal mengubah status')
+    }
   }
 
   const submitPay = async () => {
@@ -169,7 +189,9 @@ export default function ClientStoreSettlementsPage() {
                             <b className="text-[15px]">{fmtRp(st.amount)}</b>
                             {st.status === 'paid'
                               ? <Tag icon={<CheckCircleOutlined />} color="green" className="!m-0">Dibayar</Tag>
-                              : <Tag icon={<ClockCircleOutlined />} color="orange" className="!m-0">Menunggu</Tag>}
+                              : st.status === 'processing'
+                                ? <Tag icon={<LockOutlined />} color="purple" className="!m-0">Diproses — Terkunci</Tag>
+                                : <Tag icon={<ClockCircleOutlined />} color="orange" className="!m-0">Menunggu</Tag>}
                           </div>
                           <div className="text-[13px] text-gray-500 mt-1 break-words">{st.note || '—'}</div>
                         </div>
@@ -180,10 +202,28 @@ export default function ClientStoreSettlementsPage() {
                         {st.result_note && <div className="text-gray-500 mt-0.5">Hasil: {st.result_note}</div>}
                       </div>
                       {st.status === 'pending' && (
-                        <Button type="primary" size="small" block icon={<UploadOutlined />}
-                          className="!mt-3" onClick={() => openPay(s.slug, st)}>
-                          Tandai Dibayar & Upload Bukti
-                        </Button>
+                        <div className="!mt-3 flex flex-col gap-2">
+                          <Button type="primary" size="small" block icon={<UploadOutlined />}
+                            onClick={() => openPay(s.slug, st)}>
+                            Tandai Dibayar & Upload Bukti
+                          </Button>
+                          <Button size="small" block icon={<LockOutlined />}
+                            onClick={() => setStatus(s.slug, st, 'processing')}>
+                            Mulai Proses (Kunci)
+                          </Button>
+                        </div>
+                      )}
+                      {st.status === 'processing' && (
+                        <div className="!mt-3 flex flex-col gap-2">
+                          <Button type="primary" size="small" block icon={<UploadOutlined />}
+                            onClick={() => openPay(s.slug, st)}>
+                            Tandai Dibayar & Upload Bukti
+                          </Button>
+                          <Button size="small" block icon={<UnlockOutlined />}
+                            onClick={() => setStatus(s.slug, st, 'unlock')}>
+                            Buka Kunci
+                          </Button>
+                        </div>
                       )}
                     </Card>
                   ))}
@@ -207,19 +247,36 @@ export default function ClientStoreSettlementsPage() {
                       dataIndex: 'status',
                       render: (v: string) => v === 'paid'
                         ? <Tag icon={<CheckCircleOutlined />} color="green">Dibayar</Tag>
-                        : <Tag icon={<ClockCircleOutlined />} color="orange">Menunggu</Tag>,
+                        : v === 'processing'
+                          ? <Tag icon={<LockOutlined />} color="purple">Diproses — Terkunci</Tag>
+                          : <Tag icon={<ClockCircleOutlined />} color="orange">Menunggu</Tag>,
                     },
                     { title: 'Keterangan Hasil', dataIndex: 'result_note', render: (v: string) => v || '—' },
                     { title: 'Dibayar', dataIndex: 'paid_at', render: (v: string | null) => fmtDate(v) },
                     {
                       title: 'Aksi',
                       key: 'action',
-                      render: (_, st) => st.status === 'pending' ? (
-                        <Button size="small" type="primary" danger={false} icon={<UploadOutlined />} onClick={() => openPay(s.slug, st)}>
-                          Tandai Dibayar
-                        </Button>
-                      ) : (
-                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>selesai</Typography.Text>
+                      render: (_, st) => (
+                        <Space size={4} wrap>
+                          {st.status !== 'paid' && (
+                            <Button size="small" type="primary" icon={<UploadOutlined />} onClick={() => openPay(s.slug, st)}>
+                              Tandai Dibayar
+                            </Button>
+                          )}
+                          {st.status === 'pending' && (
+                            <Button size="small" icon={<LockOutlined />} onClick={() => setStatus(s.slug, st, 'processing')}>
+                              Mulai Proses
+                            </Button>
+                          )}
+                          {st.status === 'processing' && (
+                            <Button size="small" icon={<UnlockOutlined />} onClick={() => setStatus(s.slug, st, 'unlock')}>
+                              Buka Kunci
+                            </Button>
+                          )}
+                          {st.status === 'paid' && (
+                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>selesai</Typography.Text>
+                          )}
+                        </Space>
                       ),
                     },
                   ]}

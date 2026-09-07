@@ -191,6 +191,7 @@ func main() {
 	admin.Get("/receivables", handler.GetReceivables)
 	admin.Get("/client-store-settlements", handler.GetClientStoreSettlements)
 	admin.Post("/client-store-settlements/pay", handler.PayStoreSettlement)
+	admin.Post("/client-store-settlements/settlements/status", handler.SetStoreSettlementStatus)
 	admin.Get("/client-store-settlements/stores", handler.ListClientStoresAdmin)
 	admin.Post("/client-store-settlements/stores", handler.CreateClientStoreAdmin)
 	admin.Put("/client-store-settlements/stores/:id", handler.UpdateClientStoreAdmin)
