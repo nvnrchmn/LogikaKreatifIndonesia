@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, Card, Col, Input, message, Modal, Row, Space, Spin, Statistic, Table, Tag, Typography, Upload } from 'antd'
 import { CheckCircleOutlined, ClockCircleOutlined, InboxOutlined, ReloadOutlined, UploadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet } from '../../lib/api'
+import ClientStoreManager from './ClientStoreManager'
 
 interface StoreSummary {
   total_revenue: number
@@ -114,6 +115,7 @@ export default function ClientStoreSettlementsPage() {
       </div>
 
       {error && <Alert type="error" showIcon message={error} />}
+      <ClientStoreManager onChanged={load} />
 
       <Spin spinning={loading}>
         {stores.map((s) => (

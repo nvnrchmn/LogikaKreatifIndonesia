@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 
@@ -48,12 +49,58 @@ func Connect() error {
 		&Page{},
 		&Section{},
 		&Media{},
+		&ClientStore{},
 	); err != nil {
 		log.Printf("AutoMigrate warning: %v\n", err)
 	}
 
 	seedDefaultAdmin()
+	seedClientStoresFromEnv()
 	return nil
+}
+
+// seedClientStoresFromEnv migrates stores configured via environment
+// (CLIENT_STORES JSON or MG_INTERNAL_URL/KEY) into the client_stores table the
+// first time the table is empty. After that, management happens via the UI.
+func seedClientStoresFromEnv() {
+	var count int64
+	DB.Model(&ClientStore{}).Count(&count)
+	if count > 0 {
+		return
+	}
+	var stores []ClientStore
+	raw := os.Getenv("CLIENT_STORES")
+	if raw != "" {
+		var env []struct {
+			Slug    string `json:"slug"`
+			Name    string `json:"name"`
+			BaseURL string `json:"base_url"`
+		}
+		if err := json.Unmarshal([]byte(raw), &env); err == nil {
+			for _, e := range env {
+				stores = append(stores, ClientStore{Slug: e.Slug, Name: e.Name, BaseURL: e.BaseURL, IsActive: true})
+			}
+		}
+	}
+	if len(stores) == 0 {
+		if u := os.Getenv("MG_INTERNAL_URL"); u != "" {
+			stores = append(stores, ClientStore{
+				Slug: "mysticglide", Name: "Mystic Glide", BaseURL: u, IsActive: true,
+			})
+		}
+	}
+	key := os.Getenv("MG_INTERNAL_KEY")
+	for i := range stores {
+		if stores[i].Slug == "" || stores[i].Name == "" || stores[i].BaseURL == "" {
+			continue
+		}
+		stores[i].InternalKey = key
+		if err := DB.Create(&stores[i]).Error; err != nil {
+			log.Printf("seed client_store: %v", err)
+		} else {
+			log.Printf("seed client_store: %s (%s) dari env", stores[i].Name, stores[i].Slug)
+		}
+	}
 }
 
 // seedDefaultAdmin bootstraps an initial admin account ONLY when explicitly
