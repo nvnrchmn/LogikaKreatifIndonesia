@@ -361,7 +361,7 @@ func XenditWebhook(c fiber.Ctx) error {
 	// XenPlatform payout events (v3): body tidak punya external_id invoice —
 	// ciri: ada reference_id berprefix "pt-". Payment Hub meneruskan mentah ke
 	// logikraf-partners utk update status payout + notif WA mitra.
-	if p.ExternalID == "" && strings.Contains(string(c.Body()), "reference_id") && strings.Contains(string(c.Body()), "pt-") {
+	if p.ExternalID == "" && (strings.Contains(string(c.Body()), "v3_payout") || (strings.Contains(string(c.Body()), "reference_id") && strings.Contains(string(c.Body()), "pt-"))) {
 		return forwardPayoutToPartners(c)
 	}
 
@@ -830,15 +830,48 @@ func forwardPayoutToPartners(c fiber.Ctx) error {
 	}
 	key := os.Getenv("PARTNERS_INTERNAL_KEY")
 	body := c.Body()
+	// schema v3: reference_id & status BERADA di dalam objek `data`;
+	// fallback schema datar (status/reference_id top-level) utk kompatibilitas.
 	var ev struct {
 		ReferenceID string `json:"reference_id"`
+		Status      string `json:"status"`
+		Data        struct {
+			ReferenceID   string `json:"reference_id"`
+			Status        string `json:"status"`
+			FailureReason string `json:"failure_reason"`
+			Message       string `json:"message"`
+			Reason        string `json:"reason"`
+		} `json:"data"`
 	}
 	_ = json.Unmarshal(body, &ev)
-	if ev.ReferenceID == "" {
+	ref := ev.ReferenceID
+	if ref == "" {
+		ref = ev.Data.ReferenceID
+	}
+	if ref == "" {
 		// tidak bisa dipetakan — balas ok supaya Xendit tidak retry
 		return c.JSON(fiber.Map{"status": "ok", "message": "unmapped payout event"})
 	}
-	req, err := http.NewRequest(http.MethodPost, base+"/api/v1/internal/payout/status", bytes.NewReader(body))
+	status := strings.ToUpper(strings.TrimSpace(ev.Status))
+	if status == "" {
+		status = strings.ToUpper(strings.TrimSpace(ev.Data.Status))
+	}
+	reason := ev.Data.FailureReason
+	if reason == "" {
+		reason = ev.Data.Message
+	}
+	if reason == "" {
+		reason = ev.Data.Reason
+	}
+	// normalisasi status v3 → vocab portal
+	switch status {
+	case "SUCCEEDED", "COMPLETED":
+		status = "SUCCEEDED"
+	case "REQUIRES_ACTION", "CANCELLED", "VOIDED":
+		status = "FAILED"
+	}
+	out, _ := json.Marshal(fiber.Map{"reference_id": ref, "status": status, "failure_reason": reason})
+	req, err := http.NewRequest(http.MethodPost, base+"/api/v1/internal/payout/status", bytes.NewReader(out))
 	if err != nil {
 		return c.Status(502).JSON(fiber.Map{"error": "internal"})
 	}
