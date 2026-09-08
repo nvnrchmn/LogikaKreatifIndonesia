@@ -16,8 +16,8 @@ import (
 
 // ---- Webhook event akun XenPlatform (verification / suspension / created) ----
 
-// isAccountEvent — deteksi event akun XenPlatform: ada account_id/business_id
-// atau penanda event akun; BUKAN invoice (yang punya external_id mg-*).
+// isAccountEvent — deteksi event akun XenPlatform. Schema resmi punya
+// `business_id` top-level + `event: "account.*"` + `data.{id,status}`.
 func isAccountEvent(raw string) bool {
 	for _, k := range []string{`"account_id"`, `"business_id"`, `"sub_account_id"`} {
 		if strings.Contains(raw, k) {
@@ -25,8 +25,13 @@ func isAccountEvent(raw string) bool {
 		}
 	}
 	l := strings.ToLower(raw)
-	return strings.Contains(l, "account.verification") || strings.Contains(l, "account.suspension") ||
-		strings.Contains(l, "verification_status") || strings.Contains(l, "suspension_status")
+	for _, tok := range []string{"account.created", "account.updated", "account.verification", "account.suspension", "verification_status", "suspension_status"} {
+		if strings.Contains(l, tok) {
+			return true
+		}
+	}
+	// body ber-event lain tanpa external_id invoice (split dll) → coba jalur akun
+	return strings.Contains(l, `"event"`) && !strings.Contains(raw, `"external_id"`)
 }
 
 // handleAccountEventWebhook — cocokkan event akun ke client_stores.sub_account_id,
