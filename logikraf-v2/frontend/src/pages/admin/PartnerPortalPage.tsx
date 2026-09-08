@@ -11,14 +11,16 @@ interface StoreView {
 }
 
 const KYC_COLOR: Record<string, string> = {
-  REGISTERED: 'default', AWAITING_DOCS: 'warning', PENDING_VERIFICATION: 'processing',
+  INVITED: 'blue', REGISTERED: 'default', AWAITING_DOCS: 'warning', PENDING_VERIFICATION: 'processing',
   AWAITING_RESUBMISSION: 'error', LIVE: 'success', DECLINED: 'error', SUSPENDED: 'error', DORMANT: 'default',
 }
 const KYC_LABEL: Record<string, string> = {
-  REGISTERED: 'Terdaftar', AWAITING_DOCS: 'Menunggu Dokumen', PENDING_VERIFICATION: 'Review Xendit',
+  INVITED: 'Diundang', REGISTERED: 'Terdaftar', AWAITING_DOCS: 'Menunggu Dokumen', PENDING_VERIFICATION: 'Review Xendit',
   AWAITING_RESUBMISSION: 'Perlu Ulang Upload', LIVE: 'Aktif', DECLINED: 'Ditolak', SUSPENDED: 'Ditangguhkan', DORMANT: 'Tidak Aktif',
 }
 const genPass = () => { const c = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 12; i++) s += c[Math.floor(Math.random() * c.length)]; return s + '!7' }
+
+interface XenAccount { id: string; email: string; status: string; business_name: string; created?: string }
 
 export default function PartnerPortalPage() {
   const [stores, setStores] = useState<StoreView[]>([])
@@ -28,6 +30,10 @@ export default function PartnerPortalPage() {
   const [savingXp, setSavingXp] = useState(false)
   const [formUser] = Form.useForm()
   const [formXp] = Form.useForm()
+  const [xenOpen, setXenOpen] = useState(false)
+  const [xenList, setXenList] = useState<XenAccount[]>([])
+  const [xenBusy, setXenBusy] = useState(false)
+  const [linkMap, setLinkMap] = useState<Record<string, number | undefined>>({})
 
   const load = useCallback(() => {
     setLoading(true)
@@ -38,6 +44,29 @@ export default function PartnerPortalPage() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  const syncXen = async () => {
+    setXenBusy(true)
+    try {
+      const d = await apiGet('/admin/xenplatform/accounts')
+      setXenList((d?.data as XenAccount[]) || [])
+      setXenOpen(true)
+      if (!d?.data || (d.data as XenAccount[]).length === 0) message.info('Belum ada Managed sub-account di akun Xendit (atau belum diundang)')
+    } catch (e) { message.error((e as Error).message) } finally { setXenBusy(false) }
+  }
+
+  const linkXen = async (acc: XenAccount) => {
+    const sid = linkMap[acc.id]
+    if (!sid) { message.warning('Pilih mitra tujuan dulu'); return }
+    setXenBusy(true)
+    try {
+      await apiPatch(`/admin/client-stores/${sid}/xenplatform`, {
+        sub_account_id: acc.id, kyc_status: acc.status,
+      })
+      message.success(`Sub-account ${acc.business_name || acc.email} terhubung ke mitra`)
+      setXenOpen(false); load()
+    } catch (e) { message.error((e as Error).message) } finally { setXenBusy(false) }
+  }
 
   const openModal = (s: StoreView) => {
     setOpenId(s.id)
@@ -93,7 +122,12 @@ export default function PartnerPortalPage() {
   return (
     <Card
       title={<Space><WalletOutlined /><span>Mitra & Portal XenPlatform</span></Space>}
-      extra={<Button icon={<ReloadOutlined />} onClick={load} loading={loading}>Muat Ulang</Button>}
+      extra={
+        <Space>
+          <Button icon={<ReloadOutlined />} onClick={syncXen} loading={xenBusy}>Sinkron dari Xendit</Button>
+          <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>Muat Ulang</Button>
+        </Space>
+      }
     >
       <Typography.Paragraph type="secondary">
         Kelola akun login mitra di <Typography.Text code>partners.logikraf.id</Typography.Text> dan data sub-account Xendit per mitra.
@@ -138,6 +172,36 @@ export default function PartnerPortalPage() {
           </Typography.Paragraph>
           <Button type="primary" loading={savingUser} onClick={saveUser}>Simpan Akun Portal</Button>
         </Form>
+      </Modal>
+
+      <Modal
+        title="Sub-account Xendit (Managed) — hasil undangan"
+        open={xenOpen} onCancel={() => setXenOpen(false)} footer={null} width={760}
+      >
+        <Typography.Paragraph type="secondary" style={{ fontSize: 12 }}>
+          Daftar ini diambil langsung dari Xendit (GET /v2/accounts). Pilih mitra tujuan untuk mengisi
+          Business ID + status KYC-nya di baris mitra, lalu tekan <b>Hubungkan</b>. Status KYC akan ikut
+          tersinkron saat mitra menyelesaikan verifikasi.
+        </Typography.Paragraph>
+        <Table
+          rowKey="id" size="small" dataSource={xenList} pagination={false} loading={xenBusy}
+          columns={[
+            { title: 'Akun', key: 'n', render: (_: unknown, a: XenAccount) => (<div><Typography.Text strong>{a.business_name || '—'}</Typography.Text><div><Typography.Text type="secondary">{a.email}</Typography.Text></div></div>) },
+            { title: 'Status', dataIndex: 'status', key: 's', width: 150, render: (s: string) => <Tag color={KYC_COLOR[s] || 'default'}>{KYC_LABEL[s] || s}</Tag> },
+            {
+              title: 'Hubungkan ke mitra', key: 'l', width: 260, render: (_: unknown, a: XenAccount) => (
+                <Space.Compact style={{ width: '100%' }}>
+                  <Select
+                    style={{ width: '100%' }} placeholder="Pilih mitra…" showSearch optionFilterProp="label"
+                    value={linkMap[a.id]} onChange={(v) => setLinkMap((m) => ({ ...m, [a.id]: v }))}
+                    options={stores.map((s) => ({ value: s.id, label: s.name }))}
+                  />
+                  <Button type="primary" loading={xenBusy} onClick={() => linkXen(a)}>Hubungkan</Button>
+                </Space.Compact>
+              ),
+            },
+          ]}
+        />
       </Modal>
     </Card>
   )

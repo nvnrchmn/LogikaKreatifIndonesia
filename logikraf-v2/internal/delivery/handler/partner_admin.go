@@ -1,8 +1,13 @@
 package handler
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"golang.org/x/crypto/bcrypt"
@@ -121,6 +126,64 @@ func UpsertPartnerUserAdmin(c fiber.Ctx) error {
 		}
 	}
 	return c.JSON(fiber.Map{"ok": true, "email": u.Email})
+}
+
+// XenAccount — ringkasan Managed sub-account dari Xendit (GET /v2/accounts)
+type XenAccount struct {
+	ID           string `json:"id"`
+	Email        string `json:"email"`
+	Status       string `json:"status"`
+	BusinessName string `json:"business_name"`
+	Created      string `json:"created"`
+}
+
+// GET /api/admin/xenplatform/accounts — daftar Managed sub-account dari Xendit (utk sinkron)
+func ListXenplatformAccountsAdmin(c fiber.Ctx) error {
+	secret := setting("xendit_secret_key", "logikraf")
+	if secret == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "xendit_secret_key belum dikonfigurasi")
+	}
+	req, err := http.NewRequest(http.MethodGet, "https://api.xendit.co/v2/accounts?type=MANAGED&limit=50", nil)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "gagal membuat request")
+	}
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(secret+":")))
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadGateway, "tidak dapat menghubungi Xendit")
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		msg := strings.TrimSpace(string(body))
+		if len(msg) > 200 {
+			msg = msg[:200]
+		}
+		return c.Status(resp.StatusCode).JSON(fiber.Map{"error": "Xendit: " + msg})
+	}
+	var parsed struct {
+		Data []struct {
+			ID            string `json:"id"`
+			Email         string `json:"email"`
+			Status        string `json:"status"`
+			PublicProfile struct {
+				BusinessName string `json:"business_name"`
+			} `json:"public_profile"`
+			Created string `json:"created"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return fiber.NewError(fiber.StatusBadGateway, "respons Xendit tidak valid")
+	}
+	out := []XenAccount{}
+	for _, a := range parsed.Data {
+		out = append(out, XenAccount{
+			ID: a.ID, Email: a.Email, Status: a.Status,
+			BusinessName: a.PublicProfile.BusinessName, Created: a.Created,
+		})
+	}
+	return c.JSON(fiber.Map{"data": out})
 }
 
 // PATCH /api/admin/client-stores/:id/xenplatform — set data XenPlatform sub-account
