@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, Card, Form, Input, message, Modal, Select, Space, Table, Tag, Typography } from 'antd'
+import { Button, Card, Form, Grid, Input, message, Modal, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import { KeyOutlined, LinkOutlined, ReloadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet, apiPatch, apiPost } from '../../lib/api'
 
@@ -23,6 +23,8 @@ const genPass = () => { const c = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXY
 interface XenAccount { id: string; email: string; status: string; business_name: string; created?: string }
 
 export default function PartnerPortalPage() {
+  const screens = Grid.useBreakpoint()
+  const isMobile = !screens.md
   const [stores, setStores] = useState<StoreView[]>([])
   const [loading, setLoading] = useState(true)
   const [openId, setOpenId] = useState<number | null>(null)
@@ -138,10 +140,38 @@ export default function PartnerPortalPage() {
         Kelola akun login mitra di <Typography.Text code>partners.logikraf.id</Typography.Text> dan data sub-account Xendit per mitra.
         Kredensial dibuat di sini (admin); mitra wajib ganti password saat login pertama.
       </Typography.Paragraph>
-      <Table rowKey="id" size="small" loading={loading} columns={cols} dataSource={stores} pagination={false} scroll={{ x: 860 }} />
+      {isMobile ? (
+        <div className="space-y-3">
+          {loading && <div className="py-8 text-center text-text-muted"><Spin size="small" /> Memuat…</div>}
+          {!loading && stores.length === 0 && <Typography.Paragraph type="secondary">Belum ada mitra terdaftar.</Typography.Paragraph>}
+          {stores.map((s) => (
+            <Card key={s.id} size="small" styles={{ body: { padding: 14 } }}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <Typography.Text strong className="block truncate">{s.name}</Typography.Text>
+                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>{s.slug}</Typography.Text>
+                </div>
+                {s.kyc_status ? <Tag color={KYC_COLOR[s.kyc_status] || 'default'}>{KYC_LABEL[s.kyc_status] || s.kyc_status}</Tag> : <Tag>—</Tag>}
+              </div>
+              <div className="mt-2 space-y-1 text-sm">
+                <div className="flex justify-between"><span className="text-text-muted">Entity</span><span>{s.entity_type || '—'}</span></div>
+                <div className="flex justify-between gap-3"><span className="text-text-muted shrink-0">Sub-account</span>
+                  <span className="truncate text-right">{s.sub_account_id ? <Typography.Text code style={{ fontSize: 11 }}>{s.sub_account_id.slice(0, 16)}…</Typography.Text> : <Typography.Text type="secondary">Belum terhubung</Typography.Text>}</span>
+                </div>
+                <div className="flex justify-between gap-3"><span className="text-text-muted shrink-0">Akun portal</span>
+                  <span className="truncate text-right">{s.partner_user ? <span className="truncate">{s.partner_user.email}</span> : <Tag style={{ marginInlineEnd: 0 }}>Belum dibuat</Tag>}</span>
+                </div>
+              </div>
+              <Button block className="mt-3" size="small" type="primary" ghost icon={<WalletOutlined />} onClick={() => openModal(s)}>Kelola Portal Mitra</Button>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Table rowKey="id" size="small" loading={loading} columns={cols} dataSource={stores} pagination={false} scroll={{ x: 860 }} />
+      )}
 
       <Modal
-        title="Kelola Portal Mitra" open={openId !== null} onCancel={() => setOpenId(null)} footer={null} width={560}
+        title="Kelola Portal Mitra" open={openId !== null} onCancel={() => setOpenId(null)} footer={null} width={isMobile ? '96%' : 560}
       >
         <Form form={formXp} layout="vertical" style={{ marginTop: 8 }}>
           <Space.Compact style={{ width: '100%' }}>
@@ -181,7 +211,7 @@ export default function PartnerPortalPage() {
 
       <Modal
         title="Sub-account Xendit (Managed) — hasil undangan"
-        open={xenOpen} onCancel={() => setXenOpen(false)} footer={null} width={760}
+        open={xenOpen} onCancel={() => setXenOpen(false)} footer={null} width={isMobile ? '96%' : 760}
       >
         <Typography.Paragraph type="secondary" style={{ fontSize: 12 }}>
           Daftar ini diambil langsung dari Xendit (GET /v2/accounts). Pilih mitra tujuan untuk mengisi
@@ -189,7 +219,7 @@ export default function PartnerPortalPage() {
           tersinkron saat mitra menyelesaikan verifikasi.
         </Typography.Paragraph>
         <Table
-          rowKey="id" size="small" dataSource={xenList} pagination={false} loading={xenBusy}
+          rowKey="id" size="small" dataSource={xenList} pagination={false} loading={xenBusy} scroll={{ x: 520 }}
           columns={[
             { title: 'Akun', key: 'n', render: (_: unknown, a: XenAccount) => (<div><Typography.Text strong>{a.business_name || '—'}</Typography.Text><div><Typography.Text type="secondary">{a.email}</Typography.Text></div></div>) },
             { title: 'Status', dataIndex: 'status', key: 's', width: 150, render: (s: string) => <Tag color={KYC_COLOR[s] || 'default'}>{KYC_LABEL[s] || s}</Tag> },
