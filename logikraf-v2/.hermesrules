@@ -1,0 +1,8 @@
+
+
+## PEMBARUAN 2026-09-08 — pembersihan and keputusan
+- Modul superadmin DIHAPUS: Merchant Accounts, Payment Hub (config gateway → Settings), Reports (duplikat dashboard), Rekonsiliasi (→ Payment Ledger), engine Piutang/Invoices + 2 cron harian (invoices/invoice_reminders 0 baris), halaman Workflow (konten → ~/wiki). Grup menu 'Layanan Payment' hilang; Payment Ledger pindah ke 'Uang Masuk'.
+- Webhook pusat /api/webhooks/xendit kini memproses: (1) invoice mg-* → forward store; (2) payout v3 `v3_payout.*` (schema data.reference_id/data.status) → normalisasi → partners /api/v1/internal/payout/status (auth X-Internal-Key; ref 404 diabaikan agar tak retry); (3) event akun xenPlatform (account.created/registered/activated/verification/suspected/suspended/cleared; pakai `event` ATAU `event_type`; id dicari rekursif: business_id/data.id/data.user_id; status dari data.status/data.kyc.status) → update client_stores.kyc_status + notif WA via partners.
+- Catatan Fiber v3: grup Group("", RequireAuth) membungkus route /api/v1 yang didaftarkan SETELAHNYA — endpoint internal partners WAJIB didaftarkan sebelum grup authed.
+- Keuangan (definisi 3 sumber): `transactions` status settled = revenue proyek dev (dashboard /api/reports/finance; dikelola manual menu Transactions). `payment_transactions` = pembayaran produk quick (Beli Paket via CheckoutModal Xendit; Payment Ledger; TIDAK dihitung dashboard). MG pasca-KYC: uang di sub-account XenPlatform (partners portal, GET /transactions Xendit) — TIDAK masuk 2 tabel master (event mg-* hanya diforward, tak dicatat lokal) → tanpa dobel catat.
+- KYC MG (2026-09-08): owner submit → status Review Xendit (PENDING_VERIFICATION). Webhook account.verification otomatis update.
