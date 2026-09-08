@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -211,10 +213,42 @@ func UpdateXenplatformAdmin(c fiber.Ctx) error {
 		store.EntityType = strings.ToUpper(strings.TrimSpace(*body.EntityType))
 	}
 	if body.KYCStatus != nil {
-		store.KYCStatus = strings.ToUpper(strings.TrimSpace(*body.KYCStatus))
+		newKYC := strings.ToUpper(strings.TrimSpace(*body.KYCStatus))
+		if newKYC != store.KYCStatus {
+			oldKYC := store.KYCStatus
+			store.KYCStatus = newKYC
+			if err := model.DB.Save(&store).Error; err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "gagal menyimpan")
+			}
+			// notif WA status KYC ke mitra (fire-and-forget)
+			if oldKYC != "" || newKYC != "" {
+				go notifyKYCStatus(store.ID, newKYC)
+			}
+			return c.JSON(fiber.Map{"ok": true})
+		}
 	}
 	if err := model.DB.Save(&store).Error; err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "gagal menyimpan")
 	}
 	return c.JSON(fiber.Map{"ok": true})
+}
+
+// notifyKYCStatus — panggil logikraf-partners utk kirim WA ke mitra saat status
+// KYC berubah. Error diabaikan (best-effort), timeout pendek.
+func notifyKYCStatus(storeID uint, kyc string) {
+	base := strings.TrimRight(os.Getenv("PARTNERS_INTERNAL_URL"), "/")
+	if base == "" {
+		base = "http://127.0.0.1:8096"
+	}
+	payload, _ := json.Marshal(map[string]any{"store_id": storeID, "kyc_status": kyc})
+	req, err := http.NewRequest(http.MethodPost, base+"/api/v1/internal/notify/kyc", bytes.NewReader(payload))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Internal-Key", os.Getenv("PARTNERS_INTERNAL_KEY"))
+	resp, err := (&http.Client{Timeout: 5 * time.Second}).Do(req)
+	if err == nil {
+		resp.Body.Close()
+	}
 }
