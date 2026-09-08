@@ -33,6 +33,7 @@ const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
 const AdminHeroStatsPage = lazy(() => import('./pages/admin/HeroStatsPage'))
 const AdminReceivablesPage = lazy(() => import('./pages/admin/ReceivablesPage'))
 const AdminClientStoreSettlementsPage = lazy(() => import('./pages/admin/ClientStoreSettlementsPage'))
+const AdminPartnerPortalPage = lazy(() => import('./pages/admin/PartnerPortalPage'))
 const AdminPaymentGuidePage = lazy(() => import('./pages/admin/PaymentGuidePage'))
 const AdminCronJobsPage = lazy(() => import('./pages/admin/CronJobsPage'))
 const AdminWorkflowDocsPage = lazy(() => import('./pages/admin/WorkflowDocsPage'))
@@ -121,6 +122,7 @@ export default function App() {
         <Route path="reports" element={<AdminReportsPage />} />
         <Route path="receivables" element={<AdminReceivablesPage />} />
         <Route path="client-settlements" element={<AdminClientStoreSettlementsPage />} />
+        <Route path="partner-portal" element={<AdminPartnerPortalPage />} />
         <Route path="payment-guide" element={<AdminPaymentGuidePage />} />
         <Route path="cron" element={<AdminCronJobsPage />} />
         <Route path="workflow" element={<AdminWorkflowDocsPage />} />

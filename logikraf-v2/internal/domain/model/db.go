@@ -50,6 +50,7 @@ func Connect() error {
 		&Section{},
 		&Media{},
 		&ClientStore{},
+		&PartnerUser{},
 	); err != nil {
 		log.Printf("AutoMigrate warning: %v\n", err)
 	}

@@ -22,8 +22,13 @@ type ClientStore struct {
 	ExtPrefix     string    `gorm:"size:20" json:"ext_prefix"` // prefix external_id Xendit, contoh "mg-" → route webhook ke store ini
 	WebhookURL    string    `gorm:"size:255" json:"-"`         // endpoint webhook store, kosong = BaseURL + "/api/v1/webhook/xendit"
 	WebhookSecret string    `gorm:"size:100" json:"-"`         // shared secret utk header X-Logikraf-Signature saat forward
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	// XenPlatform (portal mitra partners.logikraf.id)
+	SubAccountID string `gorm:"size:120" json:"sub_account_id"` // Business ID Managed Sub-account Xendit
+	EntityType   string `gorm:"size:40" json:"entity_type"`     // INDIVIDUAL / SOLE_PROPRIETORSHIP / CORPORATION dll
+	KYCStatus    string `gorm:"size:40" json:"kyc_status"`      // REGISTERED → AWAITING_DOCS → PENDING_VERIFICATION → LIVE
+	WAPhone      string `gorm:"size:30" json:"wa_phone"`        // WA notifikasi mitra (fallback level store)
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func (ClientStore) TableName() string { return "client_stores" }

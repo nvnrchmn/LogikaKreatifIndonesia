@@ -30,3 +30,8 @@ export const apiPut = (path: string, body: unknown) =>
 
 export const apiPost = (path: string, body: unknown) =>
   fetch(path, { method: 'POST', headers: auth(), body: JSON.stringify(body) }).then(handleResponse)
+
+export const apiPatch = (path: string, body: unknown) =>
+  fetch(path, { method: 'PATCH', headers: auth(), body: JSON.stringify(body) }).then(handleResponse)
+
+export const apiDelete = (path: string) => fetch(path, { method: 'DELETE', headers: auth() }).then(handleResponse)
