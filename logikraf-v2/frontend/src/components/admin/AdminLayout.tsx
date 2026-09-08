@@ -59,7 +59,6 @@ const navSections = [
     title: 'Sistem',
     defaultCollapsed: true,
     items: [
-      { label: 'Workflow', path: '/admin/workflow', icon: DocNavIcon },
       { label: 'Otomatis', path: '/admin/cron', icon: AutomationNavIcon },
       { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
       { label: 'Settings', path: '/admin/settings', icon: SettingsIcon },
