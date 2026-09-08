@@ -49,9 +49,14 @@ export default function PartnerPortalPage() {
     setXenBusy(true)
     try {
       const d = await apiGet('/admin/xenplatform/accounts')
-      setXenList((d?.data as XenAccount[]) || [])
-      setXenOpen(true)
-      if (!d?.data || (d.data as XenAccount[]).length === 0) message.info('Belum ada Managed sub-account di akun Xendit (atau belum diundang)')
+      const list = (d?.data as XenAccount[]) || []
+      setXenList(list)
+      if (list.length > 0) {
+        setXenOpen(true)
+      } else {
+        setXenOpen(true)
+        message.warning('Respons Xendit kosong. Kalau kamu yakin sudah mengundang sub-account, cek permission "Accounts Read / xenPlatform Read" di Settings → API Keys dashboard Xendit, lalu coba lagi.')
+      }
     } catch (e) { message.error((e as Error).message) } finally { setXenBusy(false) }
   }
 
