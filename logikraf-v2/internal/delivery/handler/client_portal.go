@@ -100,23 +100,6 @@ func ClientOrders(c fiber.Ctx) error {
 	return c.JSON(items)
 }
 
-// ClientInvoices lists only the invoices belonging to the logged-in client's orders.
-func ClientInvoices(c fiber.Ctx) error {
-	clientID, _, err := clientIDForUser(c)
-	if err != nil {
-		return c.Status(404).JSON(fiber.Map{"error": "client not found"})
-	}
-	var items []model.Invoice
-	if err := model.DB.Model(&model.Invoice{}).
-		Joins("JOIN orders ON orders.id = invoices.order_id").
-		Where("orders.client_id = ?", clientID).
-		Order("invoices.created_at desc").
-		Find(&items).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "failed"})
-	}
-	return c.JSON(items)
-}
-
 // ClientTickets lists tickets created by the logged-in client user.
 func ClientTickets(c fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(uint)

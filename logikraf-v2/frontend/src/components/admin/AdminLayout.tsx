@@ -32,10 +32,8 @@ const navSections = [
     title: 'Uang Masuk',
     hint: 'Tagihan & pembayaran klien',
     items: [
-      { label: 'Piutang', path: '/admin/receivables', icon: LedgerNavIcon },
       { label: 'Mitra & Portal', path: '/admin/partner-portal', icon: WalletNavIcon },
       { label: 'Panduan Payment', path: '/admin/payment-guide', icon: DocNavIcon },
-      { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
       { label: 'Payment Ledger', path: '/admin/payment-ledger', icon: LedgerNavIcon },
     ],
@@ -148,13 +146,6 @@ function OrdersNavIcon() {
   )
 }
 
-function InvoiceNavIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-    </svg>
-  )
-}
 
 function TransactionNavIcon() {
   return (
