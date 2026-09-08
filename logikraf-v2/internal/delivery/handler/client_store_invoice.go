@@ -68,8 +68,19 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 	// Keamanan: external_id HARUS diawali prefix store (mis. "mg-") — mencegah
 	// store membuat invoice yg akan di-route/klaim sebagai milik store lain.
-	if !strings.HasPrefix(in.ExternalID, store.ExtPrefix) {
+	if !strings.HasPrefix(strings.ToLower(in.ExternalID), strings.ToLower(store.ExtPrefix)) {
 		return c.Status(400).JSON(fiber.Map{"error": "external_id harus diawali '" + store.ExtPrefix + "'"})
+	}
+	// Normalisasi identitas: kalau nomor order store SUDAH memuat kode brandnya
+	// sendiri (mis. MG-20260907-8336, dikirim sbg "mg-MG-20260907-8336"), buang
+	// prefix store sehingga external_id = "MG-20260907-8336" — satu identitas,
+	// tanpa dobel prefix. Routing webhook tetap cocok (case-insensitive).
+	canonical := in.ExternalID
+	if strings.HasPrefix(in.ExternalID, store.ExtPrefix) {
+		rest := in.ExternalID[len(store.ExtPrefix):]
+		if rest != "" && strings.HasPrefix(strings.ToLower(rest), strings.ToLower(store.ExtPrefix)) {
+			canonical = rest
+		}
 	}
 	if in.PayerEmail == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "payer_email wajib"})
@@ -85,7 +96,7 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 
 	bodyMap := map[string]any{
-		"external_id":          in.ExternalID,
+		"external_id":          canonical,
 		"amount":               in.Amount,
 		"payer_email":          in.PayerEmail,
 		"description":          orDefault(in.Description, store.Name+" Order"),

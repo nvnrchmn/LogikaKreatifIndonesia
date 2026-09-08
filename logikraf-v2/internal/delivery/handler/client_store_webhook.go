@@ -32,7 +32,7 @@ func ForwardToClientStore(c fiber.Ctx, externalID string) (bool, error) {
 	}
 	var store *model.ClientStore
 	for i := range stores {
-		if strings.HasPrefix(externalID, stores[i].ExtPrefix) {
+		if strings.HasPrefix(strings.ToLower(externalID), strings.ToLower(stores[i].ExtPrefix)) {
 			store = &stores[i]
 			break
 		}
