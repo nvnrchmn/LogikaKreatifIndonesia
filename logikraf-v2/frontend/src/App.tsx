@@ -24,12 +24,8 @@ const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
 const AdminResourcePage = lazy(() => import('./components/admin/AdminResourcePage'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
-const AdminPaymentHubPage = lazy(() => import('./pages/admin/PaymentHubPage'))
-const AdminTenantPaymentAccountsPage = lazy(() => import('./pages/admin/TenantPaymentAccountsPage'))
 const AdminPaymentLedgerPage = lazy(() => import('./pages/admin/PaymentLedgerPage'))
-const AdminReconciliationPage = lazy(() => import('./pages/admin/ReconciliationPage'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
-const AdminReportsPage = lazy(() => import('./pages/admin/ReportsPage'))
 const AdminHeroStatsPage = lazy(() => import('./pages/admin/HeroStatsPage'))
 const AdminReceivablesPage = lazy(() => import('./pages/admin/ReceivablesPage'))
 const AdminPartnerPortalPage = lazy(() => import('./pages/admin/PartnerPortalPage'))
@@ -118,16 +114,12 @@ export default function App() {
       }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
-        <Route path="reports" element={<AdminReportsPage />} />
         <Route path="receivables" element={<AdminReceivablesPage />} />
         <Route path="partner-portal" element={<AdminPartnerPortalPage />} />
         <Route path="payment-guide" element={<AdminPaymentGuidePage />} />
         <Route path="cron" element={<AdminCronJobsPage />} />
         <Route path="workflow" element={<AdminWorkflowDocsPage />} />
-        <Route path="payment-hub" element={<AdminPaymentHubPage />} />
-        <Route path="merchant-accounts" element={<AdminTenantPaymentAccountsPage />} />
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
-        <Route path="reconciliation" element={<AdminReconciliationPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
         <Route path="hero-stats" element={<AdminHeroStatsPage />} />
         {/* Generic CRUD resources: list / new / edit */}

@@ -266,8 +266,6 @@ func main() {
 	admin.Post("/testimonials", handler.CreateTestimonial)
 	admin.Put("/testimonials/:id", handler.UpdateTestimonial)
 	admin.Delete("/testimonials/:id", handler.DeleteTestimonial)
-	admin.Get("/tenant-payment-accounts", handler.ListTenantPaymentAccounts)
-	admin.Get("/payment-reconciliation", handler.GetReconciliation)
 	admin.Post("/payment-transactions/:id/refund", handler.RefundPaymentTransaction)
 	admin.Get("/transactions/:id", handler.GetTransactionByID)
 	admin.Get("/transactions", handler.GetTransactions)

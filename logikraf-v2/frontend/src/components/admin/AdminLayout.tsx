@@ -37,7 +37,7 @@ const navSections = [
       { label: 'Panduan Payment', path: '/admin/payment-guide', icon: DocNavIcon },
       { label: 'Invoices', path: '/admin/invoices', icon: InvoiceNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
-      { label: 'Reports', path: '/admin/reports', icon: ChartIcon },
+      { label: 'Payment Ledger', path: '/admin/payment-ledger', icon: LedgerNavIcon },
     ],
   },
   {
@@ -55,19 +55,6 @@ const navSections = [
     title: 'Layanan Klien',
     items: [
       { label: 'Tickets', path: '/admin/tickets', icon: HelpIcon },
-    ],
-  },
-  {
-    // Second product line. Kept intact (tenants are planned) but parked below daily work
-    // and collapsed by default so it stops competing for attention while tenants = 0.
-    title: 'Layanan Payment (Multi-Tenant)',
-    hint: 'Produk kedua — untuk tenant lain',
-    defaultCollapsed: true,
-    items: [
-      { label: 'Merchant Accounts', path: '/admin/merchant-accounts', icon: MerchantNavIcon },
-      { label: 'Payment Hub', path: '/admin/payment-hub', icon: PaymentHubNavIcon },
-      { label: 'Payment Ledger', path: '/admin/payment-ledger', icon: LedgerNavIcon },
-      { label: 'Rekonsiliasi', path: '/admin/reconciliation', icon: ReconcileNavIcon },
     ],
   },
   {
@@ -178,21 +165,7 @@ function TransactionNavIcon() {
   )
 }
 
-function PaymentHubNavIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  )
-}
 
-function MerchantNavIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 7l9-4 9 4M4 10h16M6 10v8m4-8v8m4-8v8m4-8v8" />
-    </svg>
-  )
-}
 
 
 function LedgerNavIcon() {
@@ -211,13 +184,6 @@ function WalletNavIcon() {
   )
 }
 
-function ReconcileNavIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  )
-}
 
 function AutomationNavIcon() {
   return (
@@ -236,13 +202,6 @@ function DocNavIcon() {
   )
 }
 
-function ChartIcon() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-    </svg>
-  )
-}
 
 function HelpIcon() {
   return (

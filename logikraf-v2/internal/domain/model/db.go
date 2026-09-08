@@ -41,8 +41,6 @@ func Connect() error {
 		&Testimonial{},
 		&Setting{},
 		&HeroStat{},
-		&TenantPaymentAccount{},
-		&Tenant{},
 		&ProjectTemplate{},
 		&Plan{},
 		&Entitlement{},
