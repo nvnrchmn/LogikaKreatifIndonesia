@@ -37,7 +37,7 @@ export default function PartnerPortalPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    apiGet('/admin/client-store-partners')
+    apiGet('/api/client-store-partners')
       .then((d) => setStores((d?.data as StoreView[]) || []))
       .catch((e: Error) => message.error(e.message))
       .finally(() => setLoading(false))
@@ -48,7 +48,7 @@ export default function PartnerPortalPage() {
   const syncXen = async () => {
     setXenBusy(true)
     try {
-      const d = await apiGet('/admin/xenplatform/accounts')
+      const d = await apiGet('/api/xenplatform/accounts')
       const list = (d?.data as XenAccount[]) || []
       setXenList(list)
       if (list.length > 0) {
@@ -65,7 +65,7 @@ export default function PartnerPortalPage() {
     if (!sid) { message.warning('Pilih mitra tujuan dulu'); return }
     setXenBusy(true)
     try {
-      await apiPatch(`/admin/client-stores/${sid}/xenplatform`, {
+      await apiPatch(`/api/client-stores/${sid}/xenplatform`, {
         sub_account_id: acc.id, kyc_status: acc.status,
       })
       message.success(`Sub-account ${acc.business_name || acc.email} terhubung ke mitra`)
@@ -89,7 +89,7 @@ export default function PartnerPortalPage() {
     const v = await formUser.validateFields()
     setSavingUser(true)
     try {
-      await apiPost(`/admin/client-stores/${openId}/partner-user`, {
+      await apiPost(`/api/client-stores/${openId}/partner-user`, {
         email: v.email.trim(), wa_phone: v.wa_phone || '', password: v.password,
       })
       message.success('Akun portal mitra disimpan')
@@ -101,7 +101,7 @@ export default function PartnerPortalPage() {
     const v = await formXp.validateFields()
     setSavingXp(true)
     try {
-      await apiPatch(`/admin/client-stores/${openId}/xenplatform`, {
+      await apiPatch(`/api/client-stores/${openId}/xenplatform`, {
         sub_account_id: v.sub_account_id?.trim() || '', entity_type: v.entity_type, kyc_status: v.kyc_status,
       })
       message.success('Data XenPlatform disimpan')
