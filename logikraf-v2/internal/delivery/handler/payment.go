@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -355,6 +356,13 @@ func XenditWebhook(c fiber.Ctx) error {
 	}
 	if err := c.Bind().JSON(&p); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
+	}
+
+	// XenPlatform payout events (v3): body tidak punya external_id invoice —
+	// ciri: ada reference_id berprefix "pt-". Payment Hub meneruskan mentah ke
+	// logikraf-partners utk update status payout + notif WA mitra.
+	if p.ExternalID == "" && strings.Contains(string(c.Body()), "reference_id") && strings.Contains(string(c.Body()), "pt-") {
+		return forwardPayoutToPartners(c)
 	}
 
 	// Payment Hub routing: kalau external_id punya prefix client store aktif
@@ -803,4 +811,37 @@ func ForcePasswordReset(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
 	return c.JSON(fiber.Map{"status": "ok"})
+}
+
+// forwardPayoutToPartners — teruskan event payout Xendit (v3) mentah ke
+// logikraf-partners utk update status + notif WA. Env:
+// PARTNERS_INTERNAL_URL (default http://127.0.0.1:8096), PARTNERS_INTERNAL_KEY.
+func forwardPayoutToPartners(c fiber.Ctx) error {
+	base := strings.TrimRight(os.Getenv("PARTNERS_INTERNAL_URL"), "/")
+	if base == "" {
+		base = "http://127.0.0.1:8096"
+	}
+	key := os.Getenv("PARTNERS_INTERNAL_KEY")
+	body := c.Body()
+	var ev struct {
+		ReferenceID string `json:"reference_id"`
+	}
+	_ = json.Unmarshal(body, &ev)
+	if ev.ReferenceID == "" {
+		// tidak bisa dipetakan — balas ok supaya Xendit tidak retry
+		return c.JSON(fiber.Map{"status": "ok", "message": "unmapped payout event"})
+	}
+	req, err := http.NewRequest(http.MethodPost, base+"/api/v1/internal/payout/status", bytes.NewReader(body))
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "internal"})
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Internal-Key", key)
+	resp, err := (&http.Client{Timeout: 10 * time.Second}).Do(req)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "partners unreachable"})
+	}
+	defer resp.Body.Close()
+	raw, _ := io.ReadAll(resp.Body)
+	return c.Status(resp.StatusCode).JSON(fiber.Map{"status": "forwarded", "detail": string(raw)})
 }

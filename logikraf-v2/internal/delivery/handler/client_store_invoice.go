@@ -105,6 +105,13 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(secret+":")))
+	// XenPlatform single-door lanjutan: kalau store punya Managed sub-account LIVE,
+	// invoice dibuat ATAS NAMA sub-account (header for-user-id) → dana masuk saldo
+	// sub-account mitra, bukan saldo master. Store lama tanpa sub-account tetap
+	// seperti sebelumnya (dana ke master Logikraf).
+	if store.SubAccountID != "" && strings.EqualFold(store.KYCStatus, "LIVE") {
+		req.Header.Set("for-user-id", store.SubAccountID)
+	}
 
 	resp, err := (&http.Client{Timeout: 20 * time.Second}).Do(req)
 	if err != nil {
