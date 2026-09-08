@@ -262,7 +262,7 @@ export default function ClientStoreManager({ onChanged }: { onChanged?: () => vo
           <div>
             <Typography.Text strong>URL Internal (Base URL)</Typography.Text>
             <Input value={fBase} onChange={e => setFBase(e.target.value)} placeholder="mis. http://127.0.0.1:8095/api/v1/internal" />
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Endpoint internal aplikasi client ({'{base}'}/finance/summary harus tersedia).</Typography.Text>
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Base URL internal aplikasi client (dipakai Hub utk panggil server-to-server bila perlu).</Typography.Text>
           </div>
           <div>
             <Typography.Text strong>Slug (opsional)</Typography.Text>
