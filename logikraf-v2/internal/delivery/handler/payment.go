@@ -850,5 +850,9 @@ func forwardPayoutToPartners(c fiber.Ctx) error {
 	}
 	defer resp.Body.Close()
 	raw, _ := io.ReadAll(resp.Body)
+	// payout tak dikenal di partners (mis. row sudah dihapus) → abaikan supaya Xendit tidak retry
+	if resp.StatusCode == 404 {
+		return c.JSON(fiber.Map{"status": "ok", "message": "payout event ignored (tidak ditemukan di portal)"})
+	}
 	return c.Status(resp.StatusCode).JSON(fiber.Map{"status": "forwarded", "detail": string(raw)})
 }
