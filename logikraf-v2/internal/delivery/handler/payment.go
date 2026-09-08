@@ -365,6 +365,13 @@ func XenditWebhook(c fiber.Ctx) error {
 		return forwardPayoutToPartners(c)
 	}
 
+	// XenPlatform account events (verification / suspension / created):
+	// ciri: body punya account_id/business_id tanpa external_id invoice →
+	// cocokkan sub_account_id, update kyc_status store, notif WA via partners.
+	if p.ExternalID == "" && isAccountEvent(string(c.Body())) {
+		return handleAccountEventWebhook(c)
+	}
+
 	// Payment Hub routing: kalau external_id punya prefix client store aktif
 	// (mis. "mg-") → forward seluruh payload ke webhook store.
 	handled, ferr := ForwardToClientStore(c, p.ExternalID)
