@@ -25,7 +25,7 @@ func isAccountEvent(raw string) bool {
 		}
 	}
 	l := strings.ToLower(raw)
-	for _, tok := range []string{"account.created", "account.updated", "account.verification", "account.suspension", "verification_status", "suspension_status"} {
+	for _, tok := range []string{"account.created", "account.updated", "account.registered", "account.activated", "account.verification", "account.suspected", "account.suspended", "account.cleared", "verification_status", "suspension_status", `"event_type"`} {
 		if strings.Contains(l, tok) {
 			return true
 		}
@@ -66,7 +66,11 @@ func handleAccountEventWebhook(c fiber.Ctx) error {
 	if !found {
 		return c.Status(200).JSON(fiber.Map{"status": "ok", "message": "account event ignored (sub-account belum terhubung)"})
 	}
-	if status != "" && status != store.KYCStatus {
+	// event informasional (mis. account.registered tanpa status) → cukup tandai processed
+	if status == "" {
+		return c.JSON(fiber.Map{"status": "ok", "message": "account event processed (tanpa status)", "store_id": store.ID})
+	}
+	if status != store.KYCStatus {
 		store.KYCStatus = status
 		if err := model.DB.Save(&store).Error; err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "gagal simpan status"})

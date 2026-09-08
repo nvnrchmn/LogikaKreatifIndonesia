@@ -17,6 +17,7 @@ const KYC_COLOR: Record<string, string> = {
 const KYC_LABEL: Record<string, string> = {
   INVITED: 'Diundang', REGISTERED: 'Terdaftar', AWAITING_DOCS: 'Menunggu Dokumen', PENDING_VERIFICATION: 'Review Xendit',
   AWAITING_RESUBMISSION: 'Perlu Ulang Upload', LIVE: 'Aktif', DECLINED: 'Ditolak', SUSPENDED: 'Ditangguhkan', DORMANT: 'Tidak Aktif',
+  PASSED: 'Verifikasi Lolos', ACTIVE: 'Aktif', PENDING: 'Menunggu',
 }
 const genPass = () => { const c = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 12; i++) s += c[Math.floor(Math.random() * c.length)]; return s + '!7' }
 
