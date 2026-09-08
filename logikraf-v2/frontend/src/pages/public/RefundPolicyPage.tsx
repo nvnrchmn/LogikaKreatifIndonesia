@@ -71,7 +71,7 @@ export default function RefundPolicyPage() {
               <h3 className="text-xl font-bold text-text-main mt-8 mb-3">5. Gerbang Pembayaran Resmi</h3>
               <div className="bg-canvas-light p-5 rounded-xl border border-border-minimal my-4">
                 {gateways.length === 0 ? (
-                  <p className="text-text-muted text-xs">Gerbang pembayaran QRIS aktif: <strong>iPaymu</strong> (Terenkripsi SSL 256-bit dan diawasi oleh Bank Indonesia).</p>
+                  <p className="text-text-muted text-xs">Pembayaran diproses aman via gerbang pembayaran Xendit (terenkripsi SSL 256-bit dan diawasi oleh Bank Indonesia).</p>
                 ) : (
                   <div className="space-y-3 text-xs">
                     {gateways.map(g => (

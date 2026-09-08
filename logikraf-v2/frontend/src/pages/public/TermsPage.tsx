@@ -48,7 +48,7 @@ export default function TermsPage() {
               <div className="bg-canvas-light p-5 rounded-xl border border-border-minimal my-4">
                 <h4 className="font-semibold text-text-main text-sm mb-2">Kebijakan Pemrosesan Gerbang Pembayaran QRIS:</h4>
                 {gateways.length === 0 ? (
-                  <p className="text-text-muted text-xs">Gerbang pembayaran QRIS aktif: <strong>iPaymu</strong> (Terenkripsi SSL 256-bit dan diawasi oleh Bank Indonesia).</p>
+                  <p className="text-text-muted text-xs">Pembayaran diproses aman via gerbang pembayaran Xendit (terenkripsi SSL 256-bit dan diawasi oleh Bank Indonesia).</p>
                 ) : (
                   <div className="space-y-3 text-xs">
                     {gateways.map(g => (

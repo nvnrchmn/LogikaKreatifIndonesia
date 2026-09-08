@@ -47,9 +47,6 @@ export default function Footer() {
                 <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-text-light/80 text-xs font-medium">
                   <span>🔒 256-Bit SSL</span>
                 </div>
-                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-text-light/80 text-xs font-medium">
-                  <span>⚡ iPaymu Gateway</span>
-                </div>
               </div>
             </div>
           </div>
