@@ -137,3 +137,60 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 	return c.Status(resp.StatusCode).JSON(out)
 }
+
+// ExpireClientStoreInvoice — force-expire invoice Xendit milik store (mis. saat
+// admin store membatalkan order yang belum dibayar). Jalur sama dgn create:
+// X-Internal-Key store; Xendit dipanggil dgn key master (atau for-user-id bila LIVE).
+//
+//	POST /api/client-store-invoices/:id/expire
+//	Header: X-Internal-Key: <internal_key store>
+func ExpireClientStoreInvoice(c fiber.Ctx) error {
+	got := c.Get("X-Internal-Key")
+	invoiceID := c.Params("id")
+	if got == "" || invoiceID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "missing X-Internal-Key / invoice id"})
+	}
+	var store model.ClientStore
+	var stores []model.ClientStore
+	if err := model.DB.Where("is_active = 1").Find(&stores).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "db error"})
+	}
+	found := false
+	for _, s := range stores {
+		if s.InternalKey != "" && subtle.ConstantTimeCompare([]byte(got), []byte(s.InternalKey)) == 1 {
+			store = s
+			found = true
+			break
+		}
+	}
+	if !found {
+		return c.Status(401).JSON(fiber.Map{"error": "invalid internal key"})
+	}
+
+	secret := setting("xendit_secret_key", "logikraf")
+	if secret == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "xendit_secret_key belum dikonfigurasi"})
+	}
+
+	req, err := http.NewRequest(http.MethodPost,
+		"https://api.xendit.co/v2/invoices/"+invoiceID+"/expire!", nil)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "failed"})
+	}
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(secret+":")))
+	if store.SubAccountID != "" && strings.EqualFold(store.KYCStatus, "LIVE") {
+		req.Header.Set("for-user-id", store.SubAccountID)
+	}
+	resp, err := (&http.Client{Timeout: 20 * time.Second}).Do(req)
+	if err != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "xendit unreachable"})
+	}
+	defer resp.Body.Close()
+	raw, _ := io.ReadAll(resp.Body)
+
+	var out any
+	if json.Unmarshal(raw, &out) != nil {
+		return c.Status(502).JSON(fiber.Map{"error": "bad xendit response"})
+	}
+	return c.Status(resp.StatusCode).JSON(out)
+}
