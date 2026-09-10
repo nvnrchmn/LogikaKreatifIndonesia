@@ -18,9 +18,19 @@ type QrisStatus = {
 
 const fmtRp = (n: number) => 'Rp ' + (n || 0).toLocaleString('id-ID')
 
+// Branding halaman bayar — dinamis dari Settings LKI
+type Branding = { logo: string; title: string; subtitle: string; footer: string }
+const DEFAULT_BRANDING: Branding = {
+  logo: '/logo.png',
+  title: 'Pembayaran QRIS',
+  subtitle: 'Selesaikan pembayaran pesananmu',
+  footer: 'Pembayaran diproses aman oleh Xendit · QRIS diawasi Bank Indonesia',
+}
+
 export default function PaymentQris() {
   const { reference = '' } = useParams()
   const navigate = useNavigate()
+  const [brand, setBrand] = useState<Branding>(DEFAULT_BRANDING)
   const [data, setData] = useState<QrisStatus | null>(null)
   const [qrImg, setQrImg] = useState('')
   const [err, setErr] = useState('')
@@ -43,6 +53,20 @@ export default function PaymentQris() {
   }
 
   useEffect(() => { fetchStatus() }, [reference])
+
+  // Branding dinamis dari Settings (judul, subjudul, logo, catatan bawah)
+  useEffect(() => {
+    fetch('/api/settings/public').then(r => r.json()).then((d: any) => {
+      const src = d?.data ?? d
+      if (!src || typeof src !== 'object') return
+      setBrand({
+        logo: src.payment_logo_url || DEFAULT_BRANDING.logo,
+        title: src.payment_header_title || DEFAULT_BRANDING.title,
+        subtitle: src.payment_header_subtitle || DEFAULT_BRANDING.subtitle,
+        footer: src.payment_footer_note || DEFAULT_BRANDING.footer,
+      })
+    }).catch(() => { /* pakai default */ })
+  }, [])
 
   // Render QR dari qr_string (Xendit) memakai lib qrcode
   useEffect(() => {
@@ -116,9 +140,13 @@ export default function PaymentQris() {
     <div className="min-h-screen bg-canvas-light font-body px-4 py-10">
       <div className="mx-auto w-full max-w-md">
 
-        {/* Brand — logo asli LKI */}
-        <div className="flex items-center justify-center mb-6">
-          <img src="/logo.png" alt="Logikraf" className="h-11 w-auto object-contain" />
+        {/* Brand — logo & teks dinamis dari Settings */}
+        <div className="flex items-center justify-center mb-4">
+          <img src={brand.logo} alt="Logo" className="h-11 w-auto object-contain" />
+        </div>
+        <div className="text-center mb-5">
+          <h1 className="font-display font-bold text-text-main text-lg leading-tight">{brand.title}</h1>
+          {brand.subtitle && <p className="text-xs text-text-muted mt-0.5">{brand.subtitle}</p>}
         </div>
 
         <div className="card p-5 sm:p-6">
@@ -203,9 +231,7 @@ export default function PaymentQris() {
           )}
         </div>
 
-        <p className="text-center text-[11px] text-text-muted mt-5">
-          Pembayaran diproses aman oleh Xendit · QRIS diawasi Bank Indonesia
-        </p>
+        <p className="text-center text-[11px] text-text-muted mt-5">{brand.footer}</p>
       </div>
     </div>
   )
