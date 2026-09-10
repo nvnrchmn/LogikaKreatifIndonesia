@@ -116,10 +116,9 @@ export default function PaymentQris() {
     <div className="min-h-screen bg-canvas-light font-body px-4 py-10">
       <div className="mx-auto w-full max-w-md">
 
-        {/* Brand */}
-        <div className="flex items-center justify-center gap-2.5 mb-6">
-          <div className="w-9 h-9 rounded-xl bg-brand-primary text-white flex items-center justify-center font-bold">L</div>
-          <span className="font-display font-bold text-text-main">Logikraf <span className="text-text-muted font-normal text-sm">· Pembayaran QRIS</span></span>
+        {/* Brand — logo asli LKI */}
+        <div className="flex items-center justify-center mb-6">
+          <img src="/logo.png" alt="Logikraf" className="h-11 w-auto object-contain" />
         </div>
 
         <div className="card p-5 sm:p-6">
