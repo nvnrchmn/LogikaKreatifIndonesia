@@ -181,6 +181,7 @@ func main() {
 	api.Post("/client-store-invoices", handler.CreateClientStoreInvoice)
 	api.Post("/client-store-invoices/:id/expire", handler.ExpireClientStoreInvoice)
 	api.Post("/client-store-refunds", handler.RefundClientStoreInvoice)
+	api.Post("/client-store-qris", handler.CreateClientStoreQris)
 	api.Post("/webhooks/midtrans", handler.MidtransWebhook)
 	api.Post("/webhooks/ipaymu", handler.IpaymuWebhook)
 	app.Get("/sitemap.xml", handler.GetSitemap)
