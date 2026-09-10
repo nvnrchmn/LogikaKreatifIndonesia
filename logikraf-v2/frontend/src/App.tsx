@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 
 // Public Pages
 import HomePage from './pages/public/HomePage'
+import PaymentQris from './pages/public/PaymentQris'
 
 const PortfolioPage = lazy(() => import('./pages/public/PortfolioPage'))
 const PortfolioDetailPage = lazy(() => import('./pages/public/PortfolioDetailPage'))
@@ -104,6 +105,7 @@ export default function App() {
       <Route path="/kebijakan-privasi" element={<PrivacyPage />} />
       <Route path="/kebijakan-refund" element={<RefundPolicyPage />} />
       <Route path="/faq" element={<FaqPage />} />
+      <Route path="/pay/qris/:reference" element={<PaymentQris />} />
       {/* Admin */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route path="/admin" element={
