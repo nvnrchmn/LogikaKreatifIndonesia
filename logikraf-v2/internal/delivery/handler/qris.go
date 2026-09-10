@@ -59,6 +59,11 @@ func markOrderPaidByExternalID(externalID string) {
 	}
 }
 
+// qrisSimulateAllowed — tombol simulasi hanya muncul kalau memang mode tes.
+func qrisSimulateAllowed() bool {
+	return qrisMode() == "test" || strings.EqualFold(os.Getenv("QRIS_ALLOW_SIMULATE"), "true")
+}
+
 func qrisMode() string {
 	m := strings.ToLower(strings.TrimSpace(os.Getenv("QRIS_MODE")))
 	if m == "" {
@@ -278,16 +283,17 @@ func CreateQrisPayment(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "gagal simpan pembayaran"})
 	}
 	return c.Status(201).JSON(fiber.Map{
-		"reference_id": p.ReferenceID,
-		"provider_id":  p.ProviderID,
-		"pay_url":      "https://" + c.Host() + "/pay/qris/" + p.ReferenceID,
-		"qr_string":    p.QrString,
-		"amount":       p.Amount,
-		"currency":     p.Currency,
-		"status":       p.Status,
-		"mode":         p.Mode,
-		"expires_at":   p.ExpiresAt,
-		"stream_url":   "/api/payment/qris/" + p.ReferenceID + "/stream",
+		"reference_id":     p.ReferenceID,
+		"provider_id":      p.ProviderID,
+		"pay_url":          "https://" + c.Host() + "/pay/qris/" + p.ReferenceID,
+		"qr_string":        p.QrString,
+		"simulate_allowed": qrisSimulateAllowed(),
+		"amount":           p.Amount,
+		"currency":         p.Currency,
+		"status":           p.Status,
+		"mode":             p.Mode,
+		"expires_at":       p.ExpiresAt,
+		"stream_url":       "/api/payment/qris/" + p.ReferenceID + "/stream",
 	})
 }
 
@@ -299,16 +305,17 @@ func GetQrisPaymentStatus(c fiber.Ctx) error {
 	}
 	qrisSyncFromProvider(p)
 	return c.JSON(fiber.Map{
-		"reference_id": p.ReferenceID,
-		"external_id":  p.ExternalID,
-		"status":       p.Status,
-		"amount":       p.Amount,
-		"currency":     p.Currency,
-		"mode":         p.Mode,
-		"qr_string":    p.QrString,
-		"expires_at":   p.ExpiresAt,
-		"paid_at":      p.PaidAt,
-		"payer_name":   p.PayerName,
+		"reference_id":     p.ReferenceID,
+		"external_id":      p.ExternalID,
+		"status":           p.Status,
+		"amount":           p.Amount,
+		"currency":         p.Currency,
+		"mode":             p.Mode,
+		"qr_string":        p.QrString,
+		"simulate_allowed": qrisSimulateAllowed(),
+		"expires_at":       p.ExpiresAt,
+		"paid_at":          p.PaidAt,
+		"payer_name":       p.PayerName,
 	})
 }
 
