@@ -8,7 +8,7 @@ import "time"
 type QrisPayment struct {
 	ID          uint       `json:"id" gorm:"primaryKey"`
 	ReferenceID string     `json:"reference_id" gorm:"size:120;uniqueIndex"`
-	StoreID     uint       `json:"store_id" gorm:"index;default:0"` // 0 = LKI sendiri, >0 = client store (MG dll)
+	StoreID     uint       `json:"store_id" gorm:"index;default:0"`   // 0 = LKI sendiri, >0 = client store (MG dll)
 	ExternalID  string     `json:"external_id" gorm:"size:120;index"` // mis. nomor pesanan/invoice LKI
 	ProviderID  string     `json:"provider_id" gorm:"size:120"`       // id payment_request / qr_code Xendit
 	QrString    string     `json:"qr_string" gorm:"type:text"`        // payload QRIS (di-render jadi QR di FE)

@@ -220,6 +220,7 @@ func main() {
 	admin.Delete("/templates/:id", handler.DeleteTemplate)
 
 	// Payment & Transaction Admin API
+	admin.Get("/platform-fees", handler.ListPlatformFees)
 	admin.Get("/payment-transactions", handler.GetPaymentTransactions)
 	admin.Get("/payment-transactions/summary", handler.GetPaymentSummary)
 	admin.Get("/payment-transactions/ledger", handler.GetPaymentLedger)

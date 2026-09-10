@@ -50,6 +50,7 @@ func Connect() error {
 		&ClientStore{},
 		&PartnerUser{},
 		&QrisPayment{},
+		&PlatformFee{},
 	); err != nil {
 		log.Printf("AutoMigrate warning: %v\n", err)
 	}

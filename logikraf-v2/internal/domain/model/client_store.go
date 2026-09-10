@@ -12,16 +12,22 @@ import (
 // plus konfigurasi routing webhook (ext_prefix) kalau store menumpang di akun
 // Xendit Logikraf — Xendit callback masuk logikraf.id lalu diforward ke store.
 type ClientStore struct {
-	ID            uint    `gorm:"primaryKey" json:"id"`
-	Slug          string  `gorm:"size:60;uniqueIndex;not null" json:"slug"`
-	Name          string  `gorm:"size:120;not null" json:"name"`
-	BaseURL       string  `gorm:"size:255" json:"base_url"` // base API store, contoh: http://127.0.0.1:8095
-	InternalKey   string  `gorm:"size:100" json:"-"`        // X-Internal-Key (tidak pernah diekspos di list JSON)
-	FeePct        float64 `gorm:"type:decimal(5,2);default:0" json:"fee_pct"`
-	IsActive      bool    `gorm:"default:true" json:"is_active"`
-	ExtPrefix     string  `gorm:"size:20" json:"ext_prefix"` // prefix external_id Xendit, contoh "mg-" → route webhook ke store ini
-	WebhookURL    string  `gorm:"size:255" json:"-"`         // endpoint webhook store, kosong = BaseURL + "/api/v1/webhook/xendit"
-	WebhookSecret string  `gorm:"size:100" json:"-"`         // shared secret utk header X-Logikraf-Signature saat forward
+	ID          uint    `gorm:"primaryKey" json:"id"`
+	Slug        string  `gorm:"size:60;uniqueIndex;not null" json:"slug"`
+	Name        string  `gorm:"size:120;not null" json:"name"`
+	BaseURL     string  `gorm:"size:255" json:"base_url"` // base API store, contoh: http://127.0.0.1:8095
+	InternalKey string  `gorm:"size:100" json:"-"`        // X-Internal-Key (tidak pernah diekspos di list JSON)
+	FeePct      float64 `gorm:"type:decimal(5,2);default:0" json:"fee_pct"`
+	// Konfigurasi biaya layanan platform (dipakai mesin fee: accrual + laporan)
+	FeeEnabled      bool       `gorm:"default:true" json:"fee_enabled"`
+	FeeMonthlyFixed int        `gorm:"default:50000" json:"fee_monthly_fixed"`
+	FeeMinMonthly   int        `gorm:"default:100000" json:"fee_min_monthly"`
+	FeeBasis        string     `gorm:"size:20;default:total" json:"fee_basis"`
+	FeeWaivedUntil  *time.Time `json:"fee_waived_until"`
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	ExtPrefix       string     `gorm:"size:20" json:"ext_prefix"` // prefix external_id Xendit, contoh "mg-" → route webhook ke store ini
+	WebhookURL      string     `gorm:"size:255" json:"-"`         // endpoint webhook store, kosong = BaseURL + "/api/v1/webhook/xendit"
+	WebhookSecret   string     `gorm:"size:100" json:"-"`         // shared secret utk header X-Logikraf-Signature saat forward
 	// XenPlatform (portal mitra partners.logikraf.id)
 	SubAccountID string    `gorm:"size:120" json:"sub_account_id"` // Business ID Managed Sub-account Xendit
 	EntityType   string    `gorm:"size:40" json:"entity_type"`     // INDIVIDUAL / SOLE_PROPRIETORSHIP / CORPORATION dll
