@@ -270,7 +270,18 @@ func RefundClientStoreInvoice(c fiber.Ctx) error {
 	if in.Reason == "" {
 		in.Reason = "REQUESTED_BY_CUSTOMER"
 	}
-	body, _ := json.Marshal(in)
+	// Xendit Refunds API (baru) wajib: invoice_id atau payment_request_id.
+	if in.InvoiceID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "invoice_id wajib untuk refund"})
+	}
+	payload := map[string]interface{}{
+		"invoice_id":   in.InvoiceID,
+		"amount":       in.Amount,
+		"currency":     in.Currency,
+		"reason":       in.Reason,
+		"reference_id": in.ReferenceID,
+	}
+	body, _ := json.Marshal(payload)
 	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/refunds", bytes.NewReader(body))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
