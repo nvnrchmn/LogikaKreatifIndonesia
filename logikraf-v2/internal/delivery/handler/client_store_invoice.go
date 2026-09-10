@@ -268,10 +268,10 @@ func RefundClientStoreInvoice(c fiber.Ctx) error {
 		in.Currency = "IDR"
 	}
 	if in.Reason == "" {
-		in.Reason = "USER_REQUEST"
+		in.Reason = "REQUESTED_BY_CUSTOMER"
 	}
 	body, _ := json.Marshal(in)
-	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v1/refunds", bytes.NewReader(body))
+	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/refunds", bytes.NewReader(body))
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
