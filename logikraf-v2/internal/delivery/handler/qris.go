@@ -205,8 +205,16 @@ func CreateQrisPayment(c fiber.Ctx) error {
 		return c.Status(resp.StatusCode).JSON(fiber.Map{"error": "xendit: " + strings.TrimSpace(string(raw))})
 	}
 	var out struct {
-		ID      string `json:"id"`
-		Status  string `json:"status"`
+		ID            string `json:"id"`
+		Status        string `json:"status"`
+		ReferenceID   string `json:"reference_id"`
+		PaymentMethod struct {
+			QRCode struct {
+				ChannelProperties struct {
+					QRString string `json:"qr_string"`
+				} `json:"channel_properties"`
+			} `json:"qr_code"`
+		} `json:"payment_method"`
 		Actions []struct {
 			Type  string `json:"type"`
 			Value string `json:"value"`
@@ -215,15 +223,14 @@ func CreateQrisPayment(c fiber.Ctx) error {
 	if err := json.Unmarshal(raw, &out); err != nil {
 		return c.Status(502).JSON(fiber.Map{"error": "bad xendit response"})
 	}
-	qrString := ""
+	// QR string Xendit ada di payment_method.qr_code.channel_properties.qr_string;
+	// actions[] hanya dipakai kalau bentuk respons berubah.
+	qrString := strings.TrimSpace(out.PaymentMethod.QRCode.ChannelProperties.QRString)
 	for _, a := range out.Actions {
 		if strings.EqualFold(a.Type, "QR_CODE") && a.Value != "" {
 			qrString = a.Value
 			break
 		}
-	}
-	if qrString == "" && len(out.Actions) > 0 {
-		qrString = out.Actions[0].Value
 	}
 	exp := time.Now().Add(15 * time.Minute)
 	if in.ExpiresIn > 0 {
