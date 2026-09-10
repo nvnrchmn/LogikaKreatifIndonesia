@@ -286,9 +286,9 @@ func UpdateOrderStatus(c fiber.Ctx) error {
 // ticketStatusTransitions maps each ticket status to the statuses it may move into.
 // Closed is not terminal: a reopened complaint is a normal support case.
 var ticketStatusTransitions = map[string][]string{
-	"open":     {"pending", "closed"},
-	"pending":  {"open", "closed"},
-	"closed":   {"open"},
+	"open":    {"pending", "closed"},
+	"pending": {"open", "closed"},
+	"closed":  {"open"},
 }
 
 // GetTicketStatusOptions returns the legal next statuses for a ticket.

@@ -63,14 +63,14 @@ func SettlePaymentTransaction(c fiber.Ctx) error {
 // Aggregates transactions by status, provider, and date.
 func GetPaymentLedger(c fiber.Ctx) error {
 	var results []struct {
-		Date          string  `json:"date"`
-		Provider      string  `json:"provider"`
-		Status        string  `json:"status"`
-		Count         int     `json:"count"`
-		GrossAmount   uint    `json:"gross_amount"`
-		ProviderFee   uint    `json:"provider_fee"`
-		PlatformFee   uint    `json:"platform_fee"`
-		NetAmount     uint    `json:"net_amount"`
+		Date        string `json:"date"`
+		Provider    string `json:"provider"`
+		Status      string `json:"status"`
+		Count       int    `json:"count"`
+		GrossAmount uint   `json:"gross_amount"`
+		ProviderFee uint   `json:"provider_fee"`
+		PlatformFee uint   `json:"platform_fee"`
+		NetAmount   uint   `json:"net_amount"`
 	}
 
 	if err := model.DB.Model(&model.PaymentTransaction{}).
@@ -87,14 +87,14 @@ func GetPaymentLedger(c fiber.Ctx) error {
 // GetPaymentSummary returns payment summary totals for dashboard.
 func GetPaymentSummary(c fiber.Ctx) error {
 	type resultType struct {
-		TotalTransactions int    `json:"total_transactions"`
-		PendingCount      int    `json:"pending_count"`
-		SettledCount      int    `json:"settled_count"`
-		FailedCount       int    `json:"failed_count"`
-		TotalGross        uint   `json:"total_gross"`
-		TotalNet          uint   `json:"total_net"`
-		TotalProviderFee  uint   `json:"total_provider_fee"`
-		TotalPlatformFee  uint   `json:"total_platform_fee"`
+		TotalTransactions int  `json:"total_transactions"`
+		PendingCount      int  `json:"pending_count"`
+		SettledCount      int  `json:"settled_count"`
+		FailedCount       int  `json:"failed_count"`
+		TotalGross        uint `json:"total_gross"`
+		TotalNet          uint `json:"total_net"`
+		TotalProviderFee  uint `json:"total_provider_fee"`
+		TotalPlatformFee  uint `json:"total_platform_fee"`
 	}
 	var result resultType
 

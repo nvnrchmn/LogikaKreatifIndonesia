@@ -43,5 +43,6 @@ func AutoMigrate() error {
 		&model.Invoice{},
 		&model.Ticket{},
 		&model.Testimonial{},
+		&model.QrisPayment{},
 	)
 }

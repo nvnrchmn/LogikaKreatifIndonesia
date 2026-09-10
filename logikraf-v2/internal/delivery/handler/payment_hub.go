@@ -40,13 +40,13 @@ type CreateDirectPaymentRequest struct {
 
 // CreateSplitPaymentRequest — payload untuk split payment (iuran warga).
 type CreateSplitPaymentRequest struct {
-	OrderID     string           `json:"order_id" validate:"required"`
-	Amount      uint             `json:"amount" validate:"required,min=1"`
-	Description string           `json:"description"`
-	BuyerName   string           `json:"buyer_name"`
-	BuyerEmail  string           `json:"buyer_email"`
-	BuyerPhone  string           `json:"buyer_phone"`
-	Splits      []SplitDetail    `json:"splits" validate:"required,min=1"`
+	OrderID     string        `json:"order_id" validate:"required"`
+	Amount      uint          `json:"amount" validate:"required,min=1"`
+	Description string        `json:"description"`
+	BuyerName   string        `json:"buyer_name"`
+	BuyerEmail  string        `json:"buyer_email"`
+	BuyerPhone  string        `json:"buyer_phone"`
+	Splits      []SplitDetail `json:"splits" validate:"required,min=1"`
 }
 
 // SplitDetail — satu bagian dari split.
@@ -161,10 +161,10 @@ func handleCreateSubAccount(c fiber.Ctx) error {
 	}
 
 	return c.Status(201).JSON(fiber.Map{
-		"id":      account.ID,
+		"id":        account.ID,
 		"tenant_id": account.TenantID,
 		"va_number": subData.VA,
-		"status":  account.Status,
+		"status":    account.Status,
 	})
 }
 

@@ -82,5 +82,3 @@ func RefundPaymentTransaction(c fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"status": "refunded", "order_id": pt.OrderID, "provider": pt.Provider})
 }
-
-

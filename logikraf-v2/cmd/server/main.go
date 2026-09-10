@@ -171,6 +171,12 @@ func main() {
 	api.Post("/payment/midtrans/invoice", handler.CreateMidtransSnap)
 	api.Post("/payment/ipaymu/snap", handler.CreateIpaymuPayment)
 	api.Post("/payment/ipaymu/invoice", handler.CreateIpaymuPayment)
+	// QRIS kustom (halaman bayar sendiri) + realtime
+	api.Post("/payment/qris", handler.CreateQrisPayment)
+	api.Get("/payment/qris/:reference", handler.GetQrisPaymentStatus)
+	api.Post("/payment/qris/:reference/simulate", handler.SimulateQrisPayment)
+	api.Get("/payment/qris/:reference/stream", handler.QrisPaymentStream)
+	api.Post("/webhooks/xendit/qris", handler.XenditQrisWebhook)
 	api.Post("/webhooks/xendit", handler.XenditWebhook)
 	api.Post("/client-store-invoices", handler.CreateClientStoreInvoice)
 	api.Post("/client-store-invoices/:id/expire", handler.ExpireClientStoreInvoice)

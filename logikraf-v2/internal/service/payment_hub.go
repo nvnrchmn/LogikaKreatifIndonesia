@@ -18,14 +18,14 @@ import (
 // (e.g. iuran warga), the tenant also gets a sub-merchant VA so funds can be
 // split automatically by iPaymu.
 type Service struct {
-	db  *gorm.DB
-ipaymu *ipaymu.Client
+	db     *gorm.DB
+	ipaymu *ipaymu.Client
 }
 
 // NewService builds a Payment Hub Service.
 func NewService(db *gorm.DB) *Service {
 	return &Service{
-		db:    db,
+		db:     db,
 		ipaymu: ipaymu.NewClient(),
 	}
 }
@@ -37,7 +37,7 @@ func NewServiceWithClient(db *gorm.DB, c *ipaymu.Client) *Service {
 
 // SubAccountRequest is the payload to register a new tenant sub-account.
 type SubAccountRequest struct {
-	TenantID    string `json:"tenant_id" validate:"required"`
+	TenantID     string `json:"tenant_id" validate:"required"`
 	BusinessName string `json:"business_name" validate:"required"`
 	ContactEmail string `json:"contact_email" validate:"required,email"`
 	ContactPhone string `json:"contact_phone"`
@@ -68,13 +68,13 @@ func (s *Service) CreateSubAccount(req SubAccountRequest) (*SubAccountResponse, 
 	// Build iPaymu submerchant payload.
 	// Reference: POST /api/v2/submerchant
 	subBody := map[string]interface{}{
-		"name":           req.BusinessName,
-		"email":          req.ContactEmail,
-		"phone":          req.ContactPhone,
-		"address":        req.Address,
-		"ownerName":      req.OwnerName,
-		"ownerIdNumber":  req.OwnerID,
-		"ipnUrl":         "", // optional per-tenant IPN
+		"name":          req.BusinessName,
+		"email":         req.ContactEmail,
+		"phone":         req.ContactPhone,
+		"address":       req.Address,
+		"ownerName":     req.OwnerName,
+		"ownerIdNumber": req.OwnerID,
+		"ipnUrl":        "", // optional per-tenant IPN
 	}
 	bodyBytes, _ := json.Marshal(subBody)
 
@@ -225,20 +225,20 @@ func (s *Service) CreateDirectPayment(req PaymentRequest) (*PaymentResponse, err
 
 // SplitPaymentRequest is the payload for a split payment (iuran warga).
 type SplitPaymentRequest struct {
-	TenantID    string          `json:"tenant_id" validate:"required"`
-	OrderID     string          `json:"order_id" validate:"required"`
-	Amount      uint            `json:"amount" validate:"required,min=1"`
-	Description string          `json:"description"`
-	BuyerName   string          `json:"buyer_name"`
-	BuyerEmail  string          `json:"buyer_email"`
-	BuyerPhone  string          `json:"buyer_phone"`
-	Splits      []SplitDetail   `json:"splits" validate:"required,min=1"`
+	TenantID    string        `json:"tenant_id" validate:"required"`
+	OrderID     string        `json:"order_id" validate:"required"`
+	Amount      uint          `json:"amount" validate:"required,min=1"`
+	Description string        `json:"description"`
+	BuyerName   string        `json:"buyer_name"`
+	BuyerEmail  string        `json:"buyer_email"`
+	BuyerPhone  string        `json:"buyer_phone"`
+	Splits      []SplitDetail `json:"splits" validate:"required,min=1"`
 }
 
 // SplitDetail defines one leg of a split.
 type SplitDetail struct {
-	MerchantID string `json:"merchant_id"` // sub-merchant VA
-	Amount     uint   `json:"amount"`
+	MerchantID  string `json:"merchant_id"` // sub-merchant VA
+	Amount      uint   `json:"amount"`
 	Description string `json:"description"`
 }
 

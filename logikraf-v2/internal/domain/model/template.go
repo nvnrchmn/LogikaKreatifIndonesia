@@ -10,7 +10,7 @@ type ProjectTemplate struct {
 	PackageID   uint      `json:"package_id"`
 	Package     Package   `gorm:"foreignKey:PackageID" json:"package,omitempty"`
 	Name        string    `gorm:"size:255;not null" json:"name"`
-	RepoURL     string    `gorm:"size:500" json:"repo_url"` // GitHub repo
+	RepoURL     string    `gorm:"size:500" json:"repo_url"`     // GitHub repo
 	ArtifactKey string    `gorm:"size:500" json:"artifact_key"` // S3 object key of built .tar.gz
 	Description string    `gorm:"type:text" json:"description"`
 	IsActive    bool      `gorm:"default:true" json:"is_active"`

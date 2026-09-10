@@ -25,7 +25,7 @@ type minioClient struct {
 }
 
 func NewS3Client() (S3Client, error) {
-	endpoint := os.Getenv("S3_ENDPOINT")       // e.g., "is3.cloudhost.id"
+	endpoint := os.Getenv("S3_ENDPOINT") // e.g., "is3.cloudhost.id"
 	accessKeyID := os.Getenv("S3_ACCESS_KEY")
 	secretAccessKey := os.Getenv("S3_SECRET_KEY")
 	useSSL := true
