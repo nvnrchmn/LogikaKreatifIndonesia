@@ -24,3 +24,13 @@
 - ⚠️ `.env` di repo default PORT=8080 (dev); prod = 8081 via systemd
 - Ponytail config FULL untuk review/audit
 - Selalu update file ini saat ada perubahan struktur/status
+
+UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
+- Backend: internal/delivery/handler/qris.go + internal/service/qris_hub.go + model QrisPayment (tabel qris_payments).
+- Endpoint: POST /api/payment/qris (create), GET /api/payment/qris/:ref (status), POST /api/payment/qris/:ref/simulate (mode tes, gated), GET /api/payment/qris/:ref/stream (SSE realtime), POST /api/webhooks/xendit/qris (webhook payment_request).
+- Provider: Xendit Payment Requests API (header api-version 2024-11-11). qr_string ada di payment_method.qr_code.channel_properties.qr_string (BUKAN actions[]).
+- Realtime: SSE (bukan WebSocket) — Fiber v3 SendStreamWriter; klien juga polling 4 dtk sbg fallback. Terbukti: pending -> paid -> done.
+- Migrasi: AutoMigrate runtime ada di internal/domain/model/db.go (internal/infrastructure/database/database.go TIDAK dipakai saat start) — tambahkan model baru di db.go.
+- Env LKI: QRIS_MODE=live|test, QRIS_ALLOW_SIMULATE=true (test-only; WAJIB dimatikan sebelum produksi nyata). Mode test butuh key sandbox (settings xendit_secret_key_sandbox / env XENDIT_SANDBOX_KEY).
+- UI: frontend/src/pages/public/PaymentQris.tsx, route /pay/qris/:reference (di luar layout publik), QR dirender klien via lib qrcode.
+- Catatan: SDK resmi github.com/xendit/xendit-go/v7 tersedia (paket payment_request/invoice/refund) tapi implementasi pakai HTTP langsung agar konsisten dgn pola hub.

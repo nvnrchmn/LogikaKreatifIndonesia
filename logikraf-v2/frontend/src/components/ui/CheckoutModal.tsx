@@ -60,30 +60,25 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
     if (!pkg) return
     setBusy(true)
     setErr('')
-    const gw = gateways.length > 0 ? gateways[0] : { id: 'ipaymu', name: 'iPaymu' }
-    const endpoint = gw.id === 'xendit' ? '/api/payment/xendit/invoice' : `/api/payment/${gw.id}/snap`
+    // Pembayaran QRIS kustom: halaman bayar milik Logikraf sendiri (QR dirender
+    // di frontend, status realtime via SSE) — bukan hosted page Xendit.
     const orderId = `LK-${Date.now()}-${pkg.id}`
     const payload = {
-      order_id: orderId,
       external_id: orderId,
+      order_id: orderId,
       amount: Number(pkg.price),
-      first_name: form.name,
-      email: form.email,
       payer_email: form.email,
-      phone: form.phone,
       description: `Paket ${pkg.name} - Logikraf`,
-      paymentMethod: 'qris',
-      paymentChannel: 'qris',
     }
     try {
-      const r = await fetch(endpoint, {
+      const r = await fetch('/api/payment/qris', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await r.json()
       if (!r.ok) throw new Error(data?.error || data?.Message || 'Gagal memproses pembayaran.')
-      const url = data.redirect_url || data.invoice_url || data.payment_url || data.Data?.Url || data.url
+      const url = data.pay_url || data.invoice_url || (data.reference_id ? `/pay/qris/${data.reference_id}` : '')
       if (url) window.location.href = url
       else throw new Error('Tautan pembayaran tidak ditemukan.')
     } catch (e: any) {

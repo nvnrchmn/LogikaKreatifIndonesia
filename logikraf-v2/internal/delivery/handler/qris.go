@@ -41,6 +41,24 @@ var qrisHTTP = &http.Client{Timeout: 30 * time.Second}
 
 const xenditAPIVersion = "2024-11-11"
 
+// markOrderPaidByExternalID — kalau pembayaran QRIS ini terhubung ke order LKI
+// (external_id = order_number), tandai order tsb lunas.
+func markOrderPaidByExternalID(externalID string) {
+	if externalID == "" {
+		return
+	}
+	res := model.DB.Model(&model.Order{}).
+		Where("order_number = ? AND status <> ?", externalID, "paid").
+		Update("status", "paid")
+	if res.Error != nil {
+		log.Printf("[qris] gagal tandai order %s lunas: %v", externalID, res.Error)
+		return
+	}
+	if res.RowsAffected > 0 {
+		log.Printf("[qris] order %s ditandai PAID via QRIS", externalID)
+	}
+}
+
 func qrisMode() string {
 	m := strings.ToLower(strings.TrimSpace(os.Getenv("QRIS_MODE")))
 	if m == "" {
@@ -134,6 +152,10 @@ func qrisApplyStatus(p *model.QrisPayment, providerStatus, payer string) {
 	}
 	log.Printf("[qris] %s → %s", p.ReferenceID, newStatus)
 	qrisPublishSnapshot(p)
+	// Kalau QRIS ini milik order LKI (external_id = order_number), tandai lunas.
+	if newStatus == "paid" {
+		markOrderPaidByExternalID(p.ExternalID)
+	}
 }
 
 func qrisPublishSnapshot(p *model.QrisPayment) {
@@ -258,6 +280,7 @@ func CreateQrisPayment(c fiber.Ctx) error {
 	return c.Status(201).JSON(fiber.Map{
 		"reference_id": p.ReferenceID,
 		"provider_id":  p.ProviderID,
+		"pay_url":      "https://" + c.Host() + "/pay/qris/" + p.ReferenceID,
 		"qr_string":    p.QrString,
 		"amount":       p.Amount,
 		"currency":     p.Currency,
