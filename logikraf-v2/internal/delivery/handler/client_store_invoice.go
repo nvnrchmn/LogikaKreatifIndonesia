@@ -267,7 +267,11 @@ func RefundClientStoreInvoice(c fiber.Ctx) error {
 	if in.Currency == "" {
 		in.Currency = "IDR"
 	}
-	if in.Reason == "" {
+	// Normalisasi reason ke enum yang sah milik Xendit.
+	switch strings.ToUpper(strings.TrimSpace(in.Reason)) {
+	case "FRAUDULENT", "DUPLICATE", "REQUESTED_BY_CUSTOMER", "CANCELLATION", "OTHERS":
+		in.Reason = strings.ToUpper(strings.TrimSpace(in.Reason))
+	default:
 		in.Reason = "REQUESTED_BY_CUSTOMER"
 	}
 	// Xendit Refunds API (baru) wajib: invoice_id atau payment_request_id.
