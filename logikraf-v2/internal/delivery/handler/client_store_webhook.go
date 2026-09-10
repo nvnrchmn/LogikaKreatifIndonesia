@@ -27,9 +27,20 @@ func accruePlatformFee(store *model.ClientStore, body []byte) {
 		ExternalID string `json:"external_id"`
 		Status     string `json:"status"`
 		Amount     int    `json:"amount"`
+		Metadata   struct {
+			ProductSubtotal int `json:"product_subtotal"`
+		} `json:"metadata"`
 	}
 	if err := json.Unmarshal(body, &p); err != nil {
 		return
+	}
+	// Basis biaya layanan: subtotal produk (kalau store mengirimkannya via
+	// metadata invoice) — supaya ongkir tidak ikut dikenakan fee.
+	basis := p.Amount
+	basisLabel := "total"
+	if p.Metadata.ProductSubtotal > 0 && p.Metadata.ProductSubtotal <= p.Amount {
+		basis = p.Metadata.ProductSubtotal
+		basisLabel = "product"
 	}
 	if !strings.EqualFold(strings.TrimSpace(p.Status), "PAID") && !strings.EqualFold(strings.TrimSpace(p.Status), "SETTLED") {
 		return
@@ -42,18 +53,14 @@ func accruePlatformFee(store *model.ClientStore, body []byte) {
 	if count > 0 {
 		return
 	}
-	fee := int(math.Round(float64(p.Amount) * store.FeePct / 100.0))
-	basis := store.FeeBasis
-	if basis == "" {
-		basis = "total"
-	}
+	fee := int(math.Round(float64(basis) * store.FeePct / 100.0))
 	row := model.PlatformFee{
 		StoreID:    store.ID,
 		Period:     time.Now().Format("2006-01"),
 		ExternalID: p.ExternalID,
 		InvoiceID:  p.ID,
-		Gross:      p.Amount,
-		Basis:      basis,
+		Gross:      basis,
+		Basis:      basisLabel,
 		FeePct:     store.FeePct,
 		FeeAmount:  fee,
 		Status:     "accrued",
@@ -63,7 +70,7 @@ func accruePlatformFee(store *model.ClientStore, body []byte) {
 		log.Printf("[fee] gagal simpan accrual %s: %v", p.ExternalID, err)
 		return
 	}
-	log.Printf("[fee] accrual store=%s ext=%s gross=%d fee=%d (pct=%.2f)", store.Slug, p.ExternalID, p.Amount, fee, store.FeePct)
+	log.Printf("[fee] accrual store=%s ext=%s basis=%s gross=%d fee=%d (pct=%.2f)", store.Slug, p.ExternalID, basisLabel, basis, fee, store.FeePct)
 }
 
 // ForwardToClientStore — Payment Hub routing: kalau external_id webhook Xendit

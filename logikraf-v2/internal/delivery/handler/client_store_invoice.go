@@ -51,14 +51,15 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 
 	var in struct {
-		ExternalID         string `json:"external_id"`
-		Amount             int    `json:"amount"`
-		PayerEmail         string `json:"payer_email"`
-		GivenNames         string `json:"given_names"`
-		Description        string `json:"description"`
-		SuccessRedirectURL string `json:"success_redirect_url"`
-		FailureRedirectURL string `json:"failure_redirect_url"`
-		InvoiceDuration    int    `json:"invoice_duration"`
+		ExternalID         string         `json:"external_id"`
+		Amount             int            `json:"amount"`
+		PayerEmail         string         `json:"payer_email"`
+		GivenNames         string         `json:"given_names"`
+		Description        string         `json:"description"`
+		SuccessRedirectURL string         `json:"success_redirect_url"`
+		FailureRedirectURL string         `json:"failure_redirect_url"`
+		InvoiceDuration    int            `json:"invoice_duration"`
+		Metadata           map[string]any `json:"metadata"`
 	}
 	if err := c.Bind().JSON(&in); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid"})
@@ -107,6 +108,10 @@ func CreateClientStoreInvoice(c fiber.Ctx) error {
 	}
 	if in.GivenNames != "" {
 		bodyMap["customer"] = map[string]string{"given_names": in.GivenNames, "email": in.PayerEmail}
+	}
+	// Metadata diteruskan ke Xendit (dipakai hub utk basis biaya layanan).
+	if len(in.Metadata) > 0 {
+		bodyMap["metadata"] = in.Metadata
 	}
 	body, _ := json.Marshal(bodyMap)
 

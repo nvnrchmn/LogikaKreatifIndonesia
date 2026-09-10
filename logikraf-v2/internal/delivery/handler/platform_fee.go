@@ -1,12 +1,53 @@
 package handler
 
 import (
+	"crypto/subtle"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 )
+
+func storeByInternalKey(got string) (*model.ClientStore, bool) {
+	if got == "" {
+		return nil, false
+	}
+	var stores []model.ClientStore
+	if err := model.DB.Where("is_active = 1").Find(&stores).Error; err != nil {
+		return nil, false
+	}
+	for i, s := range stores {
+		if s.InternalKey != "" && subtle.ConstantTimeCompare([]byte(got), []byte(s.InternalKey)) == 1 {
+			return &stores[i], true
+		}
+	}
+	return nil, false
+}
+
+// ReversePlatformFee — batalkan (balik) biaya layanan utk satu transaksi,
+// dipanggil store saat order direfund supaya fee tidak diambil dari uang yang
+// dikembalikan ke pembeli. Auth: X-Internal-Key store. Body: { external_id }.
+func ReversePlatformFee(c fiber.Ctx) error {
+	store, ok := storeByInternalKey(c.Get("X-Internal-Key"))
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "invalid internal key"})
+	}
+	var in struct {
+		ExternalID string `json:"external_id"`
+	}
+	if err := c.Bind().JSON(&in); err != nil || strings.TrimSpace(in.ExternalID) == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "external_id wajib"})
+	}
+	res := model.DB.Model(&model.PlatformFee{}).
+		Where("store_id = ? AND external_id = ? AND status = ?", store.ID, in.ExternalID, "accrued").
+		Updates(map[string]any{"status": "reversed", "note": "fee dibalik — order direfund"})
+	if res.Error != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "db error"})
+	}
+	return c.JSON(fiber.Map{"reversed": res.RowsAffected, "external_id": in.ExternalID})
+}
 
 // ListPlatformFees — laporan biaya layanan platform per store per periode.
 // Dipakai owner (superadmin) untuk melihat tagihan/pemotongan: total GMV, fee 2%,
