@@ -228,13 +228,41 @@ func RefundClientStoreInvoice(c fiber.Ctx) error {
 	}
 	var in struct {
 		PaymentID   string `json:"payment_id"`
+		InvoiceID   string `json:"invoice_id"`
 		Amount      int    `json:"amount"`
 		Currency    string `json:"currency"`
 		Reason      string `json:"reason"`
 		ReferenceID string `json:"reference_id"`
 	}
-	if err := c.Bind().JSON(&in); err != nil || in.PaymentID == "" || in.Amount <= 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "payment_id & amount wajib"})
+	if err := c.Bind().JSON(&in); err != nil || in.Amount <= 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "payment_id (atau invoice_id) & amount wajib"})
+	}
+	// Fallback: order lama tanpa payment_id tersimpan → resolve dari invoice
+	if in.PaymentID == "" && in.InvoiceID != "" {
+		greq, err := http.NewRequest(http.MethodGet, "https://api.xendit.co/v1/invoices/"+in.InvoiceID, nil)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "failed"})
+		}
+		greq.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(secret+":")))
+		if store.SubAccountID != "" && strings.EqualFold(store.KYCStatus, "LIVE") {
+			greq.Header.Set("for-user-id", store.SubAccountID)
+		}
+		gresp, err := (&http.Client{Timeout: 30 * time.Second}).Do(greq)
+		if err != nil {
+			return c.Status(502).JSON(fiber.Map{"error": "xendit unreachable"})
+		}
+		defer gresp.Body.Close()
+		var inv struct {
+			PaymentID string `json:"payment_id"`
+		}
+		_ = json.NewDecoder(gresp.Body).Decode(&inv)
+		if inv.PaymentID == "" {
+			return c.Status(400).JSON(fiber.Map{"error": "payment_id tidak ada di invoice ini (belum terbayar?)"})
+		}
+		in.PaymentID = inv.PaymentID
+	}
+	if in.PaymentID == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "payment_id wajib"})
 	}
 	if in.Currency == "" {
 		in.Currency = "IDR"
