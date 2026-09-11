@@ -21,8 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: logikraf-v2/frontend/package-lock.json
+          cache: false   # hemat kuota storage Actions (cache npm juga dihitung)
       - run: npm ci --ignore-scripts
       - run: npm run build
       - name: Package artifact
@@ -31,3 +30,4 @@ jobs:
         with:
           name: ${{ inputs.template_name }}
           path: ${{ github.workspace }}/${{ inputs.template_name }}.tar.gz
+          retention-days: 1
