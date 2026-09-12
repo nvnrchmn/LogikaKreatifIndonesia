@@ -419,6 +419,13 @@ func XenditWebhook(c fiber.Ctx) error {
 			if err := model.DB.Where("order_number = ?", ref).First(&order).Error; err == nil {
 				orderID = order.ID
 			}
+			// Jaring pengaman: pembayaran settled tapi Order belum ada → buat otomatis
+			if orderID == 0 {
+				if id, created := ensureOrderFromPayment(pt); created {
+					orderID = id
+					notifyAdminNewOrder(pt, id)
+				}
+			}
 
 			txRef := pt.ProviderTxID
 			if txRef == "" {
@@ -732,6 +739,13 @@ func IpaymuWebhook(c fiber.Ctx) error {
 			orderID := uint(0)
 			if err := model.DB.Where("order_number = ?", p.ReferenceID).First(&order).Error; err == nil {
 				orderID = order.ID
+			}
+			// Jaring pengaman: pembayaran settled tapi Order belum ada → buat otomatis
+			if orderID == 0 {
+				if id, created := ensureOrderFromPayment(pt); created {
+					orderID = id
+					notifyAdminNewOrder(pt, id)
+				}
 			}
 
 			// Auto-create Transaction (ledger entry)
