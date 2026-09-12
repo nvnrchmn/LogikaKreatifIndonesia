@@ -284,3 +284,7 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Blok tanda tangan ("Bekasi, <tanggal> / Hormat kami / Tim Logikraf") DIHAPUS atas permintaan pemilik. Footer "Dokumen ini diterbitkan otomatis dan sah tanpa tanda tangan basah" tetap ada.
 - Catatan standar kini "Terima kasih telah bekerja sama dengan Logikraf." (default di `pkg/invoice` saat `Notes` kosong; literal di `order_invoice.go`, `order_qris.go`, `sample_test.go` ikut disamakan).
 - Blok Penerbit tidak lagi dipaku di dasar halaman: mengikuti akhir isi (`GetY()+10`, dibatasi y=250) supaya halaman tidak separuh kosong.
+
+### Audit 12 Sep 2026 — temuan & perbaikan
+- FIX (4f9b320): `simulate_allowed` pada respons QRIS kini `qrisSimulateAllowed() && p.Mode != "live"` sehingga tombol "Simulasikan pembayaran berhasil (mode tes)" TIDAK pernah muncul untuk pembayaran live. Sebelumnya `QRIS_ALLOW_SIMULATE=true` di `.env` produksi membuat tombol tes tampil ke pelanggan nyata (klik-nya memang ditolak 403 oleh guard di `SimulateQrisPayment`, tetapi tetap menyesatkan). Env sengaja TIDAK diubah agar pengujian mode tes tetap berjalan.
+- Celah yang MASIH terbuka (hasil audit, belum dikerjakan): (1) backup DB otomatis — `/www/backup` kosong; (2) `fail2ban` inactive; (3) verifikasi email tidak dipakai (`EmailVerifiedAt` tak pernah diisi); (4) tidak ada lonceng notifikasi di portal klien; (5) tidak ada manifest PWA; (6) tidak ada `sitemap.xml` (robots.txt ada); (7) tidak ada 2FA/TOTP; (8) tidak ada analytics pengunjung; (9) NIB/NPWP belum diisi sehingga belum dicetak di invoice.
