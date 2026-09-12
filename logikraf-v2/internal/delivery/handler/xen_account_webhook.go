@@ -47,7 +47,12 @@ func handleAccountEventWebhook(c fiber.Ctx) error {
 	var candidates []string
 	seen := map[string]bool{}
 	walkAccountPayload(body, &status, &candidates, seen)
-	cands := append(candidates, c.Get("for-user-id"))
+	// Hanya ID berpola Xendit yang dipakai sebagai kandidat store (payload memuat string
+	// non-ID seperti "account.verification" yang bisa mencocokkan store salah).
+	cands := trustedAccountIDs(candidates)
+	if h := strings.TrimSpace(c.Get("for-user-id")); h != "" {
+		cands = append(cands, h)
+	}
 	if status == "" && len(cands) == 0 {
 		return c.Status(200).JSON(fiber.Map{"status": "ok", "message": "account event ignored"})
 	}
