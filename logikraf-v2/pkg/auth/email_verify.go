@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/email"
+	"github.com/logikraf/logikraf-v2/pkg/wa"
 )
 
 // SendEmailVerification — buat token verifikasi email lalu kirim tautannya.
@@ -46,6 +47,13 @@ func SendEmailVerification(user model.User) {
 			"<p>Tautan berlaku 24 jam dan hanya bisa dipakai sekali.</p>" +
 			"<p>Salam,<br>Tim Logikraf</p>"
 		go func() { _ = email.Send(cfg, []string{user.Email}, "Verifikasi email portal Logikraf", body) }()
+	}
+	// Pengingat lewat WhatsApp bila klien punya nomor terdaftar (pola sama
+	// dengan reset kata sandi & pemberitahuan pesanan).
+	if num := clientWhatsApp(user.Email); num != "" {
+		go func() {
+			_ = wa.New().Send(num, "Verifikasi email portal Logikraf\nTautan (berlaku 24 jam):\n"+link)
+		}()
 	}
 }
 
