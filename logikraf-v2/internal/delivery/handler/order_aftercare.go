@@ -5,6 +5,7 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/email"
+	"github.com/logikraf/logikraf-v2/pkg/wa"
 )
 
 // portalInfo — kode aktivasi + tautan portal klien, supaya pembeli bisa memantau
@@ -36,4 +37,53 @@ func notifyClientNextSteps(pt model.PaymentTransaction) {
 	}
 	_ = email.SendOrderOnboarding(email.DefaultConfig(), pt.ClientEmail, pt.ClientName,
 		ref, strconv.Itoa(int(pt.GrossAmount)), portalInfo(pt.ClientEmail))
+}
+
+// statusLabel — terjemahan status internal ke bahasa yang enak dibaca klien.
+func statusLabel(s string) string {
+	switch s {
+	case "pending":
+		return "menunggu pembayaran"
+	case "paid":
+		return "pembayaran diterima"
+	case "active":
+		return "sedang dikerjakan"
+	case "on_hold":
+		return "dijeda sementara"
+	case "completed":
+		return "selesai"
+	case "cancelled":
+		return "dibatalkan"
+	case "refunded":
+		return "dana dikembalikan"
+	}
+	return s
+}
+
+// notifyOrderStatusChange — kabari klien (email + WA) saat status pesanan berubah,
+// supaya mereka tidak perlu menanyakan progres (P2-8).
+func notifyOrderStatusChange(order model.Order, prev, now, note string) {
+	var client model.Client
+	if order.ClientID == 0 || model.DB.First(&client, order.ClientID).Error != nil {
+		return
+	}
+	label := statusLabel(now)
+	plain := "Status pesanan " + order.OrderNumber + " kini: " + label +
+		" (sebelumnya " + statusLabel(prev) + ")."
+	if note != "" {
+		plain += "\nCatatan: " + note
+	}
+	if client.Email != "" {
+		html := "<p>Status pesanan <strong>" + order.OrderNumber + "</strong> kini: <strong>" +
+			label + "</strong> (sebelumnya " + statusLabel(prev) + ").</p>"
+		if note != "" {
+			html += "<p>Catatan: " + note + "</p>"
+		}
+		html += `<p>Pantau pesanan Anda di <a href="https://logikraf.id/client">logikraf.id/client</a>.</p>`
+		_ = email.Send(email.DefaultConfig(), []string{client.Email},
+			"Status pesanan "+order.OrderNumber+": "+label, html)
+	}
+	if client.Phone != "" {
+		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di https://logikraf.id/client")
+	}
 }

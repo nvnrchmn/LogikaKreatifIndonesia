@@ -280,6 +280,9 @@ func UpdateOrderStatus(c fiber.Ctx) error {
 		IsRead:   true,
 	})
 
+	// Kabari klien (email + WA) supaya mereka tidak perlu menanyakan progres.
+	notifyOrderStatusChange(order, prev, in.Status, in.Note)
+
 	return c.JSON(order)
 }
 
