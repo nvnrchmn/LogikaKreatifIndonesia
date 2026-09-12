@@ -242,3 +242,9 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Tiket baru dari klien -> notifikasi in-app + email + WA ke admin (`client_ticket_notify.go`); berkas baru -> `client_upload_notify.go`.
 - Uji reset E2E lolos: token sah -> login sandi baru 200; token palsu/kedaluwarsa/dipakai ulang -> 400; user uji dibersihkan.
 - Klien tidak boleh pakai `/api/upload` (admin-only) — pakai endpoint di atas.
+
+### Berkas klien — sisi admin (revisi)
+- Endpoint admin: `GET /api/client-files` (param `q` untuk cari) + `GET /api/client-files/:client_id/:name` untuk unduh. Catatan: grup `admin` itu `/api/*`, BUKAN `/api/admin/*`.
+- UI: menu admin "Berkas Klien" (`/admin/client-files`) — halaman khusus, karena rute admin lain memakai router generik `:resource`.
+- Unduhan admin aman: `safeFileName` menolak path traversal (ada tesnya).
+- Tes: `client_upload_admin_test.go` — daftar per klien, nama tampil, `order_id`, unduhan sah, traversal ditolak.
