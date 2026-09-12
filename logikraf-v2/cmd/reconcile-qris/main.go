@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/logikraf/logikraf-v2/internal/delivery/handler"
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
@@ -27,4 +28,8 @@ func main() {
 		fmt.Println("  ", r)
 	}
 	fmt.Println("selesai:", len(rows), "pembayaran diproses")
+
+	// Notifikasi dikirim asinkron oleh handler; beri waktu supaya tidak ikut
+	// mati saat proses ini keluar.
+	time.Sleep(20 * time.Second)
 }
