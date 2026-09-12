@@ -98,3 +98,12 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
   URL hasil langsung dipasang sebagai `logo` mailbox itu (jadi foto per orang, ter-host otomatis).
 - `localStorage.sigcfg` tetap dipakai sebagai cache di browser; server = sumber utama.
 - Tidak ada perubahan backend untuk fitur ini — semuanya memakai endpoint generik yang sudah ada.
+
+## Keputusan: BIMI gratis saja, TANPA sertifikat (2026-09-12, Nova)
+
+- Record BIMI **sudah dipasang**: `default._bimi.logikraf.id TXT "v=BIMI1; l=https://logikraf.id/brand/logo-bimi.svg;"`
+  → self-asserted: logo tampil di Yahoo/AOL/Fastmail; TIDAK di Gmail/Apple/Outlook.
+- **Keputusan Nova: tidak membeli VMC/CMC.** Tanda tangan email (+ Gravatar) dianggap cukup.
+  → Jangan menyarankan VMC/CMC lagi kecuali Nova minta sendiri.
+- Kalau nanti diperlukan: sisi teknis sudah siap (SVG Tiny PS valid 3,1 KB, di-host HTTPS tanpa redirect,
+  DMARC p=quarantine, DKIM selector default) — tinggal menambah parameter `a=` (URL sertifikat) di record BIMI.
