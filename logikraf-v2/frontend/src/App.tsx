@@ -42,6 +42,7 @@ const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
 const ClientFilesPage = lazy(() => import('./pages/client/ClientFilesPage'))
 const ClientInvoicesPage = lazy(() => import('./pages/client/ClientInvoicesPage'))
 const ClientTicketDetailPage = lazy(() => import('./pages/client/ClientTicketDetailPage'))
+const ClientProgressPage = lazy(() => import('./pages/client/ClientProgressPage'))
 const ClientPortalGate = lazy(() => import('./components/client/ClientPortalGate'))
 const ClientLoginPage = lazy(() => import('./pages/client/ClientLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/client/ForgotPasswordPage'))
@@ -159,6 +160,7 @@ export default function App() {
         <Route path="tickets" element={<ClientTicketsPage />} />
         <Route path="tickets/:id" element={<ClientTicketDetailPage />} />
         <Route path="invoices" element={<ClientInvoicesPage />} />
+        <Route path="progress" element={<ClientProgressPage />} />
         <Route path="profile" element={<ClientProfilePage />} />
       </Route>
       {/* Portal klien - URL bersih di host portal (client.logikraf.id/dashboard) */}
@@ -169,6 +171,7 @@ export default function App() {
         <Route path="/tickets/:id" element={<ClientTicketDetailPage />} />
         <Route path="/files" element={<ClientFilesPage />} />
         <Route path="/invoices" element={<ClientInvoicesPage />} />
+        <Route path="/progress" element={<ClientProgressPage />} />
         <Route path="/profile" element={<ClientProfilePage />} />
       </Route>
       {/* H10: 404 catch-all */}

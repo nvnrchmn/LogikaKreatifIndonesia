@@ -170,6 +170,7 @@ func main() {
 	clientAPI.Get("/files", handler.ClientFiles)
 	clientAPI.Get("/files/:name", handler.DownloadClientFile)
 	clientAPI.Get("/invoices", handler.ClientInvoices)
+	clientAPI.Get("/progress", handler.ClientProgress)
 	clientAPI.Get("/invoices/:id/pdf", handler.ClientInvoicePDF)
 	clientAPI.Get("/tickets/:id", handler.ClientTicket)
 	clientAPI.Post("/tickets/:id/replies", handler.ReplyClientTicket)

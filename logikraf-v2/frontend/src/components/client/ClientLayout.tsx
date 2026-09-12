@@ -6,6 +6,7 @@ const navItems = [
   { label: 'Pesanan Saya', path: '/orders', icon: ShoppingBagIcon },
   { label: 'Bantuan / Tiket', path: '/tickets', icon: TicketIcon },
   { label: 'Kirim Berkas', path: '/files', icon: FileIcon },
+  { label: 'Progres Proyek', path: '/progress', icon: ProgressIcon },
   { label: 'Invoice', path: '/invoices', icon: InvoiceIcon },
   { label: 'Profil Akun', path: '/profile', icon: PersonIcon },
 ]
@@ -239,6 +240,14 @@ function InvoiceIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 14h6M9 10h3m-6 9h12a1 1 0 001-1V5a1 1 0 00-1-1H6a1 1 0 00-1 1v13a1 1 0 001 1z" />
+    </svg>
+  )
+}
+
+function ProgressIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 17l5-5 4 3 5-7m0 0h-4m4 0v4" />
     </svg>
   )
 }
