@@ -49,3 +49,12 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
   STORE YANG SALAH bila ada string yang kebetulan sama dengan sub_account_id store lain.
 - Bila tak ada kandidat berpola ID, daftar mentah dipakai (jaring pengaman); header `for-user-id` selalu dihormati.
 - Tes: `go test ./internal/delivery/handler/ -run "TestTrustedAccountIDs|TestCollectFailureReasons"`
+
+## Aset brand email + BIMI (2026-09-12)
+
+- Aset di-host statis: `/www/wwwroot/logikraf.id/static-brand/` → **https://logikraf.id/brand/** (location `/brand/` di vhost `go_logikraf.id.conf`; backup konfig: `go_logikraf.id.conf.bak-bimi`).
+- Isi: `sig-logo.png` (logo tanda tangan, varian outline agar huruf K terlihat di latar putih), `logo-bimi.svg` (SVG Tiny PS 3 KB, siap BIMI), `bimi-512.png`, `preview.html`, `sig/sig-*.html` (novanurachman/support/admin/coba).
+- **Tanda tangan Outlook tidak tersinkron dari server** — disimpan lokal (`%APPDATA%\Microsoft\Signatures\`). Sekali tempel per perangkat.
+- Prasyarat BIMI: SPF ✓, DKIM selector `default` (rspamd menandatangani) ✓, DMARC `p=quarantine` ✓. Yang kurang: TXT `default._bimi.logikraf.id` = `v=BIMI1; l=https://logikraf.id/brand/logo-bimi.svg;`
+- BIMI hanya tampil di Yahoo/AOL/Fastmail. Gmail/Apple/Outlook **wajib VMC** (berbayar ~USD 900–1.500/th + merek terdaftar DJKI).
+- BillionMail **tidak punya** fitur avatar/foto profil per mailbox (kolom mailbox tanpa avatar, `hasbrandinfo=0`, tanpa modul BIMI).
