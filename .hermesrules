@@ -34,3 +34,10 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - Env LKI: QRIS_MODE=live|test, QRIS_ALLOW_SIMULATE=true (test-only; WAJIB dimatikan sebelum produksi nyata). Mode test butuh key sandbox (settings xendit_secret_key_sandbox / env XENDIT_SANDBOX_KEY).
 - UI: frontend/src/pages/public/PaymentQris.tsx, route /pay/qris/:reference (di luar layout publik), QR dirender klien via lib qrcode.
 - Catatan: SDK resmi github.com/xendit/xendit-go/v7 tersedia (paket payment_request/invoice/refund) tapi implementasi pakai HTTP langsung agar konsisten dgn pola hub.
+
+## Invoice: 'Lunas pada <tanggal>' + NIB/NPWP (12 Sep 2026, commit 95cc968)
+- `invoices.paid_at` diisi di 3 jalur pembuatan receipt (`payment.go` x2, `order_qris.go`); invoice lama di-backfill sekali saat startup dari `AutoMigrate`.
+- PDF (`pkg/invoice`) mengganti baris `Jatuh tempo` jadi `Lunas pada <tanggal>` hanya bila `PaidAt != nil && Paid >= Total`; NIB/NPWP dari Settings (`company_legal_nib`/`company_legal_npwp`) dicetak di blok penerbit, dilewati bila kosong.
+- Daftar invoice klien (`/api/client/invoices`) mengirim `paid_at`; UI klien memprioritaskan 'lunas' di atas 'jatuh tempo'.
+- Uji: `go test ./pkg/invoice/` + verifikasi teks PDF via pymupdf (`/tmp/pdfv`), 8 asersi PASS.
+- Sisa: nilai NIB/NPWP belum diisi pemilik → isi di admin Settings supaya tercetak di invoice.

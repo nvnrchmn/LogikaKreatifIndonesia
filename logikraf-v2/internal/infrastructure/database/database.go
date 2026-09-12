@@ -32,7 +32,7 @@ func Connect() error {
 }
 
 func AutoMigrate() error {
-	if err := DB.AutoMigrate(
+	return DB.AutoMigrate(
 		&model.User{},
 		&model.Package{},
 		&model.Portfolio{},
@@ -44,17 +44,5 @@ func AutoMigrate() error {
 		&model.Ticket{},
 		&model.Testimonial{},
 		&model.QrisPayment{},
-	); err != nil {
-		return err
-	}
-	// Backfill invoices.paid_at untuk invoice lama yang sudah lunas — kolom ini baru
-	// ditambahkan 12 Sep 2026, dan tanpanya PDF invoice lama tetap menampilkan
-	// "Jatuh tempo" padahal uangnya sudah diterima. Untuk invoice bertipe receipt,
-	// tanggal terbit = saat pembayaran masuk, jadi itu nilai terbaik yang tersedia.
-	// Idempoten: hanya menyentuh baris yang kolomnya masih NULL.
-	return DB.Exec(
-		"UPDATE invoices SET paid_at = COALESCE(issue_date, created_at) " +
-			"WHERE paid_at IS NULL AND total > 0 AND paid_amount >= total " +
-			"AND status IN ('paid', 'settled')",
-	).Error
+	)
 }

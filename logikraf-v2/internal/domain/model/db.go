@@ -61,6 +61,23 @@ func Connect() error {
 
 	seedDefaultAdmin()
 	seedClientStoresFromEnv()
+
+	// Backfill invoices.paid_at untuk invoice lama yang sudah lunas — kolom ini baru
+	// ditambahkan 12 Sep 2026, dan tanpanya PDF invoice lama tetap menampilkan
+	// "Jatuh tempo" padahal uangnya sudah diterima. Untuk invoice bertipe receipt,
+	// tanggal terbit = saat pembayaran masuk, jadi itu nilai terbaik yang tersedia.
+	// Idempoten: hanya menyentuh baris yang kolomnya masih NULL. Dijalankan di sini
+	// (bukan di infrastructure/database) karena AutoMigrate yang benar-benar dipakai
+	// aplikasi ada di fungsi ini.
+	if err := DB.Exec(
+		"UPDATE invoices SET paid_at = COALESCE(issue_date, created_at) " +
+			"WHERE paid_at IS NULL AND total > 0 AND paid_amount >= total " +
+			"AND status IN ('paid', 'settled')",
+	).Error; err != nil {
+		log.Printf("backfill invoices.paid_at gagal: %v\n", err)
+	} else {
+		log.Println("backfill invoices.paid_at selesai")
+	}
 	return nil
 }
 
