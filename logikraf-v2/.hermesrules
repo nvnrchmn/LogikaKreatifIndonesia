@@ -1,3 +1,25 @@
+<!-- INDEX (auto — jangan hapus penanda ini) -->
+(30 section terbaru. Baca index ini saja dulu, buka section yang relevan.)
+  231:### URL bersih portal klien (revisi)
+  238:### Portal klien — lupa sandi, profil, berkas (revisi)
+  246:### Berkas klien — sisi admin (revisi)
+  252:### Invoice & tiket portal (revisi)
+  259:### Linimasa progres klien (revisi)
+  266:### Format invoice (revisi 12 Sep 2026)
+  273:### Logo invoice diganti (12 Sep 2026, commit 9ae762f)
+  279:### Logo invoice: versi SOLID dipakai (revisi 12 Sep 2026)
+  283:### Invoice: tanpa tanda tangan + catatan baru (12 Sep 2026, 9c19f5d)
+  288:### Audit 12 Sep 2026 — temuan & perbaikan
+  292:### Backup & keamanan (12 Sep 2026)
+  299:### Verifikasi email portal klien (12 Sep 2026)
+  308:### TEMUAN BELUM TUNTAS: pendaftaran klien menolak invite code baru
+  313:### WA untuk verifikasi email (12 Sep 2026, commit `ba29c8a`)
+  318:### KOREKSI (12 Sep 2026) — "temuan invite code" itu SALAH
+  326:### WA verifikasi email — status bukti (12 Sep 2026)
+  332:### Lonceng notifikasi portal klien (12 Sep 2026, commit `1f15bdc` + `2b773c1`)
+--- ARSIP ---
+(section lebih tua dari 2 bulan dipindah ke .hermesrules-arsip.md)
+
 
 
 ## PEMBARUAN 2026-09-08 — pembersihan and keputusan
