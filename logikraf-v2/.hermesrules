@@ -190,3 +190,32 @@ multipart — belum ada pustaka PDF di `go.mod`.
 - Verifikasi: nilai DB diubah ke tanggal lain -> halaman ikut berubah (terbukti berasal
   dari DB, bukan jam sistem), lalu dikembalikan. Dicek lewat chromium-browser headless
   `--dump-dom` untuk ketiga halaman.
+
+## UPDATE 7: isi legalitas diselaraskan dengan proses nyata (2026-09-12)
+
+Ketiga halaman legal ditulis ulang (commit 5f9ad58) agar sesuai apa yang BENAR-BENAR
+berjalan, bukan template umum:
+- **Syarat & Ketentuan**: 13 pasal — ruang lingkup paket, pembayaran (QRIS/VA via PJP
+  berlisensi BI, pesanan sah setelah webhook terverifikasi), jadwal & kewajiban klien,
+  revisi (2 putaran/tahap), kepemilikan hasil (beralih setelah pelunasan), garansi bug
+  30 hari, kerahasiaan, batasan tanggung jawab, force majeure, perubahan ketentuan,
+  hukum Indonesia + musyawarah 30 hari, kontak.
+- **Kebijakan Privasi**: 12 bagian — mengacu UU 27/2022 (PDP), daftar data (dan penegasan
+  TIDAK menyimpan PIN/OTP/kartu), tujuan + dasar pemrosesan, gerbang pembayaran resmi,
+  pihak ketiga (email & WA milik sendiri + infra server), retensi (transaksi 10 tahun
+  sesuai kewajiban pembukuan), keamanan (TLS, bcrypt, JWT, akses terbatas, backup),
+  hak subjek data (akses/koreksi/hapus/tarik persetujuan, respons 14 hari kerja),
+  localStorage untuk sesi (bukan iklan), perubahan kebijakan, kontak DPO.
+  **Memperbaiki fakta salah: alamat lama tertulis "Jakarta" → kini diambil dari settings
+  `contact_address` (Bekasi).**
+- **Kebijakan Refund**: 8 bagian — kriteria disetujui (bayar ganda/kelebihan bayar/pembatalan
+  <1x24 jam sebelum kerja mulai/kegagalan kami), yang tidak dapat direfund (kerja sudah
+  jalan, biaya pihak ketiga & biaya PJP), **prosedur 2 tahap manual** (Tahap 1 verifikasi
+  1-2 hari kerja → Tahap 2 transfer 3-7 hari kerja ke rekening atas nama pemesan),
+  batas pengajuan (7 hari kalender / kapan saja dengan bukti), metode & biaya, penolakan,
+  kontak + tautan wa.me dari settings.
+
+Catatan penerapan: komponen `H` dipakai untuk penomoran pasal; perlu `type ReactNode`
+(diimpor dari react) — `React.ReactNode` tanpa impor React GAGAL tsc.
+Nilai kebijakan (revisi 2x, garansi 30 hari, jendela refund 1x24 jam/7 hari) masih ada di
+teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan editable.
