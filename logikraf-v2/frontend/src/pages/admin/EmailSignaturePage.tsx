@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, Col, Input, message, Row, Space, Tag, Typography, Upload } from 'antd'
-import { CopyOutlined, DownloadOutlined, OpenInNewOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons'
+import { CopyOutlined, DownloadOutlined, LinkOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons'
 import { apiGet, apiPut, auth } from '../../lib/api'
 
 const TPL = "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1f2430;line-height:1.5\">\n  <tr>\n    <td valign=\"top\" style=\"padding:0 16px 0 0;border-right:2px solid #0052FF\">\n      <img src=\"{{logo}}\" width=\"{{logo_size}}\" height=\"{{logo_size}}\" alt=\"Logikraf\" style=\"display:block;border:0;outline:none\">\n    </td>\n    <td valign=\"top\" style=\"padding:0 0 0 16px\">\n      <div style=\"font-size:15px;font-weight:bold;color:#0b1220\">{{nama}}</div>\n      <div style=\"font-weight:600;color:#0052FF\">{{jabatan}}</div>\n      <div style=\"color:#6b7280;margin-top:4px\">{{perusahaan}}</div>\n      <div style=\"margin-top:9px\">\n        <div style=\"margin:0 0 3px 0\"><span style=\"color:#6b7280\">Email</span> &nbsp;<a href=\"mailto:{{email}}\" style=\"color:#1f2430;text-decoration:none\">{{email}}</a></div>\n        <div style=\"margin:0 0 3px 0\"><span style=\"color:#6b7280\">WhatsApp</span> &nbsp;<a href=\"https://wa.me/{{wa}}\" style=\"color:#1f2430;text-decoration:none\">{{wa_pretty}}</a></div>\n        <div style=\"margin:0\"><span style=\"color:#6b7280\">Web</span> &nbsp;<a href=\"{{web}}\" style=\"color:#0052FF;text-decoration:none\">{{web_label}}</a></div>\n      </div>\n    </td>\n  </tr>\n</table>\n"
@@ -96,7 +96,7 @@ export default function EmailSignaturePage() {
               <Space style={{ marginTop: 10 }}>
                 <Button size="small" icon={<DownloadOutlined />} onClick={() => dl(m)}>Unduh .htm</Button>
                 <Button size="small" icon={<CopyOutlined />} onClick={() => cp(m)}>Salin HTML</Button>
-                <Button size="small" type="primary" ghost icon={<OpenInNewOutlined />} onClick={() => openTab(m)}>Buka untuk disalin</Button>
+                <Button size="small" type="primary" ghost icon={<LinkOutlined />} onClick={() => openTab(m)}>Buka untuk disalin</Button>
               </Space>
             </Card>
           ))}
