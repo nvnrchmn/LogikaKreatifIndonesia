@@ -18,6 +18,7 @@ const SearchPage = lazy(() => import('./pages/public/SearchPage'))
 const TermsPage = lazy(() => import('./pages/public/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/public/PrivacyPage'))
 const RefundPolicyPage = lazy(() => import('./pages/public/RefundPolicyPage'))
+const VerifyEmailPage = lazy(() => import('./pages/client/VerifyEmailPage'))
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 
 // Admin Components & Pages (Lazy Loaded)
@@ -147,6 +148,7 @@ export default function App() {
       <Route path="/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
       <Route path="/forgot-password" element={<ClientPortalGate><ForgotPasswordPage /></ClientPortalGate>} />
       <Route path="/reset-password" element={<ClientPortalGate><ResetPasswordPage /></ClientPortalGate>} />
+      <Route path="/verify-email" element={<ClientPortalGate><VerifyEmailPage /></ClientPortalGate>} />
       <Route path="/client/forgot-password" element={<ClientPortalGate><ForgotPasswordPage /></ClientPortalGate>} />
       <Route path="/client/reset-password" element={<ClientPortalGate><ResetPasswordPage /></ClientPortalGate>} />
       <Route path="/client/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />

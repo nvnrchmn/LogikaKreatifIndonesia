@@ -15,7 +15,7 @@ func ClientProfile(c fiber.Ctx) error {
 	if err := model.DB.First(&u, uid).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "not found"})
 	}
-	out := fiber.Map{"name": u.Name, "email": u.Email}
+	out := fiber.Map{"name": u.Name, "email": u.Email, "email_verified": u.EmailVerifiedAt != nil}
 	if _, cl, err := clientIDForUser(c); err == nil {
 		out["company"] = cl.CompanyName
 		out["phone"] = cl.Phone

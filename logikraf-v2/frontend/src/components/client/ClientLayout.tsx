@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import VerifyEmailBanner from './VerifyEmailBanner'
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: DashboardIcon },
@@ -27,6 +28,7 @@ export default function ClientLayout() {
 
   return (
     <div className="min-h-screen bg-canvas-light text-text-main flex flex-col">
+      <VerifyEmailBanner />
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden"

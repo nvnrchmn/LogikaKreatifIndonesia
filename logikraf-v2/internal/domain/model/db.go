@@ -29,6 +29,7 @@ func Connect() error {
 	if err := DB.AutoMigrate(
 		&User{},
 		&PasswordReset{},
+		&EmailVerification{},
 		&TicketReply{},
 		&Package{},
 		&Portfolio{},

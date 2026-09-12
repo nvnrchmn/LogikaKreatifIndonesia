@@ -169,5 +169,7 @@ func RegisterClient(c fiber.Ctx) error {
 	if err := tx.Commit().Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
+	// Kirim tautan verifikasi email (gagal kirim tidak menggagalkan pendaftaran).
+	auth.SendEmailVerification(user)
 	return c.Status(201).JSON(fiber.Map{"message": "registered", "email": req.Email})
 }

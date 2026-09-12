@@ -155,6 +155,7 @@ func main() {
 	api.Post("/auth/reset-password", loginLimiter, auth.ResetPassword)
 	// Client self-registration (invite-code based)
 	api.Post("/client/register", registerLimiter, handler.RegisterClient)
+	api.Post("/auth/verify-email", loginLimiter, auth.VerifyEmail)
 
 	// Client Portal API - authenticated, client-or-admin only
 	clientAPI := api.Group("/client", auth.AuthMiddleware(), auth.ClientOnly())
@@ -174,6 +175,7 @@ func main() {
 	clientAPI.Get("/invoices/:id/pdf", handler.ClientInvoicePDF)
 	clientAPI.Get("/tickets/:id", handler.ClientTicket)
 	clientAPI.Post("/tickets/:id/replies", handler.ReplyClientTicket)
+	clientAPI.Post("/resend-verification", auth.ResendVerification)
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans/iPaymu)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)
