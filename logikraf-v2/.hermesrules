@@ -328,3 +328,13 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - TERBUKTI (dikonfirmasi pemilik, 12 Sep 2026): WA benar-benar masuk ke 628983342429 berisi "Verifikasi email portal Logikraf" + tautan `client.logikraf.id/verify-email?token=...`. Jadi pengiriman email + WA pada verifikasi email sudah tuntas terbukti end-to-end.
 - Catatan: pengiriman WA hanya jalan bila klien punya nomor di kolom `clients.phone` (kalau kosong, dilewati — perilaku yang diinginkan).
 - Catatan keamanan: token verifikasi yang pernah terkirim tidak perlu dirahasiakan setelah dipakai/dihapus, tapi jangan tempel tautan verifikasi di tempat publik sebelum kedaluwarsa.
+
+### Lonceng notifikasi portal klien (12 Sep 2026, commit `1f15bdc` + `2b773c1`)
+- Model `ClientNotification` (client_id, title, body, link, read_at) + AutoMigrate; tabel `client_notifications` sudah ada di MySQL live.
+- Helper `SaveClientNotification(clientID, title, body, link)` di `internal/delivery/handler/client_notification.go`; galat simpan sengaja diabaikan agar tidak mengganggu alur utama (email/WA tetap jalan).
+- Sudah terhubung: (1) `notifyOrderStatusChange` (perubahan status pesanan), (2) `notifyTicketReplyToClient` (balasan admin pada tiket).
+- Endpoint: `GET /api/client/notifications` (50 terakhir + jumlah belum dibaca), `POST /api/client/notifications/:id/read`, `POST /api/client/notifications/read-all` — semua di grup ber-JWT dan difilter `client_id`, jadi klien lain tidak bisa membaca.
+- FE: halaman `/notifications` + menu "Notifikasi" (BellIcon) di `ClientLayout`.
+- Verifikasi live: 401 tanpa token, halaman `/notifications` 200, tabel terbentuk.
+- BONUS FIX: `notifyOrderStatusChange` dulu mengirim tautan WA rusak (`portalURL("/orders")+"/client"` → `.../orders/client`); sudah diperbaiki.
+- Belum diuji: lonceng muncul saat event nyata (perlu balas tiket dari admin atau ubah status pesanan) dan tombol "Tandai semua dibaca" dari sesi klien.
