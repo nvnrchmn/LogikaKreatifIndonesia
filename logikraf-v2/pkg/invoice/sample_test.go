@@ -14,14 +14,14 @@ func TestWriteSample(t *testing.T) {
 		t.Skip("INVOICE_SAMPLE kosong")
 	}
 	pdf, err := Build(Data{
-		Number:      "LK-INV-2026-0035",
-		Status:      "paid",
-		IssueDate:   time.Date(2026, 9, 15, 0, 0, 0, 0, time.UTC),
-		ClientName:  "Nova Nurachman",
-		Company:     "PT Logika Kreatif Indonesia",
-		Email:       "novanurachman@logikraf.id",
-		Phone:       "+62 898-3342-429",
-		Address:     "Jl. Cijengkol Setu No.35a, Bekasi 17320",
+		Number:     "LK-INV-2026-0035",
+		Status:     "paid",
+		IssueDate:  time.Date(2026, 9, 15, 0, 0, 0, 0, time.UTC),
+		ClientName: "Nova Nurachman",
+		Company:    "PT Logika Kreatif Indonesia",
+		Email:      "novanurachman@logikraf.id",
+		Phone:      "+62 898-3342-429",
+		Address:    "Jl. Cijengkol Setu No.35a, Bekasi 17320",
 		Items: []Item{
 			{Desc: "Pesanan LK-1789201323476-1 - Paket Logikraf Starter", Amount: 1499000},
 		},

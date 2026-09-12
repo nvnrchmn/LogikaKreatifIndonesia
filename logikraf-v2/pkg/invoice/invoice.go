@@ -80,14 +80,18 @@ func Build(d Data) ([]byte, error) {
 	pdf.Rect(0, 0, 210, 4, "F")
 
 	// Kop: identitas (kiri) + judul dokumen (kanan).
+	// Logo brand (bila berkasnya ada) + wordmark.
+	if logoExists() {
+		pdf.ImageOptions(logoPath(), 15, 12, 15, 0, false, fpdf.ImageOptions{ImageType: "PNG"}, 0, "")
+	}
 	pdf.SetTextColor(15, 23, 42)
 	pdf.SetFont("Helvetica", "B", 20)
-	pdf.SetXY(15, 16)
-	pdf.CellFormat(90, 9, "LOGIKRAF", "", 0, "L", false, 0, "")
+	pdf.SetXY(34, 16)
+	pdf.CellFormat(71, 9, "LOGIKRAF", "", 0, "L", false, 0, "")
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
-	pdf.SetXY(15, 26)
-	pdf.CellFormat(90, 5, "logikraf.id  |  support@logikraf.id", "", 0, "L", false, 0, "")
+	pdf.SetXY(34, 26)
+	pdf.CellFormat(71, 5, "logikraf.id  |  support@logikraf.id", "", 0, "L", false, 0, "")
 	pdf.SetFont("Helvetica", "B", 16)
 	pdf.SetTextColor(15, 23, 42)
 	pdf.SetXY(105, 16)
@@ -198,12 +202,18 @@ func Build(d Data) ([]byte, error) {
 		sy += 6
 	}
 
+	// Terbilang — jumlah dalam huruf (lazim pada invoice Indonesia).
+	pdf.SetFont("Helvetica", "I", 9)
+	pdf.SetTextColor(51, 65, 85)
+	pdf.SetXY(15, sy+1)
+	pdf.CellFormat(180, 5, "Terbilang: "+Terbilang(d.Total), "", 0, "L", false, 0, "")
+
 	// Catatan & cara bayar.
 	pdf.SetDrawColor(203, 213, 225)
-	pdf.Line(15, sy+2, 195, sy+2)
+	pdf.Line(15, sy+8, 195, sy+8)
 	pdf.SetFont("Helvetica", "", 9)
 	pdf.SetTextColor(51, 65, 85)
-	pdf.SetXY(15, sy+6)
+	pdf.SetXY(15, sy+12)
 	pdf.MultiCell(180, 4.8,
 		"Pembayaran via transfer bank atau QRIS. Mohon cantumkan nomor invoice pada berita transfer. "+
 			"Status dokumen ini: "+statusText(d.Status)+".", "", "L", false)
@@ -211,10 +221,30 @@ func Build(d Data) ([]byte, error) {
 		pdf.SetX(15)
 		pdf.MultiCell(180, 4.8, "Catatan: "+d.Notes, "", "L", false)
 	}
+	// Blok penerbit (kiri) + tanda tangan (kanan).
+	pdf.SetFont("Helvetica", "", 8)
+	pdf.SetTextColor(100, 116, 139)
+	pdf.SetXY(15, 244)
+	pdf.MultiCell(90, 4.2,
+		"Penerbit:\n"+IssuerName+" ("+IssuerForm+")\n"+IssuerAddress+"\n"+
+			IssuerEmail+"  |  "+IssuerPhone, "", "L", false)
+
+	pdf.SetTextColor(15, 23, 42)
+	pdf.SetFont("Helvetica", "", 9)
+	pdf.SetXY(120, 240)
+	pdf.CellFormat(75, 4.5, "Bekasi, "+tanggal(d.IssueDate), "", 0, "L", false, 0, "")
+	pdf.SetXY(120, 245)
+	pdf.CellFormat(75, 4.5, "Hormat kami,", "", 0, "L", false, 0, "")
+	pdf.SetDrawColor(148, 163, 184)
+	pdf.SetLineWidth(0.3)
+	pdf.Line(120, 258, 172, 258)
+	pdf.SetXY(120, 259)
+	pdf.CellFormat(75, 4.5, "Tim Logikraf", "", 0, "L", false, 0, "")
+
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
 	pdf.SetXY(15, 268)
-	pdf.CellFormat(180, 5, "Dokumen ini dibuat otomatis oleh sistem Logikraf - logikraf.id", "", 0, "C", false, 0, "")
+	pdf.CellFormat(180, 5, "Dokumen ini diterbitkan otomatis dan sah tanpa tanda tangan basah  -  logikraf.id", "", 0, "C", false, 0, "")
 
 	var buf bytes.Buffer
 	if err := pdf.Output(&buf); err != nil {
