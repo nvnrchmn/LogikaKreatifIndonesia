@@ -65,7 +65,7 @@ export default function ClientRegisterPage() {
             </button>
           </form>
           <p className="text-xs text-text-muted mt-6 text-center">
-            Sudah punya akun? <Link to="/client/login" className="text-brand-primary hover:underline">Masuk</Link>
+            Sudah punya akun? <Link to="/login" className="text-brand-primary hover:underline">Masuk</Link>
           </p>
         </div>
       </div>

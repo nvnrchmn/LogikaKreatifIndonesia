@@ -20,10 +20,10 @@ func portalInfo(mail string) string {
 		return ""
 	}
 	if client.InviteCode == nil || *client.InviteCode == "" {
-		return "Pantau pesanan Anda di " + portalBase() + "/client (daftar dengan email ini)."
+		return "Pantau pesanan Anda di " + portalURL("/login") + " (daftar dengan email ini)."
 	}
 	return "Kode aktivasi portal: " + *client.InviteCode +
-		"\nDaftar di " + portalBase() + "/client/register dengan email ini untuk memantau pesanan."
+		"\nDaftar di " + portalURL("/register") + " dengan email ini untuk memantau pesanan."
 }
 
 // notifyClientNextSteps — email berisi langkah selanjutnya ke klien saat pesanan
@@ -80,20 +80,20 @@ func notifyOrderStatusChange(order model.Order, prev, now, note string) {
 		if note != "" {
 			html += "<p>Catatan: " + note + "</p>"
 		}
-		html += `<p>Pantau pesanan Anda di <a href="` + portalBase() + `/client">portal klien</a>.</p>`
+		html += `<p>Pantau pesanan Anda di <a href="` + portalURL("/orders") + `">portal klien</a>.</p>`
 		_ = email.Send(email.DefaultConfig(), []string{client.Email},
 			"Status pesanan "+order.OrderNumber+": "+label, html)
 	}
 	if client.Phone != "" {
-		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di "+portalBase()+"/client")
+		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di "+portalURL("/orders")+"/client")
 	}
 }
 
-// portalBase — basis URL portal klien (settings `company_client_portal_url`),
+// portalURL — URL halaman portal klien (settings `company_client_portal_url`),
 // fallback ke domain utama selama subdomain belum diaktifkan.
-func portalBase() string {
+func portalURL(path string) string {
 	if v := strings.TrimSpace(setting("company_client_portal_url", "logikraf")); v != "" {
-		return strings.TrimRight(v, "/")
+		return strings.TrimRight(v, "/") + path
 	}
-	return "https://logikraf.id"
+	return "https://logikraf.id/client" + path
 }

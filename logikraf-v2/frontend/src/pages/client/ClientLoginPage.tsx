@@ -12,7 +12,8 @@ export default function ClientLoginPage() {
   useEffect(() => {
     if (token && !authLoading) {
       const role = localStorage.getItem('role')
-      window.location.href = role === 'client' ? '/client/dashboard' : '/admin/dashboard'
+      const p = window.location.pathname.startsWith('/client') ? '/client' : ''
+      window.location.href = role === 'client' ? p + '/dashboard' : '/admin/dashboard'
     }
   }, [token, authLoading])
 

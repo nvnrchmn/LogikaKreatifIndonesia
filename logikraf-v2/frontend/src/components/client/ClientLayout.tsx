@@ -2,10 +2,10 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 
 const navItems = [
-  { label: 'Dashboard', path: '/client/dashboard', icon: DashboardIcon },
-  { label: 'Pesanan Saya', path: '/client/orders', icon: ShoppingBagIcon },
-  { label: 'Bantuan / Tiket', path: '/client/tickets', icon: TicketIcon },
-  { label: 'Profil Akun', path: '/client/profile', icon: PersonIcon },
+  { label: 'Dashboard', path: '/dashboard', icon: DashboardIcon },
+  { label: 'Pesanan Saya', path: '/orders', icon: ShoppingBagIcon },
+  { label: 'Bantuan / Tiket', path: '/tickets', icon: TicketIcon },
+  { label: 'Profil Akun', path: '/profile', icon: PersonIcon },
 ]
 
 export default function ClientLayout() {

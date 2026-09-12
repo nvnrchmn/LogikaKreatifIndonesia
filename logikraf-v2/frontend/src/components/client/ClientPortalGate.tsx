@@ -12,8 +12,13 @@ export default function ClientPortalGate({ children }: { children?: ReactNode })
         if (!base) return
         try {
           const target = new URL(base)
+          const clean = window.location.pathname.replace(/^\/client/, '') || '/login'
           if (target.host !== window.location.host) {
-            window.location.replace(base + window.location.pathname + window.location.search)
+            window.location.replace(base + clean + window.location.search)
+            return
+          }
+          if (window.location.pathname.startsWith('/client/')) {
+            window.location.replace(clean + window.location.search)
           }
         } catch {
           // URL belum valid — jangan alihkan

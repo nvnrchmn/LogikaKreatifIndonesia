@@ -128,6 +128,8 @@ export default function App() {
         <Route path=":resource" element={<AdminResourcePage />} />
       </Route>
       {/* Client */}
+      <Route path="/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />
+      <Route path="/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
       <Route path="/client/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />
       <Route path="/client/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
       <Route path="/client" element={
@@ -138,6 +140,13 @@ export default function App() {
         <Route path="orders" element={<ClientOrdersPage />} />
         <Route path="tickets" element={<ClientTicketsPage />} />
         <Route path="profile" element={<ClientProfilePage />} />
+      </Route>
+      {/* Portal klien - URL bersih di host portal (client.logikraf.id/dashboard) */}
+      <Route element={<ClientPortalGate><ProtectedRoute><RequireClient><ClientLayout /></RequireClient></ProtectedRoute></ClientPortalGate>}>
+        <Route path="/dashboard" element={<ClientDashboardPage />} />
+        <Route path="/orders" element={<ClientOrdersPage />} />
+        <Route path="/tickets" element={<ClientTicketsPage />} />
+        <Route path="/profile" element={<ClientProfilePage />} />
       </Route>
       {/* H10: 404 catch-all */}
       <Route path="*" element={<NotFoundPage />} />
