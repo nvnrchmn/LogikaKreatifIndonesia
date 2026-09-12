@@ -151,6 +151,8 @@ func main() {
 	api.Get("/testimonials", handler.GetTestimonials)
 	api.Get("/orders", auth.AuthMiddleware(), handler.GetOrders)
 	api.Post("/auth/login", loginLimiter, auth.Login)
+	api.Post("/auth/forgot-password", loginLimiter, auth.ForgotPassword)
+	api.Post("/auth/reset-password", loginLimiter, auth.ResetPassword)
 	// Client self-registration (invite-code based)
 	api.Post("/client/register", registerLimiter, handler.RegisterClient)
 

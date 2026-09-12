@@ -39,6 +39,8 @@ const ClientOrdersPage = lazy(() => import('./pages/client/ClientOrdersPage'))
 const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
 const ClientPortalGate = lazy(() => import('./components/client/ClientPortalGate'))
 const ClientLoginPage = lazy(() => import('./pages/client/ClientLoginPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/client/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/client/ResetPasswordPage'))
 const ClientRegisterPage = lazy(() => import('./pages/client/ClientRegisterPage'))
 const ClientTicketsPage = lazy(() => import('./pages/client/ClientTicketsPage'))
 
@@ -135,6 +137,10 @@ export default function App() {
       {/* Client */}
       <Route path="/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />
       <Route path="/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
+      <Route path="/forgot-password" element={<ClientPortalGate><ForgotPasswordPage /></ClientPortalGate>} />
+      <Route path="/reset-password" element={<ClientPortalGate><ResetPasswordPage /></ClientPortalGate>} />
+      <Route path="/client/forgot-password" element={<ClientPortalGate><ForgotPasswordPage /></ClientPortalGate>} />
+      <Route path="/client/reset-password" element={<ClientPortalGate><ResetPasswordPage /></ClientPortalGate>} />
       <Route path="/client/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />
       <Route path="/client/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
       <Route path="/client" element={

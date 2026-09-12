@@ -49,6 +49,9 @@ export default function ClientLoginPage() {
             <div>
               <label className="label">Password</label>
               <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+              <div className="text-right">
+                <Link to="/forgot-password" className="text-xs font-bold text-brand-primary hover:underline">Lupa kata sandi?</Link>
+              </div>
             </div>
             <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">{loading ? 'Memproses...' : 'Masuk'}</button>
           </form>
