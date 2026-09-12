@@ -79,19 +79,20 @@ func Build(d Data) ([]byte, error) {
 	pdf.SetFillColor(0, 82, 255)
 	pdf.Rect(0, 0, 210, 4, "F")
 
-	// Kop: identitas (kiri) + judul dokumen (kanan).
-	// Logo brand (bila berkasnya ada) + wordmark.
+	// Kop: logo lockup (ikon LK + wordmark "Logikraf" bergaris luar) di kiri.
 	if logoExists() {
-		pdf.ImageOptions(logoPath(), 15, 12, 15, 0, false, fpdf.ImageOptions{ImageType: "PNG"}, 0, "")
+		pdf.ImageOptions(logoPath(), 15, 13, 46, 0, false, fpdf.ImageOptions{ImageType: "PNG"}, 0, "")
+	} else {
+		// Fallback teks bila berkas logo tidak tersedia.
+		pdf.SetTextColor(15, 23, 42)
+		pdf.SetFont("Helvetica", "B", 20)
+		pdf.SetXY(15, 16)
+		pdf.CellFormat(90, 9, "LOGIKRAF", "", 0, "L", false, 0, "")
 	}
-	pdf.SetTextColor(15, 23, 42)
-	pdf.SetFont("Helvetica", "B", 20)
-	pdf.SetXY(34, 16)
-	pdf.CellFormat(71, 9, "LOGIKRAF", "", 0, "L", false, 0, "")
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
-	pdf.SetXY(34, 26)
-	pdf.CellFormat(71, 5, "logikraf.id  |  support@logikraf.id", "", 0, "L", false, 0, "")
+	pdf.SetXY(15, 27)
+	pdf.CellFormat(100, 5, "logikraf.id  |  support@logikraf.id", "", 0, "L", false, 0, "")
 	pdf.SetFont("Helvetica", "B", 16)
 	pdf.SetTextColor(15, 23, 42)
 	pdf.SetXY(105, 16)
