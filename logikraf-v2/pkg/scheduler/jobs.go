@@ -7,6 +7,7 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/email"
+	"github.com/logikraf/logikraf-v2/pkg/wa"
 	"gorm.io/gorm"
 )
 
@@ -156,6 +157,19 @@ func RunReminderSend(ctx context.Context, db *gorm.DB) error {
 			thousands(outstanding), thousands(inv.Total), thousands(inv.PaidAmount),
 			dueStr, daysOverdue,
 		)
+
+		// Kanal WhatsApp: pengingat jauh lebih cepat dibaca daripada email.
+		if client.Phone != "" {
+			waMsg := "Pengingat tagihan " + inv.InvoiceNumber + "\n" +
+				"Nama: " + name + "\n" +
+				"Sisa tagihan: Rp " + thousands(outstanding) + "\n" +
+				"Jatuh tempo: " + dueStr
+			if daysOverdue > 0 {
+				waMsg += " (terlambat " + strconv.Itoa(daysOverdue) + " hari)"
+			}
+			waMsg += "\n\nMohon selesaikan pembayaran. Balas pesan ini bila ada pertanyaan."
+			_ = wa.New().Send(client.Phone, waMsg)
+		}
 
 		status := "sent"
 		errMsg := ""
