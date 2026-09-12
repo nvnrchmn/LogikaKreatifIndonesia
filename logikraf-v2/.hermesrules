@@ -234,3 +234,11 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - /client/* tetap didukung: di host portal dialihkan ke URL bersih; dari domain utama dialihkan ke subdomain.
 - Tautan nav ClientLayout + tautan email/WA (portalURL di order_aftercare.go) memakai URL bersih.
 - ProtectedRoute kini sadar-rute: rute klien -> /login (sebelumnya salah ke /admin/login).
+
+### Portal klien — lupa sandi, profil, berkas (revisi)
+- Reset sandi: `POST /api/auth/forgot-password` + `/api/auth/reset-password`; tabel `password_resets` (token = SHA-256, sekali pakai, kedaluwarsa 1 jam); halaman `/forgot-password` & `/reset-password`; tautan dikirim email + WA; limiter sama dgn login.
+- Profil klien: `GET/PUT /api/client/profile` + `PUT /api/client/password`. Sebelumnya halaman profil hanya menulis localStorage (data TIDAK tersimpan) — jangan diulang.
+- Berkas klien: `POST/GET /api/client/files` + `GET /api/client/files/:name`; disimpan di `/www/wwwroot/logikraf.id/uploads/client/<client_id>` (DI LUAR repo, milik user `www`, maks 15 MB, ekstensi terbatas); nama berkas `o<order_id>-<ts>-<nama>`; menu portal "Kirim Berkas" (`/files`).
+- Tiket baru dari klien -> notifikasi in-app + email + WA ke admin (`client_ticket_notify.go`); berkas baru -> `client_upload_notify.go`.
+- Uji reset E2E lolos: token sah -> login sandi baru 200; token palsu/kedaluwarsa/dipakai ulang -> 400; user uji dibersihkan.
+- Klien tidak boleh pakai `/api/upload` (admin-only) — pakai endpoint di atas.
