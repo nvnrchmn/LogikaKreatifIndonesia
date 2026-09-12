@@ -37,6 +37,7 @@ const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
 const ClientDashboardPage = lazy(() => import('./pages/client/ClientDashboardPage'))
 const ClientOrdersPage = lazy(() => import('./pages/client/ClientOrdersPage'))
 const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
+const ClientPortalGate = lazy(() => import('./components/client/ClientPortalGate'))
 const ClientLoginPage = lazy(() => import('./pages/client/ClientLoginPage'))
 const ClientRegisterPage = lazy(() => import('./pages/client/ClientRegisterPage'))
 const ClientTicketsPage = lazy(() => import('./pages/client/ClientTicketsPage'))
@@ -127,10 +128,10 @@ export default function App() {
         <Route path=":resource" element={<AdminResourcePage />} />
       </Route>
       {/* Client */}
-      <Route path="/client/login" element={<ClientLoginPage />} />
-      <Route path="/client/register" element={<ClientRegisterPage />} />
+      <Route path="/client/login" element={<ClientPortalGate><ClientLoginPage /></ClientPortalGate>} />
+      <Route path="/client/register" element={<ClientPortalGate><ClientRegisterPage /></ClientPortalGate>} />
       <Route path="/client" element={
-        <ProtectedRoute><RequireClient><ClientLayout /></RequireClient></ProtectedRoute>
+        <ClientPortalGate><ProtectedRoute><RequireClient><ClientLayout /></RequireClient></ProtectedRoute></ClientPortalGate>
       }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<ClientDashboardPage />} />

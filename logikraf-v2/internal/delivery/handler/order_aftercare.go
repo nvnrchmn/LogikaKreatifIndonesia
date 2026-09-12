@@ -2,6 +2,7 @@ package handler
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/email"
@@ -19,10 +20,10 @@ func portalInfo(mail string) string {
 		return ""
 	}
 	if client.InviteCode == nil || *client.InviteCode == "" {
-		return "Pantau pesanan Anda di https://logikraf.id/client (daftar dengan email ini)."
+		return "Pantau pesanan Anda di " + portalBase() + "/client (daftar dengan email ini)."
 	}
 	return "Kode aktivasi portal: " + *client.InviteCode +
-		"\nDaftar di https://logikraf.id/client/register dengan email ini untuk memantau pesanan."
+		"\nDaftar di " + portalBase() + "/client/register dengan email ini untuk memantau pesanan."
 }
 
 // notifyClientNextSteps — email berisi langkah selanjutnya ke klien saat pesanan
@@ -79,11 +80,20 @@ func notifyOrderStatusChange(order model.Order, prev, now, note string) {
 		if note != "" {
 			html += "<p>Catatan: " + note + "</p>"
 		}
-		html += `<p>Pantau pesanan Anda di <a href="https://logikraf.id/client">logikraf.id/client</a>.</p>`
+		html += `<p>Pantau pesanan Anda di <a href="` + portalBase() + `/client">portal klien</a>.</p>`
 		_ = email.Send(email.DefaultConfig(), []string{client.Email},
 			"Status pesanan "+order.OrderNumber+": "+label, html)
 	}
 	if client.Phone != "" {
-		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di https://logikraf.id/client")
+		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di "+portalBase()+"/client")
 	}
+}
+
+// portalBase — basis URL portal klien (settings `company_client_portal_url`),
+// fallback ke domain utama selama subdomain belum diaktifkan.
+func portalBase() string {
+	if v := strings.TrimSpace(setting("company_client_portal_url", "logikraf")); v != "" {
+		return strings.TrimRight(v, "/")
+	}
+	return "https://logikraf.id"
 }
