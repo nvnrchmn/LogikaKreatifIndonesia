@@ -34,7 +34,10 @@ func TestEnsureOrderFromPayment(t *testing.T) {
 		t.Fatal("klien tidak dibuat otomatis")
 	}
 	if cl.ID != o.ClientID {
-		t.Fatalf("order tidak tertaut ke klien: client_id=%d klien=%d", o.ClientID, cl.ID)
+		t.Fatalf("order tidak tertaut ke klien: client_id=%d cli=%d", o.ClientID, cl.ID)
+	}
+	if cl.InviteCode == nil || *cl.InviteCode == "" {
+		t.Fatal("klien pembeli harus punya kode aktivasi portal")
 	}
 
 	// Idempotent: pembayaran yang sama tidak boleh membuat order kedua

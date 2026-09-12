@@ -174,7 +174,7 @@ func itoa(n int) string {
 
 // SendOrderOnboarding — email "langkah selanjutnya" ke klien setelah pembayaran
 // diterima, supaya pekerjaan bisa mulai tanpa bolak-balik manual.
-func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount string) error {
+func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount, portalText string) error {
 	if to == "" {
 		return nil
 	}
@@ -183,6 +183,9 @@ func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount string)
 		name = "Bapak/Ibu"
 	}
 	subject := "Langkah selanjutnya - pesanan " + orderNumber
+	if portalText == "" {
+		portalText = "Pantau pesanan Anda di https://logikraf.id/client."
+	}
 	body := fmt.Sprintf(`
 <html>
 <body style="font-family: Arial, sans-serif; color: #333;">
@@ -197,11 +200,12 @@ func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount string)
 <li><strong>Data penagihan</strong>: nama badan usaha, NPWP (bila ada), alamat.</li>
 <li><strong>PIC</strong>: nama, WhatsApp, dan email yang bisa dihubungi.</li>
 </ol>
+<p style="background:#f5f7ff;padding:12px;border-radius:6px;white-space:pre-line;">%s</p>
 <p>Balas email ini atau WhatsApp kami begitu daftar di atas siap — kami kirim jadwal kickoff.</p>
 <p>Salam,<br><strong>Tim Logikraf</strong><br><a href="https://logikraf.id">logikraf.id</a></p>
 </div>
 </body>
 </html>
-`, name, orderNumber, amount)
+`, name, orderNumber, amount, portalText)
 	return Send(cfg, []string{to}, subject, body)
 }

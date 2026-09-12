@@ -23,9 +23,11 @@ func notifyOrderWA(pt model.PaymentTransaction, orderID uint) {
 			"Ref: "+pt.InvoiceRef)
 	}
 	if pt.ClientPhone != "" {
-		_ = c.Send(pt.ClientPhone, "Terima kasih, pembayaran Anda sudah kami terima.\n"+
-			"Order #"+strconv.Itoa(int(orderID))+"\n"+
-			"Jumlah: "+amount+"\n\n"+
-			"Tim Logikraf akan menghubungi Anda untuk langkah selanjutnya.")
+		msg := "Terima kasih, pembayaran Anda sudah kami terima.\n" +
+			"Order #" + strconv.Itoa(int(orderID)) + "\n" +
+			"Jumlah: " + amount + "\n\n" +
+			"Tim Logikraf akan menghubungi Anda untuk langkah selanjutnya." +
+			portalInfo(pt.ClientEmail)
+		_ = c.Send(pt.ClientPhone, msg)
 	}
 }

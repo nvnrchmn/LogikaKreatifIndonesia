@@ -27,11 +27,21 @@ func ensureOrderFromPayment(pt model.PaymentTransaction) (uint, bool) {
 		var client model.Client
 		if err := model.DB.Where("email = ?", pt.ClientEmail).First(&client).Error; err != nil {
 			client = model.Client{PICName: pt.ClientName, Email: pt.ClientEmail, Phone: pt.ClientPhone}
+			if code, err := generateInviteCode(); err == nil {
+				client.InviteCode = &code
+			}
 			if err := model.DB.Create(&client).Error; err == nil {
 				clientID = client.ID
 			}
 		} else {
 			clientID = client.ID
+			// Pembeli lama tanpa kode aktivasi → buatkan supaya bisa daftar portal.
+			if client.InviteCode == nil || *client.InviteCode == "" {
+				if code, err := generateInviteCode(); err == nil {
+					client.InviteCode = &code
+					model.DB.Save(&client)
+				}
+			}
 		}
 	}
 
