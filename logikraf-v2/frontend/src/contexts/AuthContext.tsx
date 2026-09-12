@@ -52,6 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		setName(data.name)
 		localStorage.setItem('token', data.token)
 		localStorage.setItem('role', data.role)
+		// scope menentukan menu mana yang boleh tampil (ops = tanpa Keuangan & Sistem)
+		if (data.scope) localStorage.setItem('scope', data.scope)
 		localStorage.setItem('name', data.name)
 		return true
 	}

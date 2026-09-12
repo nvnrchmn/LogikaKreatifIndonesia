@@ -156,6 +156,8 @@ func main() {
 	// Client self-registration (invite-code based)
 	api.Post("/client/register", registerLimiter, handler.RegisterClient)
 	api.Post("/auth/verify-email", loginLimiter, auth.VerifyEmail)
+	// Aktivasi undangan anggota tim (publik: pemegang token yang membuktikan identitasnya).
+	api.Post("/auth/accept-invite", loginLimiter, handler.AcceptInvite)
 
 	// Client Portal API - authenticated, client-or-admin only
 	clientAPI := api.Group("/client", auth.AuthMiddleware(), auth.ClientOnly())
@@ -206,7 +208,14 @@ func main() {
 	app.Get("/sitemap.xml", handler.GetSitemap)
 
 	// Admin API - protected
-	admin := api.Group("", auth.AuthMiddleware(), auth.AdminOnly())
+	admin := api.Group("", auth.AuthMiddleware(), auth.AdminOnly(), auth.ScopeGuard())
+	// Manajemen anggota tim (khusus scope "full" — dijaga ScopeGuard).
+	admin.Get("/team", handler.ListTeam)
+	admin.Post("/team/invite", handler.InviteTeamMember)
+	admin.Post("/team/:id/resend", handler.ResendInvite)
+	admin.Post("/team/:id/revoke", handler.RevokeMember)
+	admin.Post("/team/:id/restore", handler.RestoreMember)
+	admin.Patch("/team/:id", handler.UpdateScope)
 	admin.Get("/hero-stats", handler.GetHeroStats)
 	admin.Put("/hero-stats", handler.UpdateHeroStats)
 	admin.Get("/clients", handler.GetClients)

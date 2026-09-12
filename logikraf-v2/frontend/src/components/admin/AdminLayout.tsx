@@ -62,11 +62,20 @@ const navSections = [
     items: [
       { label: 'Otomatis', path: '/admin/cron', icon: AutomationNavIcon },
       { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
+      { label: 'Tim & Akses', path: '/admin/team', icon: PeopleIcon },
       { label: 'Settings', path: '/admin/settings', icon: SettingsIcon },
       { label: 'Signature Email', path: '/admin/signature-email', icon: MailNavIcon },
     ],
   },
 ]
+
+// sectionsFor — sembunyikan modul yang tidak diizinkan scope akun ("ops" = staf tanpa
+// Keuangan & Sistem). Gerbang sebenarnya ada di backend (ScopeGuard); ini hanya supaya
+// menu yang pasti ditolak tidak tetap terlihat.
+function sectionsFor(scope: string | null) {
+  if (scope !== 'ops') return navSections
+  return navSections.filter(s => s.title !== 'Uang Masuk' && s.title !== 'Sistem')
+}
 
 function MailNavIcon() {
   return (<svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>)
@@ -234,7 +243,7 @@ function SidebarContent({ sidebarOpen, collapsed, toggleSection, query, onNaviga
   const q = query.trim().toLowerCase()
   return (
     <nav className="flex-1 py-3 px-3 overflow-y-auto space-y-2">
-      {navSections.map(section => {
+      {sectionsFor(localStorage.getItem('scope')).map(section => {
         const items = q ? section.items.filter(i => i.label.toLowerCase().includes(q)) : section.items
         if (q && items.length === 0) return null
         const isCollapsed = collapsed[section.title]
@@ -285,7 +294,7 @@ export default function AdminLayout() {
   // and their choice persists for the session.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
-      navSections.filter(s => s.defaultCollapsed).map(s => [s.title, true])
+      sectionsFor(localStorage.getItem('scope')).filter(s => s.defaultCollapsed).map(s => [s.title, true])
     )
   )
   const [query, setQuery] = useState('')
@@ -318,7 +327,7 @@ export default function AdminLayout() {
     window.location.href = '/admin/login'
   }
 
-  const allItems = navSections.flatMap(s => s.items.map(item => ({ ...item, section: s.title })))
+  const allItems = sectionsFor(localStorage.getItem('scope')).flatMap(s => s.items.map(item => ({ ...item, section: s.title })))
   const activeNav = allItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))
   const pageTitle = activeNav?.label ?? 'Admin'
 

@@ -18,11 +18,17 @@ import (
 var app *fiber.App
 
 func TestMain(m *testing.M) {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	// SQLite in-memory + pool koneksi = setiap koneksi punya DB sendiri, sehingga
+	// tabel yang dibuat di satu koneksi bisa "hilang" di koneksi berikutnya.
+	// cache=shared + satu koneksi membuat seluruh suite memakai DB yang sama.
+	db, err := gorm.Open(sqlite.Open("file:hermes_test?mode=memory&cache=shared"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}, &model.Project{}, &model.Client{}); err != nil {
+	if sqlDB, err := db.DB(); err == nil {
+		sqlDB.SetMaxOpenConns(1)
+	}
+	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}, &model.Project{}, &model.Client{}, &model.User{}, &model.Setting{}); err != nil {
 		panic(err)
 	}
 	model.DB = db

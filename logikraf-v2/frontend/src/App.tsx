@@ -36,6 +36,8 @@ const AdminPartnerPortalPage = lazy(() => import('./pages/admin/PartnerPortalPag
 const AdminEmailSignaturePage = lazy(() => import('./pages/admin/EmailSignaturePage'))
 const AdminPaymentGuidePage = lazy(() => import('./pages/admin/PaymentGuidePage'))
 const AdminCronJobsPage = lazy(() => import('./pages/admin/CronJobsPage'))
+const AdminTeamPage = lazy(() => import('./pages/admin/AdminTeamPage'))
+const AcceptInvitePage = lazy(() => import('./pages/admin/AcceptInvitePage'))
 // Client Pages (Lazy Loaded)
 const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
 const ClientDashboardPage = lazy(() => import('./pages/client/ClientDashboardPage'))
@@ -125,6 +127,9 @@ export default function App() {
       <Route path="/pay/qris/:reference" element={<PaymentQris />} />
       {/* Admin */}
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin/accept-invite" element={
+        <Suspense fallback={null}><AcceptInvitePage /></Suspense>
+      } />
       <Route path="/admin" element={
         <ProtectedRoute><RequireAdmin><AdminLayout /></RequireAdmin></ProtectedRoute>
       }>
@@ -134,6 +139,7 @@ export default function App() {
         <Route path="signature-email" element={<AdminEmailSignaturePage />} />
         <Route path="payment-guide" element={<AdminPaymentGuidePage />} />
         <Route path="cron" element={<AdminCronJobsPage />} />
+        <Route path="team" element={<AdminTeamPage />} />
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
         <Route path="hero-stats" element={<AdminHeroStatsPage />} />

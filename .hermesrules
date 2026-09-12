@@ -41,3 +41,7 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - Daftar invoice klien (`/api/client/invoices`) mengirim `paid_at`; UI klien memprioritaskan 'lunas' di atas 'jatuh tempo'.
 - Uji: `go test ./pkg/invoice/` + verifikasi teks PDF via pymupdf (`/tmp/pdfv`), 8 asersi PASS.
 - Sisa: nilai NIB/NPWP belum diisi pemilik → isi di admin Settings supaya tercetak di invoice.
+
+## Jebakan migrasi (12 Sep 2026)
+- `AutoMigrate` yang BENAR-BENAR dijalankan aplikasi ada di `internal/domain/model/db.go` (`model.Connect()`), bukan `internal/infrastructure/database/database.go` — fungsi di infrastructure itu dead code (tidak dipanggil siapa pun). Setiap backfill/migrasi manual harus ditulis di `model.Connect()`.
+- Bukti: deploy `cf1c52b` → log service `backfill invoices.paid_at selesai`, `invoices.id=36` paid_at terisi 2026-09-12 15:38:52.
