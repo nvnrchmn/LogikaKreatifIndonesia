@@ -47,6 +47,12 @@ func markOrderPaidByExternalID(externalID string) {
 	if externalID == "" {
 		return
 	}
+	// Order dijamin ada (dibuat sejak checkout), lalu ditandai lunas + notifikasi.
+	var qp model.QrisPayment
+	if e := model.DB.Where("external_id = ?", externalID).Order("id desc").First(&qp).Error; e == nil {
+		ensureOrderForQris(&qp)
+		return
+	}
 	res := model.DB.Model(&model.Order{}).
 		Where("order_number = ? AND status <> ?", externalID, "paid").
 		Update("status", "paid")
@@ -188,8 +194,12 @@ func qrisFind(reference string) (*model.QrisPayment, error) {
 func CreateQrisPayment(c fiber.Ctx) error {
 	var in struct {
 		ExternalID  string `json:"external_id"`
+		OrderID     string `json:"order_id"`
 		Amount      int    `json:"amount"`
 		Description string `json:"description"`
+		PayerName   string `json:"payer_name"`
+		PayerEmail  string `json:"payer_email"`
+		PayerPhone  string `json:"payer_phone"`
 		ExpiresIn   int    `json:"expires_in_minutes"`
 	}
 	if err := c.Bind().JSON(&in); err != nil || in.Amount <= 0 {
@@ -263,9 +273,15 @@ func CreateQrisPayment(c fiber.Ctx) error {
 	if in.ExpiresIn > 0 {
 		exp = time.Now().Add(time.Duration(in.ExpiresIn) * time.Minute)
 	}
+	if in.ExternalID == "" {
+		in.ExternalID = ref
+	}
 	p := model.QrisPayment{
 		ReferenceID: in.ExternalID,
 		ExternalID:  in.ExternalID,
+		ClientName:  in.PayerName,
+		ClientEmail: in.PayerEmail,
+		ClientPhone: in.PayerPhone,
 		ProviderID:  out.ID,
 		QrString:    qrString,
 		Amount:      in.Amount,
@@ -279,9 +295,14 @@ func CreateQrisPayment(c fiber.Ctx) error {
 	if p.ReferenceID == "" {
 		p.ReferenceID = ref
 	}
+	if pid, pname := packageFromOrderRef(in.OrderID); pid > 0 {
+		p.PackageID, p.PackageName = pid, pname
+	}
 	if err := model.DB.Create(&p).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "gagal simpan pembayaran"})
 	}
+	// Tampilkan pesanan di panel admin sejak checkout (status pending).
+	ensurePendingOrderForQris(&p)
 	return c.Status(201).JSON(fiber.Map{
 		"reference_id":     p.ReferenceID,
 		"provider_id":      p.ProviderID,
@@ -350,7 +371,8 @@ func SimulateQrisPayment(c fiber.Ctx) error {
 	if !xenditOK {
 		// Simulator internal hanya boleh saat mode tes / env izin eksplisit
 		// (jangan sampai QRIS nyata ditandai lunas tanpa uang masuk).
-		allowed := qrisMode() == "test" || strings.EqualFold(os.Getenv("QRIS_ALLOW_SIMULATE"), "true")
+		// Pembayaran mode live TIDAK boleh ditandai lunas oleh simulator internal.
+		allowed := (qrisMode() == "test" || strings.EqualFold(os.Getenv("QRIS_ALLOW_SIMULATE"), "true")) && p.Mode != "live"
 		if !allowed {
 			return c.Status(403).JSON(fiber.Map{"error": "simulasi hanya untuk mode tes (set QRIS_MODE=test atau QRIS_ALLOW_SIMULATE=true)"})
 		}

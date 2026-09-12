@@ -67,7 +67,9 @@ export default function CheckoutModal({ open, pkg, onClose }: Props) {
       external_id: orderId,
       order_id: orderId,
       amount: Number(pkg.price),
+      payer_name: form.name,
       payer_email: form.email,
+      payer_phone: form.phone,
       description: `Paket ${pkg.name} - Logikraf`,
     }
     try {
