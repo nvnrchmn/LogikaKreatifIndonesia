@@ -219,3 +219,11 @@ Catatan penerapan: komponen `H` dipakai untuk penomoran pasal; perlu `type React
 (diimpor dari react) — `React.ReactNode` tanpa impor React GAGAL tsc.
 Nilai kebijakan (revisi 2x, garansi 30 hari, jendela refund 1x24 jam/7 hari) masih ada di
 teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan editable.
+
+## UPDATE 8: portal klien di client.logikraf.id (2026-09-12)
+
+- Vhost: /www/server/panel/vhost/nginx/client.logikraf.id.conf (root=dist SPA, / -> /client/login, proxy /api -> 8081, noindex).
+- Sertifikat: certbot webroot -d client.logikraf.id (auto-renew aktif).
+- Redirect: setting `company_client_portal_url` (Admin -> Settings); komponen components/client/ClientPortalGate.tsx. Kosong = perilaku lama.
+- Tautan portal di email/WA pakai portalBase() di order_aftercare.go.
+- Verifikasi: netlog Chromium dari logikraf.id/client/login -> memuat client.logikraf.id + chunk ClientLoginPage.
