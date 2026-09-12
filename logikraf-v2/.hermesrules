@@ -314,3 +314,15 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - `SendEmailVerification()` sekarang juga mengirim WhatsApp ke nomor klien (pakai `clientWhatsApp(email)` + `wa.New().Send()` — pola sama dengan reset sandi & notifikasi pesanan), hanya bila nomor terdaftar.
 - Tes: `go test ./pkg/auth/ -run TestKirimVerifikasiEmail` PASS (token dibuat + jalur WA dieksekusi).
 - BELUM terbukti: pengiriman WA-nya sendiri belum diuji end-to-end (tes lokal jalan tanpa env WA_*). Cara paling cepat membuktikan: tekan "Kirim ulang tautan" di portal klien, atau daftarkan klien baru, lalu cek WhatsApp masuk.
+
+### KOREKSI (12 Sep 2026) — "temuan invite code" itu SALAH
+- Bukan bug. Penyebabnya skrip ujiku menyisipkan baris `clients` TANPA `user_id`, sehingga tersimpan NULL; perilaku NULL itulah yang memunculkan pesan menyesatkan "invite code already used".
+- Fakta kolom: `clients.user_id` = `bigint unsigned YES MUL NULL` (nullable).
+- Kode `RegisterClient`: cek awal `client.UserID != 0` (lolos untuk NULL), lalu UPDATE dengan syarat `id = ? AND user_id = 0` — di SQL `NULL = 0` tidak pernah true → RowsAffected 0 → pesan "already used".
+- Kode yang dibuat aplikasi sendiri selalu `user_id = 0`, jadi alur nyata NORMAL (cocok dengan pengalaman: invite code memang pernah diterima via email).
+- Uji ulang dengan `user_id = 0`: daftar **201**, user terbuat, **token verifikasi terbuat 1**, invite_code jadi NULL (sekali pakai). Tidak ada bug.
+- Saran kecil (opsional, bukan bug): ubah syarat UPDATE jadi `(user_id = 0 OR user_id IS NULL)` agar pesan galat tidak menyesatkan bila ada baris lama bernilai NULL.
+
+### WA verifikasi email — status bukti (12 Sep 2026)
+- Terbukti: `SendEmailVerification` dipanggil pada pendaftaran nyata (1 baris `email_verifications` terbuat, klien uji berhasil daftar 201).
+- Belum terbukti: pesannya sampai. Log GoWA hanya menampilkan `message.ack` (log minimal), tidak ada bukti eksplisit kirim. Konfirmasi tercepat: cek WhatsApp 628983342429, atau tekan "Kirim ulang tautan" di portal klien.
