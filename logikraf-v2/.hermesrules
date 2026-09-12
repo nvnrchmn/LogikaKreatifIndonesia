@@ -295,3 +295,17 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - BARU: fail2ban terpasang + enabled (sebelumnya TIDAK terpasang sama sekali, hanya terlihat "inactive"). Jail aktif: sshd. `/etc/fail2ban/jail.local`: bantime 1h, findtime 10m, maxretry 5, ignoreip localhost. Filter sshd terbukti match baris "Failed password" (fail2ban-regex).
 - GoWA `/send/message` butuh Basic auth base64: di shell pakai `curl -u "user:pass"`, JANGAN `-H "Authorization: Basic user:pass"` (hasilnya HTTP 400).
 - BELUM: salinan backup di luar VPS (butuh tujuan S3/Backblaze/rclone); jail untuk panel aaPanel (log login tidak praktis dijail — andalkan entrance path + sandi kuat).
+
+### Verifikasi email portal klien (12 Sep 2026)
+- BARU: `internal/domain/model/email_verification.go` (token hash SHA-256, sekali pakai, 24 jam) + AutoMigrate.
+- `pkg/auth/email_verify.go`: `SendEmailVerification()` (EMAIL saja — belum ada WA), `VerifyEmail()`, `ResendVerification()`.
+- Dipanggil di `RegisterClient` setelah commit; gagal kirim TIDAK menggagalkan pendaftaran.
+- Route: `POST /api/auth/verify-email` (loginLimiter) dan `POST /api/client/resend-verification` (butuh JWT).
+- `GET /api/client/profile` menambah `email_verified`.
+- FE: `pages/client/VerifyEmailPage.tsx` (/verify-email?token=), `components/client/VerifyEmailBanner.tsx` (dipasang di ClientLayout) — sengaja TIDAK memblokir portal, karena klien lama belum terverifikasi.
+- Terverifikasi live: token sah 200, pakai ulang 400, palsu 400, kedaluwarsa 400, `email_verified_at` terisi; tabel `email_verifications` terbentuk. CI `471e1e3` success.
+
+### TEMUAN BELUM TUNTAS: pendaftaran klien menolak invite code baru
+- `POST /api/client/register` dengan `invite_code` yang BARU dibuat (insert ke `clients.invite_code`, terbukti tersimpan) tetap dibalas 400 `{"error":"invite code already used"}`.
+- Sudah dicoba: invite code milik klien 6 = NULL (sudah terpakai), insert sendiri = tersimpan tapi tetap ditolak. Jadi pengecekan invite kemungkinan melihat tabel/kolom lain, ATAU ada bug yang membuat klien baru tidak bisa daftar sendiri.
+- Bukan akibat perubahan verifikasi email (galat terjadi sebelum hook).
