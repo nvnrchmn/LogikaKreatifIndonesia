@@ -262,3 +262,10 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Tes: `client_progress_test.go` — pemetaan tahap + proyek milik klien lain tidak bocor.
 - Pratinjau design invoice tanpa kirim email: `INVOICE_SAMPLE=/path/out.pdf go test ./pkg/invoice/ -run TestWriteSample` (di-skip otomatis bila env kosong, jadi aman di CI).
 - Invoice: `invoice.Data` pakai `uint` untuk Total/Paid/Outstanding; `Item{Desc, Amount}`.
+
+### Format invoice (revisi 12 Sep 2026)
+- Kop: logo "LK" dibaca dari `/www/wwwroot/logikraf.id/uploads/brand/logo-invoice.png` (DI LUAR repo; bisa dioverride `INVOICE_LOGO`), fallback otomatis ke teks bila berkas tidak ada — invoice tidak boleh gagal karena logo.
+- Identitas penerbit ada di `pkg/invoice/identity.go` (PT Logika Kreatif Indonesia, Perseroan Perorangan, alamat Bekasi, support@logikraf.id, +62 898-3342-429). Kalau nanti mau diedit dari admin, pindahkan ke tabel settings.
+- Isi baru: baris "Terbilang:" (`pkg/invoice/terbilang.go`), blok Penerbit, tanda tangan "Hormat kami / Tim Logikraf", catatan "sah tanpa tanda tangan basah".
+- Keputusan pemilik: baris tagihan tetap RINGKAS (1 baris per pesanan — jangan dipecah per komponen/termin); nomor invoice tetap `LK-INV-YYYY-NNNN`; bahasa Indonesia saja; PPN belum ditampilkan; stempel belum dipakai.
+- Cara cek hasil tanpa kirim email: `INVOICE_SAMPLE=/tmp/out.pdf go test ./pkg/invoice/ -run TestWriteSample`, lalu ekstrak teks/render PNG pakai pymupdf di venv `/tmp/pdfv` (server tidak punya pdftoppm/gs).
