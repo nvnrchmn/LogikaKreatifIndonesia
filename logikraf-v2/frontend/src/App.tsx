@@ -29,6 +29,7 @@ const AdminPaymentLedgerPage = lazy(() => import('./pages/admin/PaymentLedgerPag
 const AdminSettingsPage = lazy(() => import('./pages/admin/SettingsPage'))
 const AdminHeroStatsPage = lazy(() => import('./pages/admin/HeroStatsPage'))
 const AdminPartnerPortalPage = lazy(() => import('./pages/admin/PartnerPortalPage'))
+const AdminEmailSignaturePage = lazy(() => import('./pages/admin/EmailSignaturePage'))
 const AdminPaymentGuidePage = lazy(() => import('./pages/admin/PaymentGuidePage'))
 const AdminCronJobsPage = lazy(() => import('./pages/admin/CronJobsPage'))
 // Client Pages (Lazy Loaded)
@@ -114,6 +115,7 @@ export default function App() {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="partner-portal" element={<AdminPartnerPortalPage />} />
+        <Route path="signature-email" element={<AdminEmailSignaturePage />} />
         <Route path="payment-guide" element={<AdminPaymentGuidePage />} />
         <Route path="cron" element={<AdminCronJobsPage />} />
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />

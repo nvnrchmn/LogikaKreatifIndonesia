@@ -62,9 +62,14 @@ const navSections = [
       { label: 'Otomatis', path: '/admin/cron', icon: AutomationNavIcon },
       { label: 'Templates', path: '/admin/templates', icon: ShoppingBagIcon },
       { label: 'Settings', path: '/admin/settings', icon: SettingsIcon },
+      { label: 'Signature Email', path: '/admin/signature-email', icon: MailNavIcon },
     ],
   },
 ]
+
+function MailNavIcon() {
+  return (<svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>)
+}
 
 function DashboardIcon() {
   return (
