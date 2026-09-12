@@ -425,6 +425,7 @@ func XenditWebhook(c fiber.Ctx) error {
 					orderID = id
 					notifyAdminNewOrder(pt, id)
 					notifyOrderWA(pt, id)
+					notifyClientNextSteps(pt)
 				}
 			}
 
@@ -747,6 +748,7 @@ func IpaymuWebhook(c fiber.Ctx) error {
 					orderID = id
 					notifyAdminNewOrder(pt, id)
 					notifyOrderWA(pt, id)
+					notifyClientNextSteps(pt)
 				}
 			}
 

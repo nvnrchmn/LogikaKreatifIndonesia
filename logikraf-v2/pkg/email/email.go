@@ -171,3 +171,37 @@ func itoa(n int) string {
 	}
 	return string(b[i:])
 }
+
+// SendOrderOnboarding — email "langkah selanjutnya" ke klien setelah pembayaran
+// diterima, supaya pekerjaan bisa mulai tanpa bolak-balik manual.
+func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount string) error {
+	if to == "" {
+		return nil
+	}
+	name := clientName
+	if name == "" {
+		name = "Bapak/Ibu"
+	}
+	subject := "Langkah selanjutnya - pesanan " + orderNumber
+	body := fmt.Sprintf(`
+<html>
+<body style="font-family: Arial, sans-serif; color: #333;">
+<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+<h2 style="color: #1a73e8;">Terima kasih, %s!</h2>
+<p>Pembayaran untuk pesanan <strong>%s</strong> (Rp %s) sudah kami terima.</p>
+<p>Agar pekerjaan bisa segera dimulai, mohon siapkan dan kirimkan:</p>
+<ol>
+<li><strong>Akses domain &amp; hosting</strong> (bila sudah ada) — atau kami bantu pendaftarannya.</li>
+<li><strong>Aset brand</strong>: logo (PNG/SVG), warna utama, foto produk/layanan.</li>
+<li><strong>Materi konten</strong>: profil usaha, daftar layanan &amp; harga, kontak, alamat.</li>
+<li><strong>Data penagihan</strong>: nama badan usaha, NPWP (bila ada), alamat.</li>
+<li><strong>PIC</strong>: nama, WhatsApp, dan email yang bisa dihubungi.</li>
+</ol>
+<p>Balas email ini atau WhatsApp kami begitu daftar di atas siap — kami kirim jadwal kickoff.</p>
+<p>Salam,<br><strong>Tim Logikraf</strong><br><a href="https://logikraf.id">logikraf.id</a></p>
+</div>
+</body>
+</html>
+`, name, orderNumber, amount)
+	return Send(cfg, []string{to}, subject, body)
+}
