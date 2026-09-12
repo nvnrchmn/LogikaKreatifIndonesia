@@ -150,3 +150,23 @@ tidak dipakai di LKI. Bukti DB saat itu: **1 pembayaran settled, 0 order**.
 **Belum dikerjakan (P1-6)**: invoice/dokumen penagihan PDF. Catatan penting: `pkg/email.Send`
 belum mendukung lampiran (MIME sederhana), jadi butuh (a) pustaka PDF + (b) ubah Send jadi
 multipart — belum ada pustaka PDF di `go.mod`.
+
+## UPDATE 5: invoice PDF berkop + lampiran email (2026-09-12)
+
+- Pustaka baru: `github.com/go-pdf/fpdf v0.9.0` (go.mod/go.sum). Pakai ini, BUKAN
+  `jung-kurt/gofpdf` (sudah arsip). Font inti + tanpa gambar → tidak bergantung cwd/path.
+- `pkg/invoice/invoice.go` — `Build(Data) ([]byte, error)`: invoice A4 berkop "LOGIKRAF"
+  + bar aksen #0052FF, blok klien, meta (tanggal/jatuh tempo/status), tabel item,
+  ringkasan (Total/Sudah dibayar/Sisa), catatan, footer.
+  Tes: `TestBuild` (prefix `%PDF-`, >1KB, menulis contoh ke `/tmp/contoh-invoice.pdf`)
+  dan `TestRp` (format ribuan).
+  JEBAKAN: footer di y > 277mm memicu auto page break → PDF jadi 2 halaman (pakai y=268).
+- `pkg/email/email.go` — `SendWithAttachment()` + `attachmentMIME()` (multipart/mixed,
+  PDF base64 76 kolom). `SendPaymentReceipt` & `SendInvoiceReminder` kini menerima
+  `pdf []byte` (kosong = email biasa seperti sebelumnya).
+  Tes: `TestAttachmentMIME` + `TestSendAttachmentLive` (kirim nyata; skip bila
+  `EMAIL_LIVE_TO` kosong, jadi CI aman).
+- Handler: `order_invoice.go` → `invoicePDFForPayment(pt)` dilampirkan pada email
+  kwitansi di kedua jalur webhook. Scheduler: `invoicePDFFor(...)` di `jobs.go` →
+  lampiran pada email pengingat tagihan.
+- Pratinjau PDF tanpa aplikasi: `/tmp/pdfvenv/bin/python` + pypdfium2 (render PNG).
