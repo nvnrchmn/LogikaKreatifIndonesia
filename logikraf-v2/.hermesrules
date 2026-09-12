@@ -107,3 +107,26 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
   → Jangan menyarankan VMC/CMC lagi kecuali Nova minta sendiri.
 - Kalau nanti diperlukan: sisi teknis sudah siap (SVG Tiny PS valid 3,1 KB, di-host HTTPS tanpa redirect,
   DMARC p=quarantine, DKIM selector default) — tinggal menambah parameter `a=` (URL sertifikat) di record BIMI.
+
+## UPDATE 3: alur order otomatis + notifikasi (2026-09-12)
+
+**Temuan audit (sebelum perbaikan):** Order TIDAK dibuat otomatis saat pembayaran
+settle — admin harus klik "create order from payment"; notifikasi hanya in-app; WA
+tidak dipakai di LKI. Bukti DB saat itu: **1 pembayaran settled, 0 order**.
+
+**Yang ditambahkan:**
+- `internal/delivery/handler/order_auto.go` — `ensureOrderFromPayment()`: buat Order +
+  data klien otomatis dari pembayaran settled (idempotent: cek `order_number` dulu),
+  dipanggil di **2** jalur webhook `payment.go` (~baris 419 dan 740).
+- `order_auto.go` — `notifyAdminNewOrder()`: email ke admin (setting
+  `admin_notify_email`, default admin@logikraf.id).
+- `order_wa.go` — `notifyOrderWA()`: WA ke admin (setting `admin_notify_wa`) + ke klien.
+- `pkg/wa/wa.go` — klien GoWA (env `WA_BASE_URL`/`WA_DEVICE_ID`/`WA_BASIC_AUTH`, sama
+  seperti portal mitra; **sudah disalin ke .env LKI**). `Normalize()`: 08xx/+62/8xx → 628xx.
+- `pkg/email/email.go` — `SendOrderOnboarding()` + `order_aftercare.go`
+  `notifyClientNextSteps()`: email "langkah selanjutnya" ke klien saat order baru dibuat.
+- Tes: `TestEnsureOrderFromPayment`, `TestNormalize` (PASS); `TestSendLive` = uji kirim
+  WA nyata, hanya berjalan bila env `WA_LIVE_TO` diisi (aman untuk CI).
+
+**Catatan operasional:** nilai notifikasi disimpan di tabel `settings` (tenant
+`logikraf`); order otomatis memakai `order_number = payment_transactions.invoice_ref`.
