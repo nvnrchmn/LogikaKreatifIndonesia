@@ -215,7 +215,7 @@ export default function PartnerPortalPage() {
           <Space style={{ marginTop: 12 }}>
             <Button icon={<ReloadOutlined />} loading={refreshing} disabled={!openStore?.sub_account_id} onClick={() => openId && refreshXendit(openId)}>Refresh Data Xendit</Button>
           </Space>
-          <Form.Item name="entity_type" label="Jenis Badan Usaha (manual — samakan dengan Xendit Dashboard)" style={{ marginTop: 12, maxWidth: 380 }}>
+          <Form.Item name="entity_type" label="Jenis Badan Usaha (opsional — Xendit tidak menyediakan data ini)" style={{ marginTop: 12, maxWidth: 440 }}>
               <Select options={[
                 { value: 'SOLE_PROPRIETORSHIP', label: 'Badan Usaha Perorangan (CV / PT Perorangan)' },
                 { value: 'INDIVIDUAL', label: 'Perorangan (khusus sub-account XenPlatform)' },
