@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { LegalIdentity, LegalUpdated } from '../../hooks/useLegal'
+import { useEffect, useState, type ReactNode } from 'react'
+import { LegalIdentity, LegalUpdated, useLegalInfo } from '../../hooks/useLegal'
 import PublicLayout from '../../components/layout/PublicLayout'
 
 interface Gateway {
@@ -10,69 +10,97 @@ interface Gateway {
 
 export default function RefundPolicyPage() {
   const [gateways, setGateways] = useState<Gateway[]>([])
-  const [settings, setSettings] = useState<Record<string, string>>({})
+  const info = useLegalInfo()
 
   useEffect(() => {
     fetch('/api/payment-gateways')
       .then(r => r.json())
       .then(d => setGateways(Array.isArray(d) ? d : []))
       .catch(() => setGateways([]))
-
-    fetch('/api/settings/public')
-      .then(r => (r.ok ? r.json() : {}))
-      .then(d => setSettings(d || {}))
-      .catch(() => {})
   }, [])
 
-  const email = settings.contact_email || 'support@logikraf.id'
-  const wa = settings.contact_whatsapp || '+62 898 3342 429'
-  const waNumber = wa.replace(/[^0-9]/g, '')
+  const waNumber = info.wa.replace(/[^0-9]/g, '')
+
+  const H = ({ n, children }: { n: string; children: ReactNode }) => (
+    <h3 className="text-xl font-bold text-text-main mt-8 mb-3">{n}. {children}</h3>
+  )
 
   return (
     <PublicLayout>
       <div className="min-h-screen bg-canvas-light">
         <div className="pt-32 pb-20">
           <div className="container-narrow max-w-4xl bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-border-minimal">
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-text-main mb-4">Kebijakan Pengembalian Dana (Refund Policy)</h1>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-text-main mb-4">Kebijakan Pengembalian Dana</h1>
             <LegalUpdated />
 
             <div className="prose prose-blue max-w-none text-text-main font-body leading-relaxed space-y-6">
-              <p>Kami di <strong>Logika Kreatif Indonesia (Logikraf)</strong> berkomitmen terhadap transparansi dan kepuasan klien. Kebijakan pengembalian dana berikut berlaku untuk seluruh transaksi yang diproses melalui platform kami, termasuk pembayaran Paket Layanan Website melalui QRIS.</p>
+              <p>
+                <strong>{info.entity}</strong> berkomitmen pada transparansi penanganan pembayaran. Kebijakan ini berlaku
+                untuk seluruh transaksi melalui situs kami, termasuk pembayaran paket layanan dengan QRIS maupun transfer
+                virtual account, dan merupakan bagian tidak terpisahkan dari Syarat &amp; Ketentuan kami.
+              </p>
+              <p className="text-sm">
+                <strong>Catatan proses:</strong> karena dana QRIS/transfer diterima melalui gerbang pembayaran berlisensi,
+                pengembalian dana kami proses <strong>secara manual oleh tim keuangan dalam dua tahap</strong> — verifikasi
+                transaksi, lalu transfer pengembalian ke rekening pemesan. Dana tidak otomatis kembali dengan sendirinya.
+              </p>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">1. Kriteria Refund yang Disetujui</h3>
+              <H n="1">Kriteria Pengajuan yang Kami Setujui</H>
               <ul className="list-disc pl-6 space-y-2 text-sm">
-                <li>Terjadi <strong>double scanning / pembayaran ganda</strong> yang tidak disengaja.</li>
-                <li><strong>Pembatalan pesanan Paket Layanan</strong> sebelum tim teknis memulai fase analisis/pengerjaan (maksimal 1x24 jam setelah pembayaran).</li>
-                <li><strong>Kegagalan sistem teknis Logikraf</strong> dalam memproses deliverable sesuai kesepakatan awal (SLA).</li>
-                <li>Pembayaran yang masuk <strong>tanpa pesanan yang valid</strong> (tidak ada order reference yang cocok).</li>
+                <li><strong>Pembayaran ganda</strong> (terbayar dua kali untuk satu pesanan yang sama) — dikembalikan penuh tanpa potongan.</li>
+                <li><strong>Kelebihan bayar</strong> dari nominal invoice — dikembalikan penuh tanpa potongan.</li>
+                <li><strong>Pembatalan pesanan</strong> yang diajukan maksimal <strong>1 x 24 jam</strong> setelah pembayaran dan sebelum pekerjaan dimulai.</li>
+                <li><strong>Pembayaran tanpa pesanan yang sah</strong> (tidak ada nomor referensi yang cocok di sistem kami).</li>
+                <li><strong>Kegagalan dari pihak kami</strong> dalam memenuhi lingkup pekerjaan yang disepakati, dan tidak dapat diselesaikan melalui perbaikan.</li>
               </ul>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">2. Ketentuan yang Tidak Dapat Direfund</h3>
+              <H n="2">Ketentuan yang Tidak Dapat Dikembalikan</H>
               <ul className="list-disc pl-6 space-y-2 text-sm">
-                <li>Pekerjaan yang sudah <strong>memasuki tahap pengerjaan/development</strong> dan berjalan sesuai SLA.</li>
-                <li>Permintaan perubahan <strong>scope pekerjaan</strong> setelah proyek dimulai.</li>
-                <li>Pembatalan sepihak oleh klien <strong>tanpa alasan yang sah</strong> setelah fase analisis dimulai.</li>
+                <li>Pekerjaan yang <strong>sudah dimulai atau berjalan</strong> sesuai lingkup yang disepakati.</li>
+                <li>Pembatalan sepihak setelah fase analisis/pengerjaan dimulai, tanpa alasan yang sah menurut perjanjian.</li>
+                <li>Perubahan lingkup (scope) pekerjaan setelah proyek berjalan.</li>
+                <li><strong>Biaya pihak ketiga yang sudah dibelanjakan</strong> atas nama Klien, misalnya domain, hosting, layanan langganan, atau lisensi.</li>
+                <li><strong>Biaya layanan gerbang pembayaran</strong> yang telah dipotong oleh penyedia pembayaran.</li>
               </ul>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">3. Prosedur Pengajuan Refund</h3>
+              <H n="3">Prosedur Pengajuan (Dua Tahap)</H>
+              <p className="text-sm"><strong>Tahap 1 — Verifikasi (1–2 hari kerja)</strong></p>
               <ol className="list-decimal pl-6 space-y-2 text-sm">
-                <li>Klien mengirimkan bukti transaksi QRIS dan nomor pesanan (order reference) ke email <strong>{email}</strong> atau WhatsApp Helpdesk.</li>
-                <li>Tim Logikraf melakukan verifikasi transaksi pada sistem pembayaran resmi (melalui gerbang pembayaran QRIS yang terlisensi Bank Indonesia).</li>
-                <li>Status pengajuan akan dikonfirmasi melalui email/WhatsApp dalam <strong>1–2 hari kerja</strong>.</li>
-                <li>Dana dikembalikan ke rekening/e-wallet asal dalam waktu <strong>3–7 hari kerja</strong> setelah pengajuan disetujui.</li>
+                <li>Klien menghubungi kami melalui email <strong>{info.email}</strong> atau WhatsApp <strong>{info.wa}</strong> dengan menyertakan: nomor pesanan/referensi, bukti pembayaran, dan alasan pengajuan.</li>
+                <li>Tim kami memeriksa transaksi pada sistem gerbang pembayaran resmi dan mencocokkannya dengan catatan pesanan.</li>
+                <li>Hasil verifikasi (disetujui atau tidak, beserta alasannya) kami sampaikan melalui email/WhatsApp.</li>
+              </ol>
+              <p className="text-sm"><strong>Tahap 2 — Pengembalian Dana (3–7 hari kerja setelah disetujui)</strong></p>
+              <ol className="list-decimal pl-6 space-y-2 text-sm" start={4}>
+                <li>Tim keuangan memproses transfer pengembalian ke rekening bank atau e-wallet <strong>atas nama pemesan</strong>.</li>
+                <li>Untuk pengembalian ke rekening yang berbeda dari sumber pembayaran, kami dapat meminta verifikasi identitas tambahan.</li>
+                <li>Bukti transfer pengembalian kami kirimkan kepada Klien sebagai penyelesaian perkara.</li>
               </ol>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">4. Metode Pengembalian Dana</h3>
+              <H n="4">Batas Waktu Pengajuan</H>
               <ul className="list-disc pl-6 space-y-2 text-sm">
-                <li>Dana dikembalikan <strong>ke sumber pembayaran asal</strong> (rekening bank / e-wallet yang digunakan untuk transaksi QRIS).</li>
-                <li>Apabila pengembalian ke sumber asal tidak memungkinkan, dana dapat ditransfer ke rekening bank atas nama klien setelah verifikasi identitas.</li>
-                <li>Biaya transfer/administrasi yang timbul akibat kesalahan data penerima menjadi tanggung jawab klien.</li>
+                <li>Kasus pembatalan sebelum pekerjaan dimulai: maksimal <strong>7 hari kalender</strong> sejak tanggal pembayaran.</li>
+                <li>Kasus pembayaran ganda atau kelebihan bayar: kapan saja, selama bukti transaksi dan nomor referensi dapat diverifikasi.</li>
               </ul>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">5. Gerbang Pembayaran Resmi</h3>
+              <H n="5">Metode &amp; Biaya</H>
+              <ul className="list-disc pl-6 space-y-2 text-sm">
+                <li>Pengembalian dilakukan melalui transfer bank/e-wallet ke rekening atas nama pemesan.</li>
+                <li>Biaya transfer bank dan biaya layanan gerbang pembayaran yang sudah terpotong tidak dapat dikembalikan; untuk kasus pembayaran ganda dan kelebihan bayar, dana dikembalikan <strong>penuh</strong> sesuai nominal yang Anda bayarkan.</li>
+                <li>Kesalahan data rekening yang diberikan Klien menjadi tanggung jawab Klien, termasuk biaya transfer ulang bila ada.</li>
+              </ul>
+
+              <H n="6">Jika Pengajuan Tidak Disetujui</H>
+              <p className="text-sm">
+                Kami menyampaikan alasan penolakan secara tertulis. Klien dapat mengajukan peninjauan ulang dengan
+                melampirkan bukti tambahan, atau menyelesaikan perselisihan sesuai klausul penyelesaian sengketa pada
+                Syarat &amp; Ketentuan.
+              </p>
+
+              <H n="7">Gerbang Pembayaran Resmi</H>
               <div className="bg-canvas-light p-5 rounded-xl border border-border-minimal my-4">
                 {gateways.length === 0 ? (
-                  <p className="text-text-muted text-xs">Pembayaran diproses aman via gerbang pembayaran Xendit (terenkripsi SSL 256-bit dan diawasi oleh Bank Indonesia).</p>
+                  <p className="text-text-muted text-xs">Pembayaran diproses melalui gerbang pembayaran resmi yang diawasi Bank Indonesia dengan enkripsi SSL.</p>
                 ) : (
                   <div className="space-y-3 text-xs">
                     {gateways.map(g => (
@@ -85,13 +113,17 @@ export default function RefundPolicyPage() {
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-text-main mt-8 mb-3">6. Hubungi Layanan Pelanggan Resmi</h3>
+              <H n="8">Kontak Layanan Resmi</H>
               <ul className="list-disc pl-6 space-y-1 text-sm">
-                <li><strong>Email:</strong> {email}</li>
-                <li><strong>WhatsApp Helpdesk:</strong> {wa}</li>
-                <li><strong>Website:</strong> https://logikraf.id</li>
+                <li><strong>Email:</strong> {info.email}</li>
+                <li><strong>WhatsApp helpdesk:</strong> {info.wa}</li>
+                <li><strong>Jam layanan:</strong> {info.hours}</li>
+                <li><strong>Situs:</strong> https://logikraf.id</li>
               </ul>
-              <p className="text-xs text-text-muted pt-4">Dengan melakukan pembayaran melalui platform Logikraf, Anda dianggap telah membaca, memahami, dan menyetujui kebijakan pengembalian dana ini.</p>
+              <p className="text-xs text-text-muted pt-4">
+                Dengan melakukan pembayaran melalui platform kami, Anda dianggap telah membaca, memahami, dan menyetujui
+                kebijakan pengembalian dana ini. Tautan WhatsApp helpdesk: https://wa.me/{waNumber}
+              </p>
             </div>
           </div>
         </div>
