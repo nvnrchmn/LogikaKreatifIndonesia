@@ -59,8 +59,13 @@ function ScrollToTop() {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuth()
+  const { pathname } = useLocation()
   if (loading) return <PageLoader />
-  if (!token) return <Navigate to="/admin/login" replace />
+  if (!token) {
+    // Rute klien -> login klien (URL bersih di host portal), rute admin -> login admin.
+    const to = pathname.startsWith('/client') ? '/client/login' : pathname.startsWith('/admin') ? '/admin/login' : '/login'
+    return <Navigate to={to} replace />
+  }
   return <>{children}</>
 }
 
