@@ -203,6 +203,8 @@ func main() {
 	admin.Post("/clients", handler.CreateClient)
 	admin.Put("/clients/:id", handler.UpdateClient)
 	admin.Delete("/clients/:id", handler.DeleteClient)
+	admin.Get("/client-files", handler.AdminClientFiles)
+	admin.Get("/client-files/:client_id/:name", handler.AdminDownloadClientFile)
 	admin.Get("/client-store-settlements/stores", handler.ListClientStoresAdmin)
 	admin.Post("/client-store-settlements/stores", handler.CreateClientStoreAdmin)
 	admin.Put("/client-store-settlements/stores/:id", handler.UpdateClientStoreAdmin)

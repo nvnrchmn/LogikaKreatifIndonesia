@@ -22,6 +22,7 @@ const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 
 // Admin Components & Pages (Lazy Loaded)
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
+const AdminClientFilesPage = lazy(() => import('./pages/admin/ClientFilesAdminPage'))
 const AdminResourcePage = lazy(() => import('./components/admin/AdminResourcePage'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
@@ -130,6 +131,7 @@ export default function App() {
         <Route path="payment-ledger" element={<AdminPaymentLedgerPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
         <Route path="hero-stats" element={<AdminHeroStatsPage />} />
+        <Route path="client-files" element={<AdminClientFilesPage />} />
         {/* Generic CRUD resources: list / new / edit */}
         <Route path=":resource/new" element={<AdminResourcePage />} />
         <Route path=":resource/:id/edit" element={<AdminResourcePage />} />

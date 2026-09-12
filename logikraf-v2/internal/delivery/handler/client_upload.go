@@ -27,6 +27,44 @@ func uploadRoot() string {
 	return "/www/wwwroot/logikraf.id/uploads"
 }
 
+func isDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// uploadOrderID — id pesanan pada prefiks nama berkas ("o<id>-..."), kosong bila tidak ada.
+func uploadOrderID(n string) string {
+	if !strings.HasPrefix(n, "o") {
+		return ""
+	}
+	i := strings.Index(n, "-")
+	if i <= 1 {
+		return ""
+	}
+	return n[1:i]
+}
+
+// prettyUploadName — nama berkas untuk ditampilkan (tanpa prefiks order & timestamp).
+func prettyUploadName(n string) string {
+	if uploadOrderID(n) != "" {
+		n = n[strings.Index(n, "-")+1:]
+	}
+	if i := strings.Index(n, "-"); i > 0 && isDigits(n[:i]) {
+		n = n[i+1:]
+	}
+	if strings.TrimSpace(n) == "" {
+		return "berkas"
+	}
+	return n
+}
+
 func clientUploadDir(cid uint) string {
 	return filepath.Join(uploadRoot(), "client", fmt.Sprintf("%d", cid))
 }

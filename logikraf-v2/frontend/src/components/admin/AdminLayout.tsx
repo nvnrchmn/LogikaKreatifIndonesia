@@ -24,6 +24,7 @@ const navSections = [
     items: [
       { label: 'Leads', path: '/admin/leads', icon: FolderIcon },
       { label: 'Clients', path: '/admin/clients', icon: PeopleIcon },
+      { label: 'Berkas Klien', path: '/admin/client-files', icon: DocNavIcon },
       { label: 'Orders', path: '/admin/orders', icon: OrdersNavIcon },
       { label: 'Projects', path: '/admin/projects', icon: WorkIcon },
     ],
