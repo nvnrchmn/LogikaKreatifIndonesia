@@ -15,6 +15,7 @@ type Invoice struct {
 	Type          string     `gorm:"size:20;default:invoice" json:"type"`
 	Total         uint       `json:"total"`
 	PaidAmount    uint       `gorm:"default:0" json:"paid_amount"`
+	PaidAt        *time.Time `json:"paid_at"` // kapan invoice benar-benar lunas → baris "Lunas pada <tanggal>"
 	Status        string     `gorm:"size:20;default:draft" json:"status"`
 	Notes         string     `gorm:"type:text" json:"notes"`
 	IssueDate     *time.Time `json:"issue_date"`

@@ -56,7 +56,12 @@ func ClientInvoicePDF(c fiber.Ctx) error {
 		Total:       inv.Total,
 		Paid:        inv.PaidAmount,
 		Outstanding: outstanding,
-		Notes:       note,
+		PaidAt:      inv.PaidAt,
+		// Identitas legal penerbit diambil dari Settings admin (satu sumber data);
+		// kosong = baris NIB/NPWP tidak dicetak.
+		NIB:   setting("company_legal_nib", resolveTenant(c)),
+		NPWP:  setting("company_legal_npwp", resolveTenant(c)),
+		Notes: note,
 	})
 	if err != nil || len(pdf) == 0 {
 		return c.Status(500).JSON(fiber.Map{"error": "gagal membuat PDF invoice"})

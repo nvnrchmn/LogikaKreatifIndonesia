@@ -33,7 +33,14 @@ type Data struct {
 	Total       uint
 	Paid        uint
 	Outstanding uint
-	Notes       string
+	// PaidAt — tanggal invoice benar-benar lunas. Bila terisi (dan Paid >= Total),
+	// baris "Jatuh tempo" diganti "Lunas pada <tanggal>": jatuh tempo sudah tidak
+	// relevan begitu uangnya diterima, sementara tanggal bayar berguna untuk arsip klien.
+	PaidAt *time.Time
+	// NIB/NPWP penerbit — kosong berarti barisnya tidak dicetak sama sekali.
+	NIB  string
+	NPWP string
+	Notes string
 }
 
 // rp — 1499000 → "1.499.000"
@@ -50,6 +57,19 @@ func rp(n uint) string {
 }
 
 func tanggal(t time.Time) string { return t.Format("02 Jan 2006") }
+
+// legalLine — baris NIB/NPWP untuk blok penerbit. Mengembalikan "" bila keduanya
+// belum diisi (invoice lama / data belum lengkap) supaya tidak ada baris kosong.
+func legalLine(nib, npwp string) string {
+	var parts []string
+	if v := strings.TrimSpace(nib); v != "" {
+		parts = append(parts, "NIB "+v)
+	}
+	if v := strings.TrimSpace(npwp); v != "" {
+		parts = append(parts, "NPWP "+v)
+	}
+	return strings.Join(parts, "  |  ")
+}
 
 func statusText(s string) string {
 	switch s {
@@ -140,6 +160,11 @@ func Build(d Data) ([]byte, error) {
 	if d.DueDate != nil {
 		meta[1][1] = tanggal(*d.DueDate)
 	}
+	// Invoice lunas: tampilkan kapan dibayar, bukan jatuh tempo yang sudah lewat.
+	if d.PaidAt != nil && d.Total > 0 && d.Paid >= d.Total {
+		meta[1][0] = "Lunas pada"
+		meta[1][1] = tanggal(*d.PaidAt)
+	}
 	my := 44.0
 	for _, m := range meta {
 		pdf.SetFont("Helvetica", "", 9)
@@ -226,16 +251,25 @@ func Build(d Data) ([]byte, error) {
 	pdf.SetX(15)
 	pdf.MultiCell(180, 4.8, "Catatan: "+note, "", "L", false)
 	// Blok penerbit mengikuti akhir isi supaya halaman tidak menyisakan ruang kosong besar.
+	issuer := "Penerbit:\n" + IssuerName + " (" + IssuerForm + ")\n" + IssuerAddress + "\n" +
+		IssuerEmail + "  |  " + IssuerPhone
+	legal := legalLine(d.NIB, d.NPWP)
+	if legal != "" {
+		issuer += "\n" + legal
+	}
 	py := pdf.GetY() + 10
-	if py > 250 {
-		py = 250
+	// Baris NIB/NPWP menambah satu baris: batas atas diturunkan agar tidak menabrak footer.
+	maxPy := 250.0
+	if legal != "" {
+		maxPy = 244
+	}
+	if py > maxPy {
+		py = maxPy
 	}
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
 	pdf.SetXY(15, py)
-	pdf.MultiCell(90, 4.2,
-		"Penerbit:\n"+IssuerName+" ("+IssuerForm+")\n"+IssuerAddress+"\n"+
-			IssuerEmail+"  |  "+IssuerPhone, "", "L", false)
+	pdf.MultiCell(90, 4.2, issuer, "", "L", false)
 
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)

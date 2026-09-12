@@ -150,6 +150,7 @@ func createReceiptForOrder(order *model.Order, p *model.QrisPayment) {
 		Type:          "receipt",
 		Total:         order.TotalAmount,
 		PaidAmount:    order.TotalAmount,
+		PaidAt:        &now,
 		Status:        "paid",
 		IssueDate:     &now,
 		DueDate:       &now,

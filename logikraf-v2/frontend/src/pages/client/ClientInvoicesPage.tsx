@@ -11,6 +11,7 @@ type Inv = {
   project_name: string
   issued_at: string
   due_at: string
+  paid_at: string
 }
 
 const hdrs = () => ({ Authorization: 'Bearer ' + (localStorage.getItem('token') || '') })
@@ -80,7 +81,7 @@ export default function ClientInvoicesPage() {
                 </div>
                 <p className="text-xs text-text-muted truncate">
                   {inv.project_name || '—'} · {inv.order_number || '-'} · terbit {inv.issued_at}
-                  {inv.due_at ? ' · jatuh tempo ' + inv.due_at : ''}
+                  {inv.paid_at ? ' · lunas ' + inv.paid_at : inv.due_at ? ' · jatuh tempo ' + inv.due_at : ''}
                 </p>
                 <p className="text-xs text-text-main font-bold">
                   {rp(inv.total)}

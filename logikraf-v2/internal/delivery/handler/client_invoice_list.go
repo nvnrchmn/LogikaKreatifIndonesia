@@ -23,13 +23,15 @@ func ClientInvoices(c fiber.Ctx) error {
 		ProjectName   string `json:"project_name"`
 		IssuedAt      string `json:"issued_at"`
 		DueAt         string `json:"due_at"`
+		PaidAt        string `json:"paid_at"`
 	}
 	rows := []invRow{}
 	model.DB.Model(&model.Invoice{}).
 		Select("invoices.id, invoices.invoice_number, invoices.status, invoices.total, invoices.paid_amount, " +
 			"invoices.order_id, orders.order_number, orders.project_name, " +
 			"DATE_FORMAT(COALESCE(invoices.issue_date, invoices.created_at), '%Y-%m-%d') as issued_at, " +
-			"COALESCE(DATE_FORMAT(invoices.due_date, '%Y-%m-%d'), '') as due_at").
+			"COALESCE(DATE_FORMAT(invoices.due_date, '%Y-%m-%d'), '') as due_at, " +
+			"COALESCE(DATE_FORMAT(invoices.paid_at, '%Y-%m-%d'), '') as paid_at").
 		Joins("JOIN orders ON orders.id = invoices.order_id").
 		Where("orders.client_id = ?", cid).
 		Order("invoices.created_at desc").
