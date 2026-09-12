@@ -269,3 +269,9 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Isi baru: baris "Terbilang:" (`pkg/invoice/terbilang.go`), blok Penerbit, tanda tangan "Hormat kami / Tim Logikraf", catatan "sah tanpa tanda tangan basah".
 - Keputusan pemilik: baris tagihan tetap RINGKAS (1 baris per pesanan — jangan dipecah per komponen/termin); nomor invoice tetap `LK-INV-YYYY-NNNN`; bahasa Indonesia saja; PPN belum ditampilkan; stempel belum dipakai.
 - Cara cek hasil tanpa kirim email: `INVOICE_SAMPLE=/tmp/out.pdf go test ./pkg/invoice/ -run TestWriteSample`, lalu ekstrak teks/render PNG pakai pymupdf di venv `/tmp/pdfv` (server tidak punya pdftoppm/gs).
+
+### Logo invoice diganti (12 Sep 2026, commit 9ae762f)
+- Berkas: `/www/wwwroot/logikraf.id/uploads/brand/logo-invoice.png` — 700x166 px, PNG transparan, 87.911 byte (dari aset lockup "LK + Logikraf" kiriman pemilik).
+- Pengolahan: crop (168,325,1379,613) dari kanvas 1536x1024 untuk buang tepi kosong, lalu diberi rim gelap #0F172A (MaxFilter(5) di kanal alpha lalu dikomposit) supaya wordmark bergaris luar tegas di latar putih.
+- Kop invoice kini HANYA memakai gambar logo (teks "LOGIKRAF" dihapus agar tidak dobel); fallback teks tetap aktif bila berkas tidak ada.
+- Setiap kirim logo baru: siapkan via venv `/tmp/pdfv` (pillow + pymupdf), crop tepi, kecilkan ~700 px lebar, lalu `sudo cp` + `chown www:www` ke path di atas. Ukuran invoice PDF ~104 KB (logo 79-88 KB).
