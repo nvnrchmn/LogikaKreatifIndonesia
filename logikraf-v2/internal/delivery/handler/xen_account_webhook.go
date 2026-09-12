@@ -77,7 +77,15 @@ func handleAccountEventWebhook(c fiber.Ctx) error {
 		}
 		notifyPartnersKYC(store.ID, status)
 	}
-	return c.JSON(fiber.Map{"status": "ok", "message": "account event processed", "store_id": store.ID, "kyc_status": status})
+	// simpan riwayat submission + alasan penolakan (dibaca portal mitra)
+	var reasons []kycReason
+	collectFailureReasons(body, &reasons)
+	subID := ""
+	if len(cands) > 0 {
+		subID = cands[0]
+	}
+	saveKYCSubmission(store.ID, subID, status, store.EntityType, reasons)
+	return c.JSON(fiber.Map{"status": "ok", "message": "account event processed", "store_id": store.ID, "kyc_status": status, "reasons": len(reasons)})
 }
 
 // notifyPartnersKYC — fire-and-forget ke logikraf-partners (endpoint internal
