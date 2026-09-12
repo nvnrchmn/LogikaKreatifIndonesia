@@ -175,3 +175,22 @@ func TestTeamScopeAndRevoke(t *testing.T) {
 		t.Fatalf("akses tidak pulih setelah restore: %d", code)
 	}
 }
+
+// TestRevokedTokenBlockedOutsideAdminGroup — celah yang ditemukan saat uji produksi:
+// rute yang hanya memakai AuthMiddleware (mis. /api/orders) sempat masih menerima token
+// akun yang sudah dicabut. Status akun kini diperiksa di AuthMiddleware, jadi berlaku
+// untuk semua rute terautentikasi.
+func TestRevokedTokenBlockedOutsideAdminGroup(t *testing.T) {
+	withTeamDB(t)
+	a := fiber.New()
+	a.Get("/api/orders", auth.AuthMiddleware(), func(c fiber.Ctx) error { return c.JSON(fiber.Map{"ok": true}) })
+	staff := makeUser(t, "staf3@test.id", "ops", "active", "staffpass123")
+	tk := token(t, staff)
+	if code, b := callJSON(t, a, "GET", "/api/orders", tk, ""); code != 200 {
+		t.Fatalf("sebelum dicabut: %d %s", code, b)
+	}
+	model.DB.Model(&model.User{}).Where("id = ?", staff).Update("status", "revoked")
+	if code, _ := callJSON(t, a, "GET", "/api/orders", tk, ""); code != 403 {
+		t.Fatalf("setelah dicabut: %d, mau 403", code)
+	}
+}

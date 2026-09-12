@@ -71,9 +71,25 @@ func AuthMiddleware() fiber.Handler {
 		if err != nil || !token.Valid {
 			return c.Status(401).JSON(fiber.Map{"error": "unauthorized"})
 		}
-		c.Locals("user_id", token.Claims.(*Claims).UserID)
+		uid := token.Claims.(*Claims).UserID
+		c.Locals("user_id", uid)
 		c.Locals("role", token.Claims.(*Claims).Role)
 		c.Locals("tenant", token.Claims.(*Claims).Tenant)
+		// Status & scope dibaca dari DB pada setiap permintaan: akun yang dicabut
+		// langsung kehilangan akses di SEMUA rute terautentikasi (bukan hanya grup
+		// admin), tanpa perlu menunggu token JWT-nya kedaluwarsa.
+		var u model.User
+		if err := model.DB.Select("id", "status", "scope").First(&u, uid).Error; err != nil {
+			return c.Status(401).JSON(fiber.Map{"error": "unauthorized"})
+		}
+		if u.Status != "" && u.Status != "active" {
+			return c.Status(403).JSON(fiber.Map{"error": "akses akun ini sudah dicabut"})
+		}
+		scope := u.Scope
+		if scope == "" {
+			scope = "full"
+		}
+		c.Locals("scope", scope)
 		return c.Next()
 	}
 }
@@ -101,15 +117,7 @@ var systemPrefixes = []string{"/settings", "/cron/jobs", "/team", "/admin/"}
 // menunggu token JWT kedaluwarsa.
 func ScopeGuard() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		uid, _ := c.Locals("user_id").(uint)
-		var u model.User
-		if err := model.DB.Select("id", "status", "scope").First(&u, uid).Error; err != nil {
-			return c.Status(401).JSON(fiber.Map{"error": "unauthorized"})
-		}
-		if u.Status != "" && u.Status != "active" {
-			return c.Status(403).JSON(fiber.Map{"error": "akses akun ini sudah dicabut"})
-		}
-		scope := u.Scope
+		scope, _ := c.Locals("scope").(string)
 		if scope == "" {
 			scope = "full"
 		}
