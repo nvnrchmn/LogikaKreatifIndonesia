@@ -205,6 +205,7 @@ func main() {
 	admin.Get("/xenplatform/accounts", handler.ListXenplatformAccountsAdmin)
 	admin.Post("/client-stores/:id/partner-user", handler.UpsertPartnerUserAdmin)
 	admin.Patch("/client-stores/:id/xenplatform", handler.UpdateXenplatformAdmin)
+	admin.Get("/client-stores/:id/xenplatform", handler.RefreshXenplatformAdmin)
 	admin.Post("/admin/force-password-reset", handler.ForcePasswordReset)
 	admin.Get("/portfolios", handler.GetPortfolios)
 	admin.Post("/portfolios", handler.CreatePortfolio)

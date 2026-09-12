@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, Card, Form, Grid, Input, message, Modal, Select, Space, Spin, Table, Tag, Typography } from 'antd'
+import { Button, Card, Descriptions, Form, Grid, Input, message, Modal, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import { KeyOutlined, LinkOutlined, ReloadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet, apiPatch, apiPost } from '../../lib/api'
 
@@ -7,6 +7,7 @@ interface PartnerUserView { id: number; email: string; wa_phone?: string; active
 interface StoreView {
   id: number; slug: string; name: string; is_active: boolean
   sub_account_id?: string; entity_type?: string; kyc_status?: string; fee_pct: number
+  xendit_account_status?: string; xendit_synced_at?: string
   partner_user?: PartnerUserView
 }
 
@@ -23,6 +24,9 @@ const genPass = () => { const c = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXY
 
 interface XenAccount { id: string; email: string; status: string; business_name: string; created?: string }
 
+/** Data akun yang ditarik langsung dari Xendit (endpoint refresh). */
+interface XenditLive { sub_account_id?: string; account_status: string; business_name?: string; email?: string; xendit_updated?: string; synced_at?: string }
+
 export default function PartnerPortalPage() {
   const screens = Grid.useBreakpoint()
   const isMobile = !screens.md
@@ -31,6 +35,8 @@ export default function PartnerPortalPage() {
   const [openId, setOpenId] = useState<number | null>(null)
   const [savingUser, setSavingUser] = useState(false)
   const [savingXp, setSavingXp] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [xr, setXr] = useState<{ id: number; d: XenditLive } | null>(null)
   const [formUser] = Form.useForm()
   const [formXp] = Form.useForm()
   const [xenOpen, setXenOpen] = useState(false)
@@ -76,6 +82,22 @@ export default function PartnerPortalPage() {
     } catch (e) { message.error((e as Error).message) } finally { setXenBusy(false) }
   }
 
+  const openStore = stores.find((x) => x.id === openId)
+  const xLive = openStore && xr && xr.id === openStore.id ? xr.d : null
+  const accStat = xLive?.account_status || openStore?.xendit_account_status
+  const syncTxt = xLive?.synced_at || openStore?.xendit_synced_at
+
+  // Refresh data akun dari Xendit (field XenPlatform read-only, tidak ada input manual)
+  const refreshXendit = async (id: number) => {
+    setRefreshing(true)
+    try {
+      const d = await apiGet(`/api/client-stores/${id}/xenplatform`) as unknown as XenditLive
+      setXr({ id, d })
+      message.success('Data Xendit diperbarui')
+      load()
+    } catch (e) { message.error((e as Error).message) } finally { setRefreshing(false) }
+  }
+
   const openModal = (s: StoreView) => {
     setOpenId(s.id)
     formUser.setFieldsValue({
@@ -104,9 +126,8 @@ export default function PartnerPortalPage() {
     const v = await formXp.validateFields()
     setSavingXp(true)
     try {
-      await apiPatch(`/api/client-stores/${openId}/xenplatform`, {
-        sub_account_id: v.sub_account_id?.trim() || '', entity_type: v.entity_type, kyc_status: v.kyc_status,
-      })
+      // Hanya entity_type yang manual; sub_account_id & kyc_status dikelola dari Xendit (read-only).
+      await apiPatch(`/api/client-stores/${openId}/xenplatform`, { entity_type: v.entity_type })
       message.success('Data XenPlatform disimpan')
       setOpenId(null); load()
     } catch (e) { message.error((e as Error).message) } finally { setSavingXp(false) }
@@ -180,17 +201,25 @@ export default function PartnerPortalPage() {
             <Button onClick={() => { navigator.clipboard?.writeText('https://partners.logikraf.id'); message.success('Link disalin') }}>Salin</Button>
           </Space.Compact>
           <div style={{ marginTop: 12 }}><Typography.Text strong>XenPlatform / Sub-account</Typography.Text></div>
-          <Form.Item name="sub_account_id" label="Business ID Sub-account (dari dashboard Xendit)" style={{ marginTop: 8 }}><Input placeholder="mis. 6b1f…" /></Form.Item>
-          <Space style={{ display: 'flex' }} align="start">
-            <Form.Item name="entity_type" label="Jenis Entity" style={{ width: 200 }}>
+          <Typography.Paragraph type="secondary" style={{ fontSize: 12, marginTop: 8 }}>
+            Data di bawah ini diambil <b>langsung dari Xendit</b> — tidak bisa diedit manual. Tekan
+            <b> Refresh Data Xendit</b> untuk memperbarui.
+          </Typography.Paragraph>
+          <Descriptions size="small" column={1} bordered items={[
+            { key: 'sub', label: 'Business ID Sub-account', children: openStore?.sub_account_id || '— belum terhubung —' },
+            { key: 'biz', label: 'Nama usaha (Xendit)', children: xLive?.business_name || openStore?.name || '—' },
+            { key: 'acc', label: 'Status akun (Xendit)', children: accStat ? <Tag color={KYC_COLOR[accStat] || 'default'}>{KYC_LABEL[accStat] || accStat}</Tag> : '— belum disinkron —' },
+            { key: 'kyc', label: 'Status KYC (dari Xendit)', children: openStore?.kyc_status ? <Tag color={KYC_COLOR[openStore.kyc_status] || 'default'}>{KYC_LABEL[openStore.kyc_status] || openStore.kyc_status}</Tag> : '—' },
+            { key: 'sync', label: 'Terakhir sinkron', children: syncTxt || '—' },
+          ]} />
+          <Space style={{ marginTop: 12 }}>
+            <Button icon={<ReloadOutlined />} loading={refreshing} disabled={!openStore?.sub_account_id} onClick={() => openId && refreshXendit(openId)}>Refresh Data Xendit</Button>
+          </Space>
+          <Form.Item name="entity_type" label="Jenis Entity (manual — Xendit tidak menyediakannya via API)" style={{ marginTop: 12, maxWidth: 380 }}>
               <Select options={['INDIVIDUAL', 'SOLE_PROPRIETORSHIP', 'CORPORATION', 'PARTNERSHIP', 'COOPERATIVE'].map((x) => ({ value: x, label: x }))} />
             </Form.Item>
-            <Form.Item name="kyc_status" label="Status KYC" style={{ width: 220 }}>
-              <Select options={Object.keys(KYC_LABEL).map((k) => ({ value: k, label: KYC_LABEL[k] }))} />
-            </Form.Item>
-          </Space>
-          <Space>
-            <Button type="primary" loading={savingXp} onClick={saveXp}>Simpan XenPlatform</Button>
+          <Space style={{ marginTop: 4 }}>
+            <Button type="primary" ghost loading={savingXp} onClick={saveXp}>Simpan Jenis Entity</Button>
           </Space>
         </Form>
 

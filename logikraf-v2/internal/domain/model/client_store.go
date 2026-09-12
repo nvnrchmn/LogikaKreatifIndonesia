@@ -32,7 +32,10 @@ type ClientStore struct {
 	SubAccountID string    `gorm:"size:120" json:"sub_account_id"` // Business ID Managed Sub-account Xendit
 	EntityType   string    `gorm:"size:40" json:"entity_type"`     // INDIVIDUAL / SOLE_PROPRIETORSHIP / CORPORATION dll
 	KYCStatus    string    `gorm:"size:40" json:"kyc_status"`      // REGISTERED → AWAITING_DOCS → PENDING_VERIFICATION → LIVE
-	WAPhone      string    `gorm:"size:30" json:"wa_phone"`        // WA notifikasi mitra (fallback level store)
+	// Hasil tarikan LANGSUNG dari Xendit (tombol "Refresh Data Xendit"; read-only di UI admin)
+	XenditAccountStatus string     `gorm:"size:40" json:"xendit_account_status"` // status AKUN Xendit, mis. AWAITING_DOCS
+	XenditSyncedAt      *time.Time `json:"xendit_synced_at"`                     // waktu sinkron terakhir dari Xendit
+	WAPhone             string     `gorm:"size:30" json:"wa_phone"`              // WA notifikasi mitra (fallback level store)
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
