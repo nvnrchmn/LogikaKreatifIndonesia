@@ -30,7 +30,7 @@ type ClientStore struct {
 	WebhookSecret   string     `gorm:"size:100" json:"-"`         // shared secret utk header X-Logikraf-Signature saat forward
 	// XenPlatform (portal mitra partners.logikraf.id)
 	SubAccountID string    `gorm:"size:120" json:"sub_account_id"` // Business ID Managed Sub-account Xendit
-	EntityType   string    `gorm:"size:40" json:"entity_type"`     // INDIVIDUAL / SOLE_PROPRIETORSHIP / CORPORATION dll
+	EntityType   string    `gorm:"size:40" json:"entity_type"`     // kode resmi Xendit utk Indonesia: SOLE_PROPRIETORSHIP / INDIVIDUAL / UNION / NON_PROFIT / PMA (informasi saja, tidak dikirim ke Xendit)
 	KYCStatus    string    `gorm:"size:40" json:"kyc_status"`      // REGISTERED → AWAITING_DOCS → PENDING_VERIFICATION → LIVE
 	// Hasil tarikan LANGSUNG dari Xendit (tombol "Refresh Data Xendit"; read-only di UI admin)
 	XenditAccountStatus string     `gorm:"size:40" json:"xendit_account_status"` // status AKUN Xendit, mis. AWAITING_DOCS

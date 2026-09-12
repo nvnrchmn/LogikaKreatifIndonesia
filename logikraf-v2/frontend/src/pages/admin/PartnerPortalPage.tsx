@@ -215,11 +215,17 @@ export default function PartnerPortalPage() {
           <Space style={{ marginTop: 12 }}>
             <Button icon={<ReloadOutlined />} loading={refreshing} disabled={!openStore?.sub_account_id} onClick={() => openId && refreshXendit(openId)}>Refresh Data Xendit</Button>
           </Space>
-          <Form.Item name="entity_type" label="Jenis Entity (manual — Xendit tidak menyediakannya via API)" style={{ marginTop: 12, maxWidth: 380 }}>
-              <Select options={['INDIVIDUAL', 'SOLE_PROPRIETORSHIP', 'CORPORATION', 'PARTNERSHIP', 'COOPERATIVE'].map((x) => ({ value: x, label: x }))} />
+          <Form.Item name="entity_type" label="Jenis Badan Usaha (manual — samakan dengan Xendit Dashboard)" style={{ marginTop: 12, maxWidth: 380 }}>
+              <Select options={[
+                { value: 'SOLE_PROPRIETORSHIP', label: 'Badan Usaha Perorangan (CV / PT Perorangan)' },
+                { value: 'INDIVIDUAL', label: 'Perorangan (khusus sub-account XenPlatform)' },
+                { value: 'UNION', label: 'Koperasi' },
+                { value: 'NON_PROFIT', label: 'Yayasan / Nirlaba' },
+                { value: 'PMA', label: 'PT PMA (Penanaman Modal Asing)' },
+              ]} />
             </Form.Item>
           <Space style={{ marginTop: 4 }}>
-            <Button type="primary" ghost loading={savingXp} onClick={saveXp}>Simpan Jenis Entity</Button>
+            <Button type="primary" ghost loading={savingXp} onClick={saveXp}>Simpan Jenis Badan Usaha</Button>
           </Space>
         </Form>
 
