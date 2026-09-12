@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { LegalIdentity, LegalUpdated } from '../../hooks/useLegal'
 import PublicLayout from '../../components/layout/PublicLayout'
 
 interface Gateway {
@@ -23,7 +24,7 @@ export default function TermsPage() {
         <div className="pt-32 pb-20">
           <div className="container-narrow max-w-4xl bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-border-minimal">
             <h1 className="text-3xl md:text-4xl font-display font-bold text-text-main mb-4">Syarat dan Ketentuan</h1>
-            <p className="text-text-muted text-sm mb-10">Pembaruan Terakhir: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            <LegalUpdated />
 
             <div className="prose prose-blue max-w-none text-text-main font-body leading-relaxed space-y-6">
               <p>Selamat datang di <strong>Logika Kreatif Indonesia (Logikraf)</strong>. Syarat dan Ketentuan ini ("Perjanjian") mengatur akses dan penggunaan Anda terhadap seluruh layanan kami, mencakup Layanan IT Solutions, Paket Pengembangan Website UMKM & Startup, dan Produk Digital terlisensi.</p>
@@ -90,6 +91,7 @@ export default function TermsPage() {
             </div>
           </div>
         </div>
+        <LegalIdentity />
       </div>
     </PublicLayout>
   )

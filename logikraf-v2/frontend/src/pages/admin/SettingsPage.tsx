@@ -21,6 +21,8 @@ interface GatewaySpec {
 
 const companyFields: FieldSpec[] = [
   { key: 'company_name', label: 'Nama Perusahaan / Entitas Legal', placeholder: 'PT. Logika Kreatif Indonesia' },
+  { key: 'company_legal_form', label: 'Bentuk Badan Usaha', placeholder: 'Perseroan Perorangan' },
+  { key: 'company_legal_updated', label: 'Tanggal Pembaruan Dokumen Legal (tetap)', placeholder: '12 September 2026' },
   { key: 'company_tagline', label: 'Slogan / Tagline Perusahaan', placeholder: 'Solusi Digital & Software House Terpercaya' },
   { key: 'company_legal_nib', label: 'Nomor Induk Berusaha (NIB)', placeholder: 'Contoh: 0123456789012' },
   { key: 'company_legal_npwp', label: 'Nomor Pokok Wajib Pajak (NPWP)', placeholder: 'Contoh: 01.234.567.8-901.000' },
