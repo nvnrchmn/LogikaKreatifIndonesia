@@ -166,6 +166,9 @@ func main() {
 	clientAPI.Get("/profile", handler.ClientProfile)
 	clientAPI.Put("/profile", handler.UpdateClientProfile)
 	clientAPI.Put("/password", handler.ChangeClientPassword)
+	clientAPI.Post("/files", handler.UploadClientFile)
+	clientAPI.Get("/files", handler.ClientFiles)
+	clientAPI.Get("/files/:name", handler.DownloadClientFile)
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans/iPaymu)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)

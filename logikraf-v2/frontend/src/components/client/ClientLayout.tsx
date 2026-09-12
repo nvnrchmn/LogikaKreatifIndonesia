@@ -5,6 +5,7 @@ const navItems = [
   { label: 'Dashboard', path: '/dashboard', icon: DashboardIcon },
   { label: 'Pesanan Saya', path: '/orders', icon: ShoppingBagIcon },
   { label: 'Bantuan / Tiket', path: '/tickets', icon: TicketIcon },
+  { label: 'Kirim Berkas', path: '/files', icon: FileIcon },
   { label: 'Profil Akun', path: '/profile', icon: PersonIcon },
 ]
 
@@ -221,6 +222,14 @@ function TicketIcon() {
   return (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-4.5h7.5m-7.5 3h7.5M3.375 6A1.875 1.875 0 015.25 4.125h13.5A1.875 1.875 0 0120.625 6v3.75c0 .622-.42 1.16-.996 1.31a2.25 2.25 0 000 4.38c.576.15.996.688.996 1.31V18a1.875 1.875 0 01-1.875 1.875H5.25A1.875 1.875 0 013.375 18v-3.19c0-.622.42-1.16.996-1.31a2.25 2.25 0 000-4.38c-.576-.15-.996-.688-.996-1.31V6z" />
+    </svg>
+  )
+}
+
+function FileIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
     </svg>
   )
 }

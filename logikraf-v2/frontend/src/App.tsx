@@ -37,6 +37,7 @@ const ClientLayout = lazy(() => import('./components/client/ClientLayout'))
 const ClientDashboardPage = lazy(() => import('./pages/client/ClientDashboardPage'))
 const ClientOrdersPage = lazy(() => import('./pages/client/ClientOrdersPage'))
 const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
+const ClientFilesPage = lazy(() => import('./pages/client/ClientFilesPage'))
 const ClientPortalGate = lazy(() => import('./components/client/ClientPortalGate'))
 const ClientLoginPage = lazy(() => import('./pages/client/ClientLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/client/ForgotPasswordPage'))
@@ -157,6 +158,7 @@ export default function App() {
         <Route path="/dashboard" element={<ClientDashboardPage />} />
         <Route path="/orders" element={<ClientOrdersPage />} />
         <Route path="/tickets" element={<ClientTicketsPage />} />
+        <Route path="/files" element={<ClientFilesPage />} />
         <Route path="/profile" element={<ClientProfilePage />} />
       </Route>
       {/* H10: 404 catch-all */}
