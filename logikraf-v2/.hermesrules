@@ -88,3 +88,13 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
 - Generator ulang halaman itu: `~/Documents/logikraf-brand/signature/gen-admin-page.py`
   (memakai `out/*.html` + `identities.json`).
 - Pengaturan editor disimpan di localStorage browser (belum di server).
+
+## UPDATE 2: signature tersimpan di server + unggah foto (2026-09-12)
+
+- Konfigurasi editor disimpan ke tabel `settings`, key **`email_signatures`** (tenant logikraf):
+  `GET /api/settings/email_signatures` (returns `{key,value}`) dan `PUT /api/settings/email_signatures`
+  body `{"value":"<json>"}` — keduanya admin-only (grup `admin`).
+- Unggah foto per mailbox: `POST /api/upload?folder=signature` multipart field **`image`** -> `{"url": "..."}`;
+  URL hasil langsung dipasang sebagai `logo` mailbox itu (jadi foto per orang, ter-host otomatis).
+- `localStorage.sigcfg` tetap dipakai sebagai cache di browser; server = sumber utama.
+- Tidak ada perubahan backend untuk fitur ini — semuanya memakai endpoint generik yang sudah ada.
