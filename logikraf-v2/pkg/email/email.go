@@ -1,9 +1,13 @@
 package email
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
 	"net/smtp"
 	"os"
+	"strconv"
+	"time"
 )
 
 // Config holds SMTP configuration
@@ -64,7 +68,7 @@ func Send(cfg Config, to []string, subject, body string) error {
 }
 
 // SendPaymentReceipt sends a payment receipt email to client
-func SendPaymentReceipt(cfg Config, to, clientName, packageName, amount, transactionID string) error {
+func SendPaymentReceipt(cfg Config, to, clientName, packageName, amount, transactionID string, pdf []byte) error {
 	subject := "Pembayaran Diterima - " + transactionID
 	body := fmt.Sprintf(`
 <html>
@@ -84,6 +88,9 @@ func SendPaymentReceipt(cfg Config, to, clientName, packageName, amount, transac
 </html>
 `, clientName, packageName, amount, transactionID)
 
+	if len(pdf) > 0 {
+		return SendWithAttachment(cfg, []string{to}, subject, body, "invoice-"+transactionID+".pdf", pdf)
+	}
 	return Send(cfg, []string{to}, subject, body)
 }
 
@@ -106,6 +113,7 @@ func SendInvoiceReminder(
 	amountDue, total, alreadyPaid string,
 	dueDate string,
 	daysOverdue int,
+	pdf []byte,
 ) error {
 	var subject, headline, tone string
 	switch {
@@ -147,6 +155,9 @@ func SendInvoiceReminder(
 <p>Terima kasih,<br><strong>Tim Logikraf</strong></p>
 </div></body></html>`
 
+	if len(pdf) > 0 {
+		return SendWithAttachment(cfg, []string{to}, subject, body, "tagihan-"+invoiceNumber+".pdf", pdf)
+	}
 	return Send(cfg, []string{to}, subject, body)
 }
 
@@ -208,4 +219,45 @@ func SendOrderOnboarding(cfg Config, to, clientName, orderNumber, amount, portal
 </html>
 `, name, orderNumber, amount, portalText)
 	return Send(cfg, []string{to}, subject, body)
+}
+
+// sendRaw — kirim pesan MIME mentah (dipakai fungsi ber-lampiran).
+func sendRaw(cfg Config, to []string, message []byte) error {
+	addr := fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)
+	var auth smtp.Auth
+	if cfg.Username != "" && cfg.Password != "" {
+		auth = smtp.PlainAuth("", cfg.Username, cfg.Password, cfg.Host)
+	}
+	return smtp.SendMail(addr, auth, cfg.From, to, message)
+}
+
+// SendWithAttachment — kirim email HTML dengan satu lampiran PDF (mis. invoice).
+func SendWithAttachment(cfg Config, to []string, subject, body, fileName string, fileData []byte) error {
+	if len(to) == 0 || to[0] == "" || len(fileData) == 0 {
+		return nil
+	}
+	boundary := "logikraf-" + strconv.FormatInt(time.Now().UnixNano(), 36)
+	return sendRaw(cfg, to, attachmentMIME(cfg.From, to[0], subject, body, fileName, fileData, boundary))
+}
+
+// attachmentMIME — susun pesan MIME multipart/mixed. Dipisah dari pengiriman agar
+// struktur pesannya bisa diuji tanpa SMTP.
+func attachmentMIME(from, to, subject, body, fileName string, fileData []byte, boundary string) []byte {
+	var b bytes.Buffer
+	fmt.Fprintf(&b, "From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\n", from, to, subject)
+	fmt.Fprintf(&b, "Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", boundary)
+	fmt.Fprintf(&b, "--%s\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n%s\r\n", boundary, body)
+	fmt.Fprintf(&b, "--%s\r\nContent-Type: application/pdf; name=\"%s\"\r\n", boundary, fileName)
+	fmt.Fprintf(&b, "Content-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename=\"%s\"\r\n\r\n", fileName)
+	enc := base64.StdEncoding.EncodeToString(fileData)
+	for i := 0; i < len(enc); i += 76 {
+		end := i + 76
+		if end > len(enc) {
+			end = len(enc)
+		}
+		b.WriteString(enc[i:end])
+		b.WriteString("\r\n")
+	}
+	fmt.Fprintf(&b, "\r\n--%s--\r\n", boundary)
+	return b.Bytes()
 }

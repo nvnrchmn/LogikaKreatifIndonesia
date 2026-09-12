@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/glebarez/sqlite v1.11.0
+	github.com/go-pdf/fpdf v0.9.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/gofiber/fiber/v3 v3.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1

@@ -476,7 +476,7 @@ func XenditWebhook(c fiber.Ctx) error {
 			go func() {
 				cfg := email.DefaultConfig()
 				if cfg.Host != "" {
-					_ = email.SendPaymentReceipt(cfg, pt.ClientEmail, pt.ClientName, pt.InvoiceRef, strconv.Itoa(int(pt.GrossAmount)), txRef)
+					_ = email.SendPaymentReceipt(cfg, pt.ClientEmail, pt.ClientName, pt.InvoiceRef, strconv.Itoa(int(pt.GrossAmount)), txRef, invoicePDFForPayment(pt))
 				}
 			}()
 
@@ -797,7 +797,7 @@ func IpaymuWebhook(c fiber.Ctx) error {
 			go func() {
 				cfg := email.DefaultConfig()
 				if cfg.Host != "" {
-					_ = email.SendPaymentReceipt(cfg, pt.ClientEmail, pt.ClientName, pt.InvoiceRef, strconv.Itoa(int(pt.GrossAmount)), pt.ProviderTxID)
+					_ = email.SendPaymentReceipt(cfg, pt.ClientEmail, pt.ClientName, pt.InvoiceRef, strconv.Itoa(int(pt.GrossAmount)), pt.ProviderTxID, invoicePDFForPayment(pt))
 				}
 			}()
 

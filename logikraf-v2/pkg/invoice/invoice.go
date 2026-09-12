@@ -1,0 +1,224 @@
+// Package invoice membuat dokumen invoice/tagihan PDF berkop Logikraf.
+// Sengaja hanya memakai font inti (Helvetica) dan tanpa gambar supaya tidak
+// bergantung pada path file/cwd saat dijalankan systemd.
+package invoice
+
+import (
+	"bytes"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/go-pdf/fpdf"
+)
+
+// Item — satu baris tagihan.
+type Item struct {
+	Desc   string
+	Amount uint
+}
+
+// Data — isi invoice.
+type Data struct {
+	Number      string
+	Status      string
+	IssueDate   time.Time
+	DueDate     *time.Time
+	ClientName  string
+	Company     string
+	Email       string
+	Phone       string
+	Address     string
+	Items       []Item
+	Total       uint
+	Paid        uint
+	Outstanding uint
+	Notes       string
+}
+
+// rp — 1499000 → "1.499.000"
+func rp(n uint) string {
+	s := strconv.FormatUint(uint64(n), 10)
+	var out []byte
+	for i := 0; i < len(s); i++ {
+		if i > 0 && (len(s)-i)%3 == 0 {
+			out = append(out, '.')
+		}
+		out = append(out, s[i])
+	}
+	return string(out)
+}
+
+func tanggal(t time.Time) string { return t.Format("02 Jan 2006") }
+
+func statusText(s string) string {
+	switch s {
+	case "paid", "settled":
+		return "LUNAS"
+	case "pending":
+		return "MENUNGGU PEMBAYARAN"
+	case "overdue":
+		return "TERLAMBAT"
+	case "draft":
+		return "DRAF"
+	}
+	if s == "" {
+		return "-"
+	}
+	return strings.ToUpper(s)
+}
+
+// Build — susun PDF invoice A4, mengembalikan byte siap dilampirkan ke email.
+func Build(d Data) ([]byte, error) {
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.SetMargins(15, 15, 15)
+	pdf.SetAutoPageBreak(true, 20)
+	pdf.AddPage()
+
+	// Bar aksen warna brand (LKI #0052FF).
+	pdf.SetFillColor(0, 82, 255)
+	pdf.Rect(0, 0, 210, 4, "F")
+
+	// Kop: identitas (kiri) + judul dokumen (kanan).
+	pdf.SetTextColor(15, 23, 42)
+	pdf.SetFont("Helvetica", "B", 20)
+	pdf.SetXY(15, 16)
+	pdf.CellFormat(90, 9, "LOGIKRAF", "", 0, "L", false, 0, "")
+	pdf.SetFont("Helvetica", "", 8)
+	pdf.SetTextColor(100, 116, 139)
+	pdf.SetXY(15, 26)
+	pdf.CellFormat(90, 5, "logikraf.id  |  support@logikraf.id", "", 0, "L", false, 0, "")
+	pdf.SetFont("Helvetica", "B", 16)
+	pdf.SetTextColor(15, 23, 42)
+	pdf.SetXY(105, 16)
+	pdf.CellFormat(90, 9, "INVOICE", "", 0, "R", false, 0, "")
+	pdf.SetFont("Helvetica", "", 10)
+	pdf.SetXY(105, 26)
+	pdf.CellFormat(90, 5, d.Number, "", 0, "R", false, 0, "")
+
+	// Garis pemisah + kepala dua kolom.
+	pdf.SetDrawColor(203, 213, 225)
+	pdf.SetLineWidth(0.4)
+	pdf.Line(15, 34, 195, 34)
+	pdf.SetFont("Helvetica", "", 8)
+	pdf.SetTextColor(100, 116, 139)
+	pdf.SetXY(15, 38)
+	pdf.CellFormat(90, 5, "DITAGIHKAN KEPADA", "", 0, "L", false, 0, "")
+	pdf.SetXY(105, 38)
+	pdf.CellFormat(90, 5, "DETAIL TAGIHAN", "", 0, "R", false, 0, "")
+
+	// Blok klien.
+	pdf.SetTextColor(15, 23, 42)
+	pdf.SetFont("Helvetica", "B", 11)
+	nm := strings.TrimSpace(d.Company)
+	if nm == "" {
+		nm = strings.TrimSpace(d.ClientName)
+	}
+	if nm == "" {
+		nm = "-"
+	}
+	pdf.SetXY(15, 44)
+	pdf.CellFormat(88, 5, nm, "", 0, "L", false, 0, "")
+	pdf.SetFont("Helvetica", "", 9)
+	y := 50.0
+	for _, line := range []string{d.ClientName, d.Email, d.Phone, d.Address} {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		pdf.SetXY(15, y)
+		pdf.CellFormat(88, 4.6, line, "", 0, "L", false, 0, "")
+		y += 5
+	}
+
+	// Meta kanan.
+	meta := [][2]string{{"Tanggal", tanggal(d.IssueDate)}, {"Jatuh tempo", "-"}, {"Status", statusText(d.Status)}}
+	if d.DueDate != nil {
+		meta[1][1] = tanggal(*d.DueDate)
+	}
+	my := 44.0
+	for _, m := range meta {
+		pdf.SetFont("Helvetica", "", 9)
+		pdf.SetTextColor(100, 116, 139)
+		pdf.SetXY(105, my)
+		pdf.CellFormat(40, 5, m[0], "", 0, "L", false, 0, "")
+		pdf.SetFont("Helvetica", "B", 9)
+		pdf.SetTextColor(15, 23, 42)
+		pdf.SetXY(145, my)
+		pdf.CellFormat(50, 5, m[1], "", 0, "R", false, 0, "")
+		my += 6
+	}
+
+	// Tabel item (fill eksplisit: default hitam membuat teks tak terlihat).
+	ty := 70.0
+	if y > 64 {
+		ty = y + 4
+	}
+	pdf.SetFillColor(226, 232, 240)
+	pdf.SetTextColor(15, 23, 42)
+	pdf.SetFont("Helvetica", "B", 9)
+	pdf.SetXY(15, ty)
+	pdf.CellFormat(10, 8, "NO", "", 0, "C", true, 0, "")
+	pdf.CellFormat(135, 8, "DESKRIPSI", "", 0, "L", true, 0, "")
+	pdf.CellFormat(35, 8, "JUMLAH", "", 0, "R", true, 0, "")
+	ry := ty + 8
+	pdf.SetFont("Helvetica", "", 9)
+	for i, it := range d.Items {
+		desc := it.Desc
+		if len(desc) > 70 {
+			desc = desc[:70]
+		}
+		pdf.SetXY(15, ry)
+		pdf.CellFormat(10, 8, strconv.Itoa(i+1), "", 0, "C", false, 0, "")
+		pdf.SetXY(25, ry)
+		pdf.CellFormat(135, 8, desc, "", 0, "L", false, 0, "")
+		pdf.SetXY(160, ry)
+		pdf.CellFormat(35, 8, "Rp "+rp(it.Amount), "", 0, "R", false, 0, "")
+		ry += 8
+	}
+
+	// Ringkasan (baris terakhir ditebalkan = jumlah yang harus dibayar).
+	rows := [][2]string{{"Total", "Rp " + rp(d.Total)}}
+	if d.Paid > 0 {
+		rows = append(rows, [2]string{"Sudah dibayar", "Rp " + rp(d.Paid)})
+	}
+	if d.Outstanding > 0 {
+		rows = append(rows, [2]string{"Sisa tagihan", "Rp " + rp(d.Outstanding)})
+	}
+	sy := ry + 2
+	for i, r := range rows {
+		style := ""
+		if i == len(rows)-1 {
+			style = "B"
+		}
+		pdf.SetFont("Helvetica", style, 10)
+		pdf.SetXY(120, sy)
+		pdf.CellFormat(40, 6, r[0], "", 0, "L", false, 0, "")
+		pdf.SetXY(160, sy)
+		pdf.CellFormat(35, 6, r[1], "", 0, "R", false, 0, "")
+		sy += 6
+	}
+
+	// Catatan & cara bayar.
+	pdf.SetDrawColor(203, 213, 225)
+	pdf.Line(15, sy+2, 195, sy+2)
+	pdf.SetFont("Helvetica", "", 9)
+	pdf.SetTextColor(51, 65, 85)
+	pdf.SetXY(15, sy+6)
+	pdf.MultiCell(180, 4.8,
+		"Pembayaran via transfer bank atau QRIS. Mohon cantumkan nomor invoice pada berita transfer. "+
+			"Status dokumen ini: "+statusText(d.Status)+".", "", "L", false)
+	if d.Notes != "" {
+		pdf.SetX(15)
+		pdf.MultiCell(180, 4.8, "Catatan: "+d.Notes, "", "L", false)
+	}
+	pdf.SetFont("Helvetica", "", 8)
+	pdf.SetTextColor(100, 116, 139)
+	pdf.SetXY(15, 268)
+	pdf.CellFormat(180, 5, "Dokumen ini dibuat otomatis oleh sistem Logikraf - logikraf.id", "", 0, "C", false, 0, "")
+
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}

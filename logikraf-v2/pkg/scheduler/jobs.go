@@ -7,6 +7,7 @@ import (
 
 	"github.com/logikraf/logikraf-v2/internal/domain/model"
 	"github.com/logikraf/logikraf-v2/pkg/email"
+	"github.com/logikraf/logikraf-v2/pkg/invoice"
 	"github.com/logikraf/logikraf-v2/pkg/wa"
 	"gorm.io/gorm"
 )
@@ -156,6 +157,7 @@ func RunReminderSend(ctx context.Context, db *gorm.DB) error {
 			cfg, emailAddr, name, inv.InvoiceNumber,
 			thousands(outstanding), thousands(inv.Total), thousands(inv.PaidAmount),
 			dueStr, daysOverdue,
+			invoicePDFFor(inv.InvoiceNumber, client, order, inv.Total, inv.PaidAmount, outstanding, inv.DueDate, daysOverdue),
 		)
 
 		// Kanal WhatsApp: pengingat jauh lebih cepat dibaca daripada email.
@@ -179,7 +181,7 @@ func RunReminderSend(ctx context.Context, db *gorm.DB) error {
 		}
 		db.Create(&model.InvoiceReminder{
 			InvoiceID:    inv.ID,
-			SentTo:      emailAddr,
+			SentTo:       emailAddr,
 			DaysOverdue:  daysOverdue,
 			Outstanding:  outstanding,
 			Status:       status,
@@ -188,4 +190,31 @@ func RunReminderSend(ctx context.Context, db *gorm.DB) error {
 		})
 	}
 	return nil
+}
+
+// invoicePDFFor — PDF tagihan untuk dilampirkan pada email pengingat.
+func invoicePDFFor(invNumber string, client model.Client, order model.Order, total, paid, outstanding uint, due *time.Time, overdueDays int) []byte {
+	status := "pending"
+	if overdueDays > 0 {
+		status = "overdue"
+	}
+	pdf, err := invoice.Build(invoice.Data{
+		Number:      invNumber,
+		Status:      status,
+		IssueDate:   time.Now(),
+		DueDate:     due,
+		Company:     client.CompanyName,
+		ClientName:  client.PICName,
+		Email:       client.Email,
+		Phone:       client.Phone,
+		Address:     client.Address,
+		Items:       []invoice.Item{{Desc: "Tagihan pesanan " + order.OrderNumber, Amount: total}},
+		Total:       total,
+		Paid:        paid,
+		Outstanding: outstanding,
+	})
+	if err != nil {
+		return nil
+	}
+	return pdf
 }
