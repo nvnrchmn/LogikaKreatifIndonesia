@@ -19,6 +19,7 @@ const TermsPage = lazy(() => import('./pages/public/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/public/PrivacyPage'))
 const RefundPolicyPage = lazy(() => import('./pages/public/RefundPolicyPage'))
 const VerifyEmailPage = lazy(() => import('./pages/client/VerifyEmailPage'))
+const ClientNotificationsPage = lazy(() => import('./pages/client/ClientNotificationsPage'))
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 
 // Admin Components & Pages (Lazy Loaded)
@@ -174,6 +175,7 @@ export default function App() {
         <Route path="/files" element={<ClientFilesPage />} />
         <Route path="/invoices" element={<ClientInvoicesPage />} />
         <Route path="/progress" element={<ClientProgressPage />} />
+        <Route path="/notifications" element={<ClientNotificationsPage />} />
         <Route path="/profile" element={<ClientProfilePage />} />
       </Route>
       {/* H10: 404 catch-all */}
