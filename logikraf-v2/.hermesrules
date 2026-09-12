@@ -325,4 +325,6 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 
 ### WA verifikasi email — status bukti (12 Sep 2026)
 - Terbukti: `SendEmailVerification` dipanggil pada pendaftaran nyata (1 baris `email_verifications` terbuat, klien uji berhasil daftar 201).
-- Belum terbukti: pesannya sampai. Log GoWA hanya menampilkan `message.ack` (log minimal), tidak ada bukti eksplisit kirim. Konfirmasi tercepat: cek WhatsApp 628983342429, atau tekan "Kirim ulang tautan" di portal klien.
+- TERBUKTI (dikonfirmasi pemilik, 12 Sep 2026): WA benar-benar masuk ke 628983342429 berisi "Verifikasi email portal Logikraf" + tautan `client.logikraf.id/verify-email?token=...`. Jadi pengiriman email + WA pada verifikasi email sudah tuntas terbukti end-to-end.
+- Catatan: pengiriman WA hanya jalan bila klien punya nomor di kolom `clients.phone` (kalau kosong, dilewati — perilaku yang diinginkan).
+- Catatan keamanan: token verifikasi yang pernah terkirim tidak perlu dirahasiakan setelah dipakai/dihapus, tapi jangan tempel tautan verifikasi di tempat publik sebelum kedaluwarsa.
