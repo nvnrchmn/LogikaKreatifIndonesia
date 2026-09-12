@@ -170,3 +170,23 @@ multipart — belum ada pustaka PDF di `go.mod`.
   kwitansi di kedua jalur webhook. Scheduler: `invoicePDFFor(...)` di `jobs.go` →
   lampiran pada email pengingat tagihan.
 - Pratinjau PDF tanpa aplikasi: `/tmp/pdfvenv/bin/python` + pypdfium2 (render PNG).
+
+## UPDATE 6: legalitas logikraf.id + tanggal tetap (2026-09-12)
+
+- Akar masalah: `frontend/src/pages/public/{Terms,Privacy,RefundPolicy}Page.tsx` memakai
+  `new Date()` -> "Pembaruan Terakhir" berubah setiap hari.
+- Solusi (meniru mysticglide.com): `frontend/src/hooks/useLegal.tsx` membaca
+  `/api/settings/public` (prefix `company_`/`contact_` sudah diizinkan -> TANPA ubah
+  backend) dengan nilai tetap sebagai fallback. Komponen `LegalUpdated` (tanggal) dan
+  `LegalIdentity` (blok identitas badan usaha), dipasang di ketiga halaman.
+- Field baru di Admin -> Settings (menu yang sudah ada): `company_legal_form`
+  (Bentuk Badan Usaha) dan `company_legal_updated` (Tanggal Pembaruan Dokumen Legal).
+- Nilai DB: company_name=PT Logika Kreatif Indonesia; company_legal_form=Perseroan
+  Perorangan; company_legal_updated=12 September 2026; contact_address=Jl. Cijengkol
+  Setu No.35a, Kec. Setu, Kab. Bekasi 17320; contact_email=support@logikraf.id;
+  contact_hours=Senin - Jumat, 09.00 - 18.00 WIB. NIB/NPWP MASIH KOSONG (jangan mengarang).
+- Identitas legal diambil dari `~/Documents/logikraf-mysticglide-legal/gen2_base.py`
+  supaya konsisten dengan kontrak yang sudah ditandatangani.
+- Verifikasi: nilai DB diubah ke tanggal lain -> halaman ikut berubah (terbukti berasal
+  dari DB, bukan jam sistem), lalu dikembalikan. Dicek lewat chromium-browser headless
+  `--dump-dom` untuk ketiga halaman.
