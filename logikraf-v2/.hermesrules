@@ -248,3 +248,10 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - UI: menu admin "Berkas Klien" (`/admin/client-files`) — halaman khusus, karena rute admin lain memakai router generik `:resource`.
 - Unduhan admin aman: `safeFileName` menolak path traversal (ada tesnya).
 - Tes: `client_upload_admin_test.go` — daftar per klien, nama tampil, `order_id`, unduhan sah, traversal ditolak.
+
+### Invoice & tiket portal (revisi)
+- Invoice portal: `GET /api/client/invoices` (daftar) + `GET /api/client/invoices/:id/pdf` (unduh). Kepemilikan dicek lewat rantai invoice → order → client_id; invoice tanpa order ditolak.
+- Tiket portal: `GET /api/client/tickets/:id` + `POST /api/client/tickets/:id/replies` (halaman `/tickets/:id`, tautan dari daftar tiket). Tiket resolved/closed otomatis jadi `open` saat klien membalas.
+- Tiket admin: `GET/POST/PUT /api/tickets-inbox[...]` (pakai prefiks `tickets-inbox`, JANGAN `/tickets/:id`, agar tidak bentrok dengan CRUD generik `:resource`). UI admin `/admin/tickets` kini halaman khusus `AdminTicketsPage` (bukan CRUD generik).
+- Balasan: klien → admin dapat lonceng + email + WA; admin → klien dapat email + WA berisi tautan portal.
+- PENTING (tes): beberapa tes lama menimpa `model.DB` global. Tes baru WAJIB mandiri — pakai helper `withTestDB(t, &model.X{}...)` di `client_ticket_detail_test.go` (sqlite sendiri + `t.Cleanup` restore), jangan menambah tabel ke `TestMain` karena membuat suite flaky.
