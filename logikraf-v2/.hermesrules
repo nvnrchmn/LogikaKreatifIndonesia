@@ -67,3 +67,13 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
 - Jangan edit langsung file di server: akan tertimpa saat `deploy.sh` berikutnya.
 - Outlook tidak tersinkron otomatis (signature lokal `%APPDATA%\Microsoft\Signatures\`); kalau hanya gambar berubah, Outlook tak perlu diubah.
 - README di folder signature berisi cara pakai singkat.
+
+## Editor tanda tangan email via UI (2026-09-12)
+
+- **https://logikraf.id/brand/edit.html** — editor berbasis browser (tanpa ubah aplikasi LKI, tanpa CI).
+- Jalan 100% di browser: ubah kolom -> Terapkan -> Unduh .htm -> simpan ke `%APPDATA%\Microsoft\Signatures\`.
+  Perubahan hanya lokal (localStorage), TIDAK menulis ke server.
+- Sumber: `~/Documents/logikraf-brand/signature/{edit.html,gen-edit-page.py,identities.json,build.py,deploy.sh}`.
+- Halaman dirakit dari hasil `build.py` dengan placeholder `{{k}}`. JANGAN pakai template literal JS: `${k}`
+  dievaluasi saat definisi -> ReferenceError sebelum form dibuat (bug yang pernah terjadi).
+- Memperbarui salinan yang di-host (`/brand/sig/*.html`): jalankan `deploy.sh`.
