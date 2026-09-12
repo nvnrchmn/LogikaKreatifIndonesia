@@ -130,3 +130,23 @@ tidak dipakai di LKI. Bukti DB saat itu: **1 pembayaran settled, 0 order**.
 
 **Catatan operasional:** nilai notifikasi disimpan di tabel `settings` (tenant
 `logikraf`); order otomatis memakai `order_number = payment_transactions.invoice_ref`.
+
+## UPDATE 4: lanjutan alur order — portal, reminder, status (2026-09-12)
+
+- **P1-4 akun portal pembeli**: `ensureOrderFromPayment()` kini juga membuat
+  `clients.invite_code` (via `generateInviteCode()`) untuk pembeli; `portalInfo(email)`
+  di `order_aftercare.go` mengembalikan kode aktivasi + tautan
+  `https://logikraf.id/client/register` dan disisipkan ke email onboarding
+  (`SendOrderOnboarding(..., portalText)`) serta pesan WA klien.
+- **P2-7 reminder tagihan**: job `invoice_reminders` (harian 09:00) sudah punya eskalasi
+  H-3/jatuh tempo/tiap 14 hari; **ditambah kanal WhatsApp** (`wa.New().Send`) memakai
+  `clients.phone`. WA gagal tidak menggagalkan catatan reminder email.
+- **P2-8 batal/refund**: mesin status order sudah ada (`orderStatusTransitions`:
+  pending→paid/cancelled, paid→active/refunded/cancelled, active→completed/on_hold,
+  completed = final). Yang ditambahkan: **notifikasi klien saat status berubah**
+  (`notifyOrderStatusChange()` → email + WA, label bahasa Indonesia via `statusLabel()`)
+  di `UpdateOrderStatus` (`workflow.go`).
+
+**Belum dikerjakan (P1-6)**: invoice/dokumen penagihan PDF. Catatan penting: `pkg/email.Send`
+belum mendukung lampiran (MIME sederhana), jadi butuh (a) pustaka PDF + (b) ubah Send jadi
+multipart — belum ada pustaka PDF di `go.mod`.
