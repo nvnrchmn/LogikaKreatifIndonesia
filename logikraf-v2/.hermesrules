@@ -309,3 +309,8 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - `POST /api/client/register` dengan `invite_code` yang BARU dibuat (insert ke `clients.invite_code`, terbukti tersimpan) tetap dibalas 400 `{"error":"invite code already used"}`.
 - Sudah dicoba: invite code milik klien 6 = NULL (sudah terpakai), insert sendiri = tersimpan tapi tetap ditolak. Jadi pengecekan invite kemungkinan melihat tabel/kolom lain, ATAU ada bug yang membuat klien baru tidak bisa daftar sendiri.
 - Bukan akibat perubahan verifikasi email (galat terjadi sebelum hook).
+
+### WA untuk verifikasi email (12 Sep 2026, commit `ba29c8a`)
+- `SendEmailVerification()` sekarang juga mengirim WhatsApp ke nomor klien (pakai `clientWhatsApp(email)` + `wa.New().Send()` — pola sama dengan reset sandi & notifikasi pesanan), hanya bila nomor terdaftar.
+- Tes: `go test ./pkg/auth/ -run TestKirimVerifikasiEmail` PASS (token dibuat + jalur WA dieksekusi).
+- BELUM terbukti: pengiriman WA-nya sendiri belum diuji end-to-end (tes lokal jalan tanpa env WA_*). Cara paling cepat membuktikan: tekan "Kirim ulang tautan" di portal klien, atau daftarkan klien baru, lalu cek WhatsApp masuk.
