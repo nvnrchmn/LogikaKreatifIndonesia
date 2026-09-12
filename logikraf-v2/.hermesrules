@@ -255,3 +255,10 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Tiket admin: `GET/POST/PUT /api/tickets-inbox[...]` (pakai prefiks `tickets-inbox`, JANGAN `/tickets/:id`, agar tidak bentrok dengan CRUD generik `:resource`). UI admin `/admin/tickets` kini halaman khusus `AdminTicketsPage` (bukan CRUD generik).
 - Balasan: klien → admin dapat lonceng + email + WA; admin → klien dapat email + WA berisi tautan portal.
 - PENTING (tes): beberapa tes lama menimpa `model.DB` global. Tes baru WAJIB mandiri — pakai helper `withTestDB(t, &model.X{}...)` di `client_ticket_detail_test.go` (sqlite sendiri + `t.Cleanup` restore), jangan menambah tabel ke `TestMain` karena membuat suite flaky.
+
+### Linimasa progres klien (revisi)
+- Endpoint: `GET /api/client/progress` — per proyek: tahap (`planning`→`in_progress`→`review`→`completed` = `stage` 0..3; `on_hold`/`cancelled` = -1), tanggal mulai/target, tautan live, catatan `orders.milestone_status`, termin dari tabel `transactions` (MilestoneName/Amount/Status/SettledAt), plus invoice per order.
+- UI portal: halaman `/progress` (menu "Progres Proyek").
+- Tes: `client_progress_test.go` — pemetaan tahap + proyek milik klien lain tidak bocor.
+- Pratinjau design invoice tanpa kirim email: `INVOICE_SAMPLE=/path/out.pdf go test ./pkg/invoice/ -run TestWriteSample` (di-skip otomatis bila env kosong, jadi aman di CI).
+- Invoice: `invoice.Data` pakai `uint` untuk Total/Paid/Outstanding; `Item{Desc, Amount}`.
