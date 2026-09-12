@@ -14,3 +14,29 @@
 - **LKI**: webhook akun Xendit (`internal/delivery/handler/xen_account_webhook.go`, dipanggil dari `payment.go`) menyimpan `failure_reasons` ke tabel `kyc_submissions` (kolom `notes` = JSON `[{field,reason,message}]`); helper di `xen_kyc_reasons.go` + `xen_kyc_submission.go`, tes di `xen_kyc_reasons_test.go`.
 - **Halaman `/verifikasi`**: menarik status saat dibuka + tombol "Perbarui Status", stepper tahan status apa pun (termasuk `AWAITING_RESUBMISSION`), checklist "Yang perlu dilengkapi (dari Xendit)".
 - Kunci Xendit **tidak ada di .env** LKI (per-store di DB); callback token divalidasi dari header `X-Callback-Token`.
+
+## Jenis Badan Usaha (entity_type) — kode resmi Xendit untuk Indonesia (2026-09-12)
+
+Sumber: https://docs.xendit.co/docs/account-verification-enumerations
+Hanya kode ini yang sah untuk akun Indonesia:
+- `SOLE_PROPRIETORSHIP` — Badan Usaha Perorangan (CV / PT Perorangan)
+- `INDIVIDUAL` — Perorangan; HANYA diizinkan untuk sub-account xenPlatform (MG memenuhi)
+- `UNION` — Koperasi
+- `NON_PROFIT` — Yayasan / nirlaba
+- `PMA` — PT PMA (Penanaman Modal Asing)
+
+JANGAN pakai `CORPORATION`/`PARTNERSHIP` (daftar Singapura/negara lain) atau `COOPERATIVE` (kodenya `UNION`).
+Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di admin + portal mitra, disalin ke
+`kyc_submissions.entity_type` — TIDAK pernah dikirim ke Xendit, tidak memengaruhi pembayaran/fee/ongkir.
+
+## Modal Kelola Portal Mitra: field XenPlatform = read-only (2026-09-12)
+
+- `sub_account_id`, `kyc_status`, nama usaha/email/status akun → read-only, ditarik LANGSUNG dari Xendit.
+- Tombol **Refresh Data Xendit** → `GET /api/client-stores/:id/xenplatform` → simpan `xendit_account_status` +
+  `xendit_synced_at` ke DB (kolom ini dibuat AutoMigrate).
+- Penautan sub-account lewat modal "Sub-account Xendit (Managed)" di halaman yang sama.
+- ⚠️ `saveXp` HANYA boleh kirim `{ entity_type }`. Mengirim `sub_account_id: ''` akan MENGHAPUS penautan
+  (backend pakai pointer `*string` → `''` berarti kosongkan).
+- `kyc_status` (DB) = status SUBMISSION dari webhook; `xendit_account_status` = status AKUN dari API. Jangan disatukan.
+- Dokumen legal per jenis badan usaha:
+  https://help.xendit.co/hc/en-us/articles/10891368765593-ID-What-are-the-legal-documents-required-to-register-to-Xendit-for-Indonesian-Merchants
