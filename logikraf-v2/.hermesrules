@@ -40,3 +40,12 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
 - `kyc_status` (DB) = status SUBMISSION dari webhook; `xendit_account_status` = status AKUN dari API. Jangan disatukan.
 - Dokumen legal per jenis badan usaha:
   https://help.xendit.co/hc/en-us/articles/10891368765593-ID-What-are-the-legal-documents-required-to-register-to-Xendit-for-Indonesian-Merchants
+
+## Webhook akun Xendit: kandidat sub_account_id wajib berpola ID (2026-09-12)
+
+- `trustedAccountIDs()` (`internal/delivery/handler/xen_account_candidates.go`) hanya meloloskan kandidat berpola
+  ObjectId 24 hex (`^[0-9a-fA-F]{24}$`). Sebelumnya SEMUA string di payload ikut di-query sebagai `sub_account_id`
+  (terbukti di log: `WHERE sub_account_id = 'account.verification'`, bahkan seluruh isi map) → berisiko mencocokkan
+  STORE YANG SALAH bila ada string yang kebetulan sama dengan sub_account_id store lain.
+- Bila tak ada kandidat berpola ID, daftar mentah dipakai (jaring pengaman); header `for-user-id` selalu dihormati.
+- Tes: `go test ./internal/delivery/handler/ -run "TestTrustedAccountIDs|TestCollectFailureReasons"`
