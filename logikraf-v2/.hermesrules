@@ -6,3 +6,11 @@
 - Catatan Fiber v3: grup Group("", RequireAuth) membungkus route /api/v1 yang didaftarkan SETELAHNYA — endpoint internal partners WAJIB didaftarkan sebelum grup authed.
 - Keuangan (definisi 3 sumber): `transactions` status settled = revenue proyek dev (dashboard /api/reports/finance; dikelola manual menu Transactions). `payment_transactions` = pembayaran produk quick (Beli Paket via CheckoutModal Xendit; Payment Ledger; TIDAK dihitung dashboard). MG pasca-KYC: uang di sub-account XenPlatform (partners portal, GET /transactions Xendit) — TIDAK masuk 2 tabel master (event mg-* hanya diforward, tak dicatat lokal) → tanpa dobel catat.
 - KYC MG (2026-09-08): owner submit → status Review Xendit (PENDING_VERIFICATION). Webhook account.verification otomatis update.
+
+## Sinkronisasi Status KYC Xendit (2026-09-12)
+
+- **Dua status berbeda, jangan disatukan**: `client_stores.kyc_status` = status **submission KYC** (diisi webhook Xendit; mis. `AWAITING_RESUBMISSION` = perlu perbaikan dokumen). `GET https://api.xendit.co/v2/accounts/{id}` → `status` = status **akun** (mis. `AWAITING_DOCS`). Portal menampilkan keduanya; endpoint sinkron **tidak boleh** menimpa `kyc_status`.
+- **Portal mitra**: `GET /api/v1/me/kyc` (auth) → tarik status akun live dari Xendit + kembalikan `kyc_status`, `reasons`, `submitted_at`. Handler: `internal/handler/kyc.go`, `kyc_reasons.go`; klien: `internal/service/xendit_account.go`.
+- **LKI**: webhook akun Xendit (`internal/delivery/handler/xen_account_webhook.go`, dipanggil dari `payment.go`) menyimpan `failure_reasons` ke tabel `kyc_submissions` (kolom `notes` = JSON `[{field,reason,message}]`); helper di `xen_kyc_reasons.go` + `xen_kyc_submission.go`, tes di `xen_kyc_reasons_test.go`.
+- **Halaman `/verifikasi`**: menarik status saat dibuka + tombol "Perbarui Status", stepper tahan status apa pun (termasuk `AWAITING_RESUBMISSION`), checklist "Yang perlu dilengkapi (dari Xendit)".
+- Kunci Xendit **tidak ada di .env** LKI (per-store di DB); callback token divalidasi dari header `X-Callback-Token`.
