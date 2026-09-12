@@ -176,6 +176,9 @@ func main() {
 	clientAPI.Get("/tickets/:id", handler.ClientTicket)
 	clientAPI.Post("/tickets/:id/replies", handler.ReplyClientTicket)
 	clientAPI.Post("/resend-verification", auth.ResendVerification)
+	clientAPI.Get("/notifications", handler.ClientNotifications)
+	clientAPI.Post("/notifications/read-all", handler.ReadAllClientNotifications)
+	clientAPI.Post("/notifications/:id/read", handler.ReadClientNotification)
 
 	// Payments + gateway webhooks (public: called by Xendit/Midtrans/iPaymu)
 	api.Get("/payment-gateways", handler.GetPaymentGateways)

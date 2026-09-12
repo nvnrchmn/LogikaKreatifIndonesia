@@ -30,6 +30,7 @@ func Connect() error {
 		&User{},
 		&PasswordReset{},
 		&EmailVerification{},
+		&ClientNotification{},
 		&TicketReply{},
 		&Package{},
 		&Portfolio{},

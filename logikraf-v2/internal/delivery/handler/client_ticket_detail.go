@@ -245,8 +245,12 @@ func notifyTicketReplyToClient(t model.Ticket, body string) {
 		go func() { _ = email.Send(cfg, []string{u.Email}, "Balasan tiket: "+t.Subject, html) }()
 	}
 	var cl model.Client
-	if err := model.DB.Where("email = ?", u.Email).First(&cl).Error; err == nil && cl.Phone != "" {
-		msg := "Balasan tiket \"" + t.Subject + "\":\n" + clip(body, 300) + "\n\nBuka: " + link
-		go func() { _ = wa.New().Send(cl.Phone, msg) }()
+	if err := model.DB.Where("email = ?", u.Email).First(&cl).Error; err == nil {
+		SaveClientNotification(cl.ID, "Balasan tiket: "+t.Subject, clip(body, 300),
+			"/tickets/"+strconv.Itoa(int(t.ID)))
+		if cl.Phone != "" {
+			msg := "Balasan tiket \"" + t.Subject + "\":\n" + clip(body, 300) + "\n\nBuka: " + link
+			go func() { _ = wa.New().Send(cl.Phone, msg) }()
+		}
 	}
 }

@@ -84,8 +84,9 @@ func notifyOrderStatusChange(order model.Order, prev, now, note string) {
 		_ = email.Send(email.DefaultConfig(), []string{client.Email},
 			"Status pesanan "+order.OrderNumber+": "+label, html)
 	}
+	SaveClientNotification(order.ClientID, "Status pesanan "+order.OrderNumber+": "+label, plain, "/orders")
 	if client.Phone != "" {
-		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di "+portalURL("/orders")+"/client")
+		_ = wa.New().Send(client.Phone, plain+"\n\nPantau di "+portalURL("/orders"))
 	}
 }
 
