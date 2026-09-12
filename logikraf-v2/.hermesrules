@@ -77,3 +77,14 @@ Field ini INFORMASI SAJA: disimpan di `client_stores.entity_type`, tampil di adm
 - Halaman dirakit dari hasil `build.py` dengan placeholder `{{k}}`. JANGAN pakai template literal JS: `${k}`
   dievaluasi saat definisi -> ReferenceError sebelum form dibuat (bug yang pernah terjadi).
 - Memperbarui salinan yang di-host (`/brand/sig/*.html`): jalankan `deploy.sh`.
+
+## UPDATE: editor tanda tangan masuk admin (2026-09-12)
+
+- Standalone `https://logikraf.id/brand/edit.html` DIHAPUS (404). Sekarang halaman admin asli:
+  **/admin/signature-email** — menu **Sistem > Signature Email**.
+- Sumber: `frontend/src/pages/admin/EmailSignaturePage.tsx` (template tanda tangan ADA DI DALAM file ini,
+  placeholder `{{k}}` — mengubah template = mengubah file ini), plus lazy import + route di `App.tsx`
+  dan item menu + ikon `MailNavIcon` di `components/admin/AdminLayout.tsx`.
+- Generator ulang halaman itu: `~/Documents/logikraf-brand/signature/gen-admin-page.py`
+  (memakai `out/*.html` + `identities.json`).
+- Pengaturan editor disimpan di localStorage browser (belum di server).
