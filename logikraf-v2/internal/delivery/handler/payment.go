@@ -424,6 +424,7 @@ func XenditWebhook(c fiber.Ctx) error {
 				if id, created := ensureOrderFromPayment(pt); created {
 					orderID = id
 					notifyAdminNewOrder(pt, id)
+					notifyOrderWA(pt, id)
 				}
 			}
 
@@ -745,6 +746,7 @@ func IpaymuWebhook(c fiber.Ctx) error {
 				if id, created := ensureOrderFromPayment(pt); created {
 					orderID = id
 					notifyAdminNewOrder(pt, id)
+					notifyOrderWA(pt, id)
 				}
 			}
 
