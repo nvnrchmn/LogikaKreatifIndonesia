@@ -275,3 +275,12 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Pengolahan: crop (168,325,1379,613) dari kanvas 1536x1024 untuk buang tepi kosong, lalu diberi rim gelap #0F172A (MaxFilter(5) di kanal alpha lalu dikomposit) supaya wordmark bergaris luar tegas di latar putih.
 - Kop invoice kini HANYA memakai gambar logo (teks "LOGIKRAF" dihapus agar tidak dobel); fallback teks tetap aktif bila berkas tidak ada.
 - Setiap kirim logo baru: siapkan via venv `/tmp/pdfv` (pillow + pymupdf), crop tepi, kecilkan ~700 px lebar, lalu `sudo cp` + `chown www:www` ke path di atas. Ukuran invoice PDF ~104 KB (logo 79-88 KB).
+
+### Logo invoice: versi SOLID dipakai (revisi 12 Sep 2026)
+- Pemilik menolak versi garis luar (outline) lalu memilih versi **solid**: ikon LK gradient + wordmark "Logikraf" terisi gelap, titik "i" biru muda.
+- Berkas aktif: `/www/wwwroot/logikraf.id/uploads/brand/logo-invoice.png` — 700x161 px, PNG transparan, 75.606 byte. Crop dari kanvas 1536x1024 pada bbox (195,350,1341,614), tanpa rim tambahan.
+
+### Invoice: tanpa tanda tangan + catatan baru (12 Sep 2026, 9c19f5d)
+- Blok tanda tangan ("Bekasi, <tanggal> / Hormat kami / Tim Logikraf") DIHAPUS atas permintaan pemilik. Footer "Dokumen ini diterbitkan otomatis dan sah tanpa tanda tangan basah" tetap ada.
+- Catatan standar kini "Terima kasih telah bekerja sama dengan Logikraf." (default di `pkg/invoice` saat `Notes` kosong; literal di `order_invoice.go`, `order_qris.go`, `sample_test.go` ikut disamakan).
+- Blok Penerbit tidak lagi dipaku di dasar halaman: mengikuti akhir isi (`GetY()+10`, dibatasi y=250) supaya halaman tidak separuh kosong.
