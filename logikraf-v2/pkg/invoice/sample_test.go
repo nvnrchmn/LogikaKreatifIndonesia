@@ -28,7 +28,7 @@ func TestWriteSample(t *testing.T) {
 		Total:       1499000,
 		Paid:        1499000,
 		Outstanding: 0,
-		Notes:       "Terima kasih atas pembayaran Anda.",
+		Notes:       "Terima kasih telah bekerja sama dengan Logikraf.",
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -30,7 +30,7 @@ func invoicePDFForPayment(pt model.PaymentTransaction) []byte {
 		Total:       pt.GrossAmount,
 		Paid:        pt.GrossAmount,
 		Outstanding: 0,
-		Notes:       "Terima kasih atas pembayaran Anda.",
+		Notes:       "Terima kasih telah bekerja sama dengan Logikraf.",
 	})
 	if err != nil {
 		return nil

@@ -220,7 +220,7 @@ func invoicePDFForQris(order *model.Order, p *model.QrisPayment) []byte {
 		Total:       uint(p.Amount),
 		Paid:        uint(p.Amount),
 		Outstanding: 0,
-		Notes:       "Terima kasih atas pembayaran Anda.",
+		Notes:       "Terima kasih telah bekerja sama dengan Logikraf.",
 	})
 	if err != nil {
 		return nil

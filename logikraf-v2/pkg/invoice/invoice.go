@@ -218,29 +218,24 @@ func Build(d Data) ([]byte, error) {
 	pdf.MultiCell(180, 4.8,
 		"Pembayaran via transfer bank atau QRIS. Mohon cantumkan nomor invoice pada berita transfer. "+
 			"Status dokumen ini: "+statusText(d.Status)+".", "", "L", false)
-	if d.Notes != "" {
-		pdf.SetX(15)
-		pdf.MultiCell(180, 4.8, "Catatan: "+d.Notes, "", "L", false)
+	// Catatan standar bila pemanggil tidak mengirim catatan khusus.
+	note := strings.TrimSpace(d.Notes)
+	if note == "" {
+		note = "Terima kasih telah bekerja sama dengan Logikraf."
 	}
-	// Blok penerbit (kiri) + tanda tangan (kanan).
+	pdf.SetX(15)
+	pdf.MultiCell(180, 4.8, "Catatan: "+note, "", "L", false)
+	// Blok penerbit mengikuti akhir isi supaya halaman tidak menyisakan ruang kosong besar.
+	py := pdf.GetY() + 10
+	if py > 250 {
+		py = 250
+	}
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
-	pdf.SetXY(15, 244)
+	pdf.SetXY(15, py)
 	pdf.MultiCell(90, 4.2,
 		"Penerbit:\n"+IssuerName+" ("+IssuerForm+")\n"+IssuerAddress+"\n"+
 			IssuerEmail+"  |  "+IssuerPhone, "", "L", false)
-
-	pdf.SetTextColor(15, 23, 42)
-	pdf.SetFont("Helvetica", "", 9)
-	pdf.SetXY(120, 240)
-	pdf.CellFormat(75, 4.5, "Bekasi, "+tanggal(d.IssueDate), "", 0, "L", false, 0, "")
-	pdf.SetXY(120, 245)
-	pdf.CellFormat(75, 4.5, "Hormat kami,", "", 0, "L", false, 0, "")
-	pdf.SetDrawColor(148, 163, 184)
-	pdf.SetLineWidth(0.3)
-	pdf.Line(120, 258, 172, 258)
-	pdf.SetXY(120, 259)
-	pdf.CellFormat(75, 4.5, "Tim Logikraf", "", 0, "L", false, 0, "")
 
 	pdf.SetFont("Helvetica", "", 8)
 	pdf.SetTextColor(100, 116, 139)
