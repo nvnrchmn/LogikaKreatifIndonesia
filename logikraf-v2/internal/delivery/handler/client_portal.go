@@ -153,5 +153,8 @@ func CreateClientTicket(c fiber.Ctx) error {
 	if err := model.DB.Create(&input).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed"})
 	}
+	if _, cl, err := clientIDForUser(c); err == nil {
+		notifyTicketCreated(input, cl)
+	}
 	return c.Status(201).JSON(input)
 }

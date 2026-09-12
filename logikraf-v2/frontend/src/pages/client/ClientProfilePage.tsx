@@ -1,5 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
+
+// hdrs — header Authorization untuk API portal klien.
+const hdrs = (json = false) => {
+  const t = localStorage.getItem('token') || ''
+  return json
+    ? { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }
+    : { Authorization: 'Bearer ' + t }
+}
 
 export default function ClientProfilePage() {
   const { name } = useAuth()
@@ -10,19 +18,56 @@ export default function ClientProfilePage() {
     phone: localStorage.getItem('phone') || '',
   })
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
+
+  // Ambil data asli dari server (bukan localStorage) supaya tidak menyesatkan.
+  useEffect(() => {
+    fetch('/api/client/profile', { headers: hdrs() })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: Record<string, string> | null) => {
+        if (!d) return
+        setForm({ name: d.name || '', email: d.email || '', company: d.company || '', phone: d.phone || '' })
+      })
+      .catch(() => {})
+  }, [])
+
+  const [pw, setPw] = useState({ cur: '', next: '' })
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwErr, setPwErr] = useState('')
+
+  const changePw = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPwMsg('')
+    setPwErr('')
+    const res = await fetch('/api/client/password', {
+      method: 'PUT',
+      headers: hdrs(true),
+      body: JSON.stringify({ current_password: pw.cur, new_password: pw.next }),
+    }).catch(() => null)
+    const d = (res ? await res.json().catch(() => ({})) : {}) as { error?: string }
+    if (res && res.ok) {
+      setPwMsg('Kata sandi berhasil diubah.')
+      setPw({ cur: '', next: '' })
+    } else {
+      setPwErr(d.error || 'Gagal mengubah kata sandi.')
+    }
+  }
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [k]: e.target.value })
     setSaved(false)
   }
 
-  const save = (e: React.FormEvent) => {
+  const save = async (e: React.FormEvent) => {
     e.preventDefault()
     localStorage.setItem('name', form.name)
-    localStorage.setItem('email', form.email)
-    localStorage.setItem('company', form.company)
-    localStorage.setItem('phone', form.phone)
-    setSaved(true)
+    const res = await fetch('/api/client/profile', {
+      method: 'PUT',
+      headers: hdrs(true),
+      body: JSON.stringify({ name: form.name, company: form.company, phone: form.phone }),
+    }).catch(() => null)
+    setSaveError(res && res.ok ? '' : 'Gagal menyimpan perubahan. Coba lagi.')
+    setSaved(!!(res && res.ok))
     setTimeout(() => setSaved(false), 3000)
   }
 
@@ -36,6 +81,12 @@ export default function ClientProfilePage() {
           Kelola informasi identitas perusahaan dan kontak PIC untuk faktur invoice dan koordinasi proyek.
         </p>
       </div>
+
+      {saveError && (
+        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          {saveError}
+        </div>
+      )}
 
       {saved && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold animate-fade-in flex items-center gap-2">
@@ -126,6 +177,21 @@ export default function ClientProfilePage() {
               Simpan Profil 💾
             </button>
           </div>
+        </form>
+      </div>
+
+      {/* Keamanan akun: ganti kata sandi */}
+      <div className="bg-white rounded-3xl border border-border-minimal shadow-sm p-6 sm:p-8 space-y-5">
+        <div>
+          <h3 className="font-display font-bold text-base text-text-main">Keamanan Akun</h3>
+          <p className="text-xs text-text-muted mt-0.5">Ganti kata sandi portal Anda kapan saja.</p>
+        </div>
+        {pwMsg && <p className="text-xs font-bold text-emerald-700">{pwMsg}</p>}
+        {pwErr && <p className="text-xs font-bold text-red-600">{pwErr}</p>}
+        <form onSubmit={changePw} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <input className="form-input text-xs sm:text-sm" type="password" placeholder="Kata sandi saat ini" value={pw.cur} onChange={(e) => setPw({ cur: e.target.value, next: pw.next })} required />
+          <input className="form-input text-xs sm:text-sm" type="password" placeholder="Kata sandi baru (min. 8)" value={pw.next} onChange={(e) => setPw({ cur: pw.cur, next: e.target.value })} required />
+          <button className="btn-primary text-xs py-2.5 px-6" type="submit">Ganti Kata Sandi</button>
         </form>
       </div>
     </div>
