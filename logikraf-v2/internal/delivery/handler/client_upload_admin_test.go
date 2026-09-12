@@ -13,6 +13,7 @@ import (
 )
 
 func TestAdminClientFiles(t *testing.T) {
+	withTestDB(t, &model.Client{}, &model.Notification{}, &model.Setting{})
 	tmp := t.TempDir()
 	os.Setenv("UPLOAD_ROOT", tmp)
 	defer os.Unsetenv("UPLOAD_ROOT")

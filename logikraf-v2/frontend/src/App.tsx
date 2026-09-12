@@ -23,6 +23,7 @@ const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 // Admin Components & Pages (Lazy Loaded)
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
 const AdminClientFilesPage = lazy(() => import('./pages/admin/ClientFilesAdminPage'))
+const AdminTicketsPage = lazy(() => import('./pages/admin/AdminTicketsPage'))
 const AdminResourcePage = lazy(() => import('./components/admin/AdminResourcePage'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
@@ -39,6 +40,8 @@ const ClientDashboardPage = lazy(() => import('./pages/client/ClientDashboardPag
 const ClientOrdersPage = lazy(() => import('./pages/client/ClientOrdersPage'))
 const ClientProfilePage = lazy(() => import('./pages/client/ClientProfilePage'))
 const ClientFilesPage = lazy(() => import('./pages/client/ClientFilesPage'))
+const ClientInvoicesPage = lazy(() => import('./pages/client/ClientInvoicesPage'))
+const ClientTicketDetailPage = lazy(() => import('./pages/client/ClientTicketDetailPage'))
 const ClientPortalGate = lazy(() => import('./components/client/ClientPortalGate'))
 const ClientLoginPage = lazy(() => import('./pages/client/ClientLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/client/ForgotPasswordPage'))
@@ -132,6 +135,7 @@ export default function App() {
         <Route path="settings" element={<AdminSettingsPage />} />
         <Route path="hero-stats" element={<AdminHeroStatsPage />} />
         <Route path="client-files" element={<AdminClientFilesPage />} />
+        <Route path="tickets" element={<AdminTicketsPage />} />
         {/* Generic CRUD resources: list / new / edit */}
         <Route path=":resource/new" element={<AdminResourcePage />} />
         <Route path=":resource/:id/edit" element={<AdminResourcePage />} />
@@ -153,6 +157,8 @@ export default function App() {
         <Route path="dashboard" element={<ClientDashboardPage />} />
         <Route path="orders" element={<ClientOrdersPage />} />
         <Route path="tickets" element={<ClientTicketsPage />} />
+        <Route path="tickets/:id" element={<ClientTicketDetailPage />} />
+        <Route path="invoices" element={<ClientInvoicesPage />} />
         <Route path="profile" element={<ClientProfilePage />} />
       </Route>
       {/* Portal klien - URL bersih di host portal (client.logikraf.id/dashboard) */}
@@ -160,7 +166,9 @@ export default function App() {
         <Route path="/dashboard" element={<ClientDashboardPage />} />
         <Route path="/orders" element={<ClientOrdersPage />} />
         <Route path="/tickets" element={<ClientTicketsPage />} />
+        <Route path="/tickets/:id" element={<ClientTicketDetailPage />} />
         <Route path="/files" element={<ClientFilesPage />} />
+        <Route path="/invoices" element={<ClientInvoicesPage />} />
         <Route path="/profile" element={<ClientProfilePage />} />
       </Route>
       {/* H10: 404 catch-all */}

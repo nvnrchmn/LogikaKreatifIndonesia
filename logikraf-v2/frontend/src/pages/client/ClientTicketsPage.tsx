@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { auth } from '../../lib/api'
 
 interface Ticket {
@@ -113,6 +114,9 @@ export default function ClientTicketsPage() {
                   </div>
                 </div>
                 <p className="text-xs text-text-muted mt-1 line-clamp-2">{t.description}</p>
+                <Link to={'/tickets/' + t.id} className="inline-block mt-2 text-xs font-bold text-brand-primary">
+                  Buka percakapan →
+                </Link>
               </div>
             ))}
           </div>
