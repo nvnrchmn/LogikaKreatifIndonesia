@@ -227,3 +227,10 @@ teks halaman, belum jadi settings — tawarkan ke Nova bila ingin dijadikan edit
 - Redirect: setting `company_client_portal_url` (Admin -> Settings); komponen components/client/ClientPortalGate.tsx. Kosong = perilaku lama.
 - Tautan portal di email/WA pakai portalBase() di order_aftercare.go.
 - Verifikasi: netlog Chromium dari logikraf.id/client/login -> memuat client.logikraf.id + chunk ClientLoginPage.
+
+### URL bersih portal klien (revisi)
+
+- URL portal: /login, /dashboard, /orders, /tickets, /profile (tanpa prefix /client).
+- /client/* tetap didukung: di host portal dialihkan ke URL bersih; dari domain utama dialihkan ke subdomain.
+- Tautan nav ClientLayout + tautan email/WA (portalURL di order_aftercare.go) memakai URL bersih.
+- ProtectedRoute kini sadar-rute: rute klien -> /login (sebelumnya salah ke /admin/login).
