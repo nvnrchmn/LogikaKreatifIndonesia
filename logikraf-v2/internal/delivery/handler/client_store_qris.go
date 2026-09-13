@@ -65,33 +65,42 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 	// terlanjur dibuat di Xendit → pembayaran nyasar tak terpakai).
 	refID := in.ExternalID
 	var ada model.QrisPayment
-	if e := model.DB.Where("reference_id = ?", refID).First(&ada).Error; e == nil {
-		switch {
-		case strings.EqualFold(ada.Status, "paid"):
-			return c.Status(409).JSON(fiber.Map{
-				"error":        "pembayaran untuk referensi ini sudah lunas",
-				"reference_id": ada.ReferenceID,
-				"status":       ada.Status,
-				"amount":       ada.Amount,
-			})
-		case strings.EqualFold(ada.Status, "pending") && ada.ExpiresAt != nil && ada.ExpiresAt.After(time.Now()):
-			// Masih berlaku → kembalikan QR yang sama, tanpa memanggil Xendit.
-			return c.Status(200).JSON(fiber.Map{
-				"reference_id":     ada.ReferenceID,
-				"external_id":      ada.ExternalID,
-				"qr_string":        ada.QrString,
-				"amount":           ada.Amount,
-				"currency":         ada.Currency,
-				"status":           ada.Status,
-				"mode":             ada.Mode,
-				"expires_at":       ada.ExpiresAt,
-				"simulate_allowed": qrisSimulateAllowed(),
-				"store":            store.Name,
-				"diambil_ulang":    true,
-			})
-		default:
-			// Kedaluwarsa/batal → terbitkan QR baru dengan referensi unik
-			// (kolom reference_id unik, dan Xendit juga menolak duplikat).
+	// (a) ada pembayaran lunas untuk external_id ini? → tolak.
+	lunas := model.DB.Where("external_id = ? AND status = ?", in.ExternalID, "paid").
+		Order("id desc").First(&ada).Error == nil
+	// (b) masih ada QR pending yang belum kedaluwarsa? → pakai ulang.
+	masihAda := false
+	if !lunas {
+		masihAda = model.DB.Where("external_id = ? AND status = ? AND expires_at > ?", in.ExternalID, "pending", time.Now()).
+			Order("id desc").First(&ada).Error == nil
+	}
+	switch {
+	case lunas:
+		return c.Status(409).JSON(fiber.Map{
+			"error":        "pembayaran untuk referensi ini sudah lunas",
+			"reference_id": ada.ReferenceID,
+			"status":       ada.Status,
+			"amount":       ada.Amount,
+		})
+	case masihAda:
+		// Kembalikan QR yang sama — tanpa memanggil Xendit lagi.
+		return c.Status(200).JSON(fiber.Map{
+			"reference_id":     ada.ReferenceID,
+			"external_id":      ada.ExternalID,
+			"qr_string":        ada.QrString,
+			"amount":           ada.Amount,
+			"currency":         ada.Currency,
+			"status":           ada.Status,
+			"mode":             ada.Mode,
+			"expires_at":       ada.ExpiresAt,
+			"simulate_allowed": qrisSimulateAllowed(),
+			"store":            store.Name,
+			"diambil_ulang":    true,
+		})
+	default:
+		// Belum ada / semua kedaluwarsa → referensi baru yang unik
+		// (kolom reference_id unik, dan Xendit juga menolak duplikat).
+		if model.DB.Where("reference_id = ?", in.ExternalID).First(&ada).Error == nil {
 			refID = fmt.Sprintf("%s-%d", in.ExternalID, time.Now().Unix())
 		}
 	}
