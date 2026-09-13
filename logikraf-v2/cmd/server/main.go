@@ -236,6 +236,7 @@ func main() {
 	admin.Delete("/client-store-settlements/stores/:id", handler.DeleteClientStoreAdmin)
 	admin.Get("/client-store-partners", handler.ListPartnerStoresAdmin)
 	admin.Get("/xenplatform/accounts", handler.ListXenplatformAccountsAdmin)
+	admin.Post("/xenplatform/accounts", handler.CreateXenplatformAccountAdmin)
 	admin.Post("/client-stores/:id/partner-user", handler.UpsertPartnerUserAdmin)
 	admin.Patch("/client-stores/:id/xenplatform", handler.UpdateXenplatformAdmin)
 	admin.Get("/client-stores/:id/xenplatform", handler.RefreshXenplatformAdmin)

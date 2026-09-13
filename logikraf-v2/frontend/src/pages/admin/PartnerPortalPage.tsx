@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, Card, Descriptions, Form, Grid, Input, message, Modal, Select, Space, Spin, Table, Tag, Typography } from 'antd'
-import { KeyOutlined, LinkOutlined, ReloadOutlined, WalletOutlined } from '@ant-design/icons'
+import { Button, Card, Descriptions, Form, Grid, Input, message, Modal, Select, Space, Spin, Switch, Table, Tag, Typography } from 'antd'
+import { KeyOutlined, LinkOutlined, PlusOutlined, ReloadOutlined, WalletOutlined } from '@ant-design/icons'
 import { apiGet, apiPatch, apiPost } from '../../lib/api'
 
 interface PartnerUserView { id: number; email: string; wa_phone?: string; active: boolean; must_change_pass: boolean; last_login_at?: string }
@@ -43,6 +43,9 @@ export default function PartnerPortalPage() {
   const [xenList, setXenList] = useState<XenAccount[]>([])
   const [xenBusy, setXenBusy] = useState(false)
   const [linkMap, setLinkMap] = useState<Record<string, number | undefined>>({})
+  const [createOpen, setCreateOpen] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [formCreate] = Form.useForm()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -133,6 +136,20 @@ export default function PartnerPortalPage() {
     } catch (e) { message.error((e as Error).message) } finally { setSavingXp(false) }
   }
 
+  const createAccount = async () => {
+    const v = await formCreate.validateFields()
+    setCreating(true)
+    try {
+      await apiPost('/api/xenplatform/accounts', {
+        name: v.name.trim(), email: v.email.trim(),
+        entity_type: v.entity_type, send_email_invite: v.send_email_invite !== false,
+        store_id: v.store_id ?? null,
+      })
+      message.success('Sub-account dibuat. Tekan "Sinkron dari Xendit" untuk melihat & menghubungkannya.')
+      setCreateOpen(false); formCreate.resetFields(); load()
+    } catch (e) { message.error((e as Error).message) } finally { setCreating(false) }
+  }
+
   const cols = [
     { title: 'Mitra', dataIndex: 'name', key: 'name', render: (_: string, r: StoreView) => (<><Typography.Text strong>{r.name}</Typography.Text><div><Typography.Text type="secondary">{r.slug}</Typography.Text></div></>) },
     { title: 'KYC', dataIndex: 'kyc_status', key: 'kyc', render: (k: string) => (k ? <Tag color={KYC_COLOR[k] || 'default'}>{KYC_LABEL[k] || k}</Tag> : <Tag>—</Tag>) },
@@ -153,6 +170,7 @@ export default function PartnerPortalPage() {
       title={<Space><WalletOutlined /><span>Mitra & Portal XenPlatform</span></Space>}
       extra={
         <Space>
+          <Button icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>Buat Sub-account</Button>
           <Button icon={<ReloadOutlined />} onClick={syncXen} loading={xenBusy}>Sinkron dari Xendit</Button>
           <Button icon={<ReloadOutlined />} onClick={load} loading={loading}>Muat Ulang</Button>
         </Space>
@@ -244,6 +262,37 @@ export default function PartnerPortalPage() {
             Simpan & kirim password ke mitra via WA/email — mitra WAJIB ganti saat login pertama. Mereset password di sini memaksa ganti password lagi.
           </Typography.Paragraph>
           <Button type="primary" loading={savingUser} onClick={saveUser}>Simpan Akun Portal</Button>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Buat Sub-account Xendit (XenPlatform)" open={createOpen} onCancel={() => setCreateOpen(false)} footer={null} width={isMobile ? '96%' : 520}
+      >
+        <Form form={formCreate} layout="vertical" style={{ marginTop: 8 }}>
+          <Form.Item name="name" label="Nama usaha" rules={[{ required: true, message: 'Wajib diisi' }]}>
+            <Input placeholder="Nama legal usaha mitra" />
+          </Form.Item>
+          <Form.Item name="email" label="Email Authorized Representative" rules={[{ required: true, type: 'email', message: 'Email valid wajib diisi' }]}>
+            <Input placeholder="owner@tokomitra.id" />
+          </Form.Item>
+          <Form.Item name="entity_type" label="Jenis badan usaha" initialValue="SOLE_PROPRIETORSHIP" rules={[{ required: true, message: 'Wajib dipilih' }]}>
+            <Select options={[
+              { value: 'SOLE_PROPRIETORSHIP', label: 'Usaha Perseorangan (Sole Prop.)' },
+              { value: 'INDIVIDUAL', label: 'Perorangan (Individual)' },
+              { value: 'CORPORATION', label: 'Perseroan Terbatas (PT)' },
+              { value: 'PARTNERSHIP', label: 'Persekutuan Komanditer (CV)' },
+              { value: 'UNION', label: 'Koperasi' },
+              { value: 'NON_PROFIT', label: 'Yayasan / Nirlaba' },
+              { value: 'PMA', label: 'PT PMA (Penanaman Modal Asing)' },
+            ]} />
+          </Form.Item>
+          <Form.Item name="send_email_invite" valuePropName="checked" initialValue={true}>
+            <Switch /> Kirim undangan KYC ke email AR (via Xendit)
+          </Form.Item>
+          <Form.Item name="store_id" label="Hubungkan ke mitra (opsional)">
+            <Select allowClear showSearch optionFilterProp="label" placeholder="Pilih mitra…" options={stores.map((s) => ({ value: s.id, label: `${s.name} (${s.slug})` }))} />
+          </Form.Item>
+          <Button type="primary" loading={creating} onClick={createAccount}>Buat Sub-account</Button>
         </Form>
       </Modal>
 
