@@ -45,3 +45,11 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 ## Jebakan migrasi (12 Sep 2026)
 - `AutoMigrate` yang BENAR-BENAR dijalankan aplikasi ada di `internal/domain/model/db.go` (`model.Connect()`), bukan `internal/infrastructure/database/database.go` — fungsi di infrastructure itu dead code (tidak dipanggil siapa pun). Setiap backfill/migrasi manual harus ditulis di `model.Connect()`.
 - Bukti: deploy `cf1c52b` → log service `backfill invoices.paid_at selesai`, `invoices.id=36` paid_at terisi 2026-09-12 15:38:52.
+
+## Fitur Tim & Akses (13 Sep 2026, commit `084b076` + `d547076`)
+- Model `users` bertambah: `status` (active|invited|revoked), `scope` (full|ops), `invite_token`, `invite_expires`, `invited_by`.
+- Endpoint admin: `GET /api/team`, `POST /api/team/invite`, `.../:id/resend|revoke|restore`, `PATCH /api/team/:id`; publik: `POST /api/auth/accept-invite` (token sekali pakai, kedaluwarsa 7 hari).
+- Scope: `full` = pemilik (semua modul), `ops` = staf tanpa modul Uang Masuk & Sistem. Gerbang ada di `AuthMiddleware` (status akun) + `ScopeGuard` (daftar prefix uang/sistem). UI: `/admin/team` + `/admin/accept-invite`, menu Keuangan & Sistem disembunyikan untuk ops.
+- JEBAKAN (ditemukan di uji produksi, sudah ditutup): rute yang didaftarkan di luar grup admin (mis. `/api/orders`) TIDAK melewati `ScopeGuard`, sehingga token akun yang dicabut sempat masih diterima (200). Karena itu pengecekan status dipindah ke `AuthMiddleware` supaya berlaku di semua rute terautentikasi. Uji regresi: `TestRevokedTokenBlockedOutsideAdminGroup`.
+- JEBAKAN uji: `sqlite :memory:` + connection pool GORM → tabel dibuat di satu koneksi, query berikutnya bisa dapat koneksi lain ('no such table'). Test baru harus membuat DB sendiri (`withTeamDB`) dan memulihkan `model.DB` di cleanup.
+- Bukti produksi 13 Sep: owner /api/settings 200 & /api/team 200; ops /api/settings 403, /api/team 403, /api/orders 200; setelah revoke token lama → 403 di /api/orders dan login 403; akun uji dibersihkan (kembali 3 user).

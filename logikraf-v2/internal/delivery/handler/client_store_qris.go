@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/subtle"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -55,13 +56,53 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "external_id harus diawali prefix store"})
 	}
 
+	// Idempotensi: satu external_id = satu QR aktif.
+	//
+	// Klien (Smarthub, MG) sering memanggil ulang endpoint ini untuk tagihan
+	// yang sama — misalnya warga membuka halaman QR dua kali, atau QR lama
+	// sudah kedaluwarsa. Tanpa blok ini, panggilan kedua selalu gagal 500
+	// "Duplicate entry" padahal QR pertama masih sah (dan QR baru sudah
+	// terlanjur dibuat di Xendit → pembayaran nyasar tak terpakai).
+	refID := in.ExternalID
+	var ada model.QrisPayment
+	if e := model.DB.Where("reference_id = ?", refID).First(&ada).Error; e == nil {
+		switch {
+		case strings.EqualFold(ada.Status, "paid"):
+			return c.Status(409).JSON(fiber.Map{
+				"error":        "pembayaran untuk referensi ini sudah lunas",
+				"reference_id": ada.ReferenceID,
+				"status":       ada.Status,
+				"amount":       ada.Amount,
+			})
+		case strings.EqualFold(ada.Status, "pending") && ada.ExpiresAt != nil && ada.ExpiresAt.After(time.Now()):
+			// Masih berlaku → kembalikan QR yang sama, tanpa memanggil Xendit.
+			return c.Status(200).JSON(fiber.Map{
+				"reference_id":     ada.ReferenceID,
+				"external_id":      ada.ExternalID,
+				"qr_string":        ada.QrString,
+				"amount":           ada.Amount,
+				"currency":         ada.Currency,
+				"status":           ada.Status,
+				"mode":             ada.Mode,
+				"expires_at":       ada.ExpiresAt,
+				"simulate_allowed": qrisSimulateAllowed(),
+				"store":            store.Name,
+				"diambil_ulang":    true,
+			})
+		default:
+			// Kedaluwarsa/batal → terbitkan QR baru dengan referensi unik
+			// (kolom reference_id unik, dan Xendit juga menolak duplikat).
+			refID = fmt.Sprintf("%s-%d", in.ExternalID, time.Now().Unix())
+		}
+	}
+
 	secret := qrisSecret()
 	if secret == "" {
 		return c.Status(503).JSON(fiber.Map{"error": "xendit_secret_key belum dikonfigurasi"})
 	}
 
 	bodyMap := map[string]any{
-		"reference_id": in.ExternalID,
+		"reference_id": refID,
 		"amount":       in.Amount,
 		"currency":     "IDR",
 		"description":  orDefault(in.Description, "Pembayaran "+orDefault(store.Name, "Toko")),
@@ -114,7 +155,7 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 		exp = time.Now().Add(time.Duration(in.ExpiresIn) * time.Minute)
 	}
 	p := model.QrisPayment{
-		ReferenceID: in.ExternalID,
+		ReferenceID: refID,
 		StoreID:     store.ID,
 		ExternalID:  in.ExternalID,
 		ProviderID:  out.ID,
