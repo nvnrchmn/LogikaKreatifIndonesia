@@ -219,6 +219,8 @@ export default function PartnerPortalPage() {
               <Select options={[
                 { value: 'SOLE_PROPRIETORSHIP', label: 'Badan Usaha Perorangan (CV / PT Perorangan)' },
                 { value: 'INDIVIDUAL', label: 'Perorangan (khusus sub-account XenPlatform)' },
+                { value: 'CORPORATION', label: 'Perseroan Terbatas (PT)' },
+                { value: 'PARTNERSHIP', label: 'Persekutuan Komanditer (CV)' },
                 { value: 'UNION', label: 'Koperasi' },
                 { value: 'NON_PROFIT', label: 'Yayasan / Nirlaba' },
                 { value: 'PMA', label: 'PT PMA (Penanaman Modal Asing)' },
