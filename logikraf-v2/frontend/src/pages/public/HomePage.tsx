@@ -5,6 +5,7 @@ import PricingSection from '../../components/public/PricingSection'
 import PortfolioGallery from '../../components/public/PortfolioGallery'
 import TestimonialsSection from '../../components/public/TestimonialsSection'
 import ProjectBriefForm from '../../components/public/ProjectBriefForm'
+import CompanyProfile from '../../components/public/CompanyProfile'
 
 interface HeroStat {
   value: string
@@ -97,6 +98,7 @@ export default function HomePage() {
           <div className="absolute bottom-0 left-0 right-0 h-32 gradient-dark-bottom" />
         </section>
 
+        <CompanyProfile />
         <PricingSection />
         <section id="portfolio">
           <PortfolioGallery />
