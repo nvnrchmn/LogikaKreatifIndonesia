@@ -55,7 +55,7 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 ## Landing: section Profil Perusahaan (14 Sep 2026, commit 77df974)
 - Section baru `components/public/CompanyProfile.tsx` (id="profil"), disisipkan di `HomePage.tsx` SETELAH hero, SEBELUM `<PricingSection />`. Ritme warna: hero(dark) → profil(`bg-canvas-overlay`) → paket(light) → portofolio(overlay) → testimoni(light).
 - Isi: badge "Profil Perusahaan" + h2 headline + intro PT Logika Kreatif Indonesia + grid 4 "Layanan Utama" + grid 3 "Nilai Keunggulan" + band CTA (`Mulai Konsultasi` → #konsultasi, `Pelajari Produk Kami` → /paket).
-- Teks diambil APA ADANYA dari draf pemilik (belum digayakan ulang) — lihat catatan editorial di laporan.
+- Nada teks DISELARASKAN dengan hero (14 Sep): headline "Software yang mengikuti cara kerja bisnis Anda" (varian A, pilihan pemilik). Kalimat "Mengintegrasikan Logika Rekayasa dan Inovasi Digital..." DIBUANG atas keputusan pemilik. Deskripsi layanan/nilai diganti bahasa konkret ("bukan template", "gampang dirawat", "yang kami kejar dampaknya").
 - Kelas konvensi section yang dipakai: `section-padding`, `container-narrow`, `badge badge-info`, `card`, `font-display`/`font-body`, `text-text-main`/`text-text-muted`.
 - CATATAN: `#portfolio` (wrapper di HomePage) dan `#portofolio` (di PortfolioGallery) itu DUA id untuk section yang sama — link hero pakai `#portofolio` (valid, jangan dikira bug).
 
