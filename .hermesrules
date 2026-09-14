@@ -52,6 +52,13 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - Scope: `full` = pemilik (semua modul), `ops` = staf tanpa modul Uang Masuk & Sistem. Gerbang ada di `AuthMiddleware` (status akun) + `ScopeGuard` (daftar prefix uang/sistem). UI: `/admin/team` + `/admin/accept-invite`, menu Keuangan & Sistem disembunyikan untuk ops.
 - JEBAKAN (ditemukan di uji produksi, sudah ditutup): rute yang didaftarkan di luar grup admin (mis. `/api/orders`) TIDAK melewati `ScopeGuard`, sehingga token akun yang dicabut sempat masih diterima (200). Karena itu pengecekan status dipindah ke `AuthMiddleware` supaya berlaku di semua rute terautentikasi. Uji regresi: `TestRevokedTokenBlockedOutsideAdminGroup`.
 - JEBAKAN uji: `sqlite :memory:` + connection pool GORM → tabel dibuat di satu koneksi, query berikutnya bisa dapat koneksi lain ('no such table'). Test baru harus membuat DB sendiri (`withTeamDB`) dan memulihkan `model.DB` di cleanup.
+## Landing: section Profil Perusahaan (14 Sep 2026, commit 77df974)
+- Section baru `components/public/CompanyProfile.tsx` (id="profil"), disisipkan di `HomePage.tsx` SETELAH hero, SEBELUM `<PricingSection />`. Ritme warna: hero(dark) → profil(`bg-canvas-overlay`) → paket(light) → portofolio(overlay) → testimoni(light).
+- Isi: badge "Profil Perusahaan" + h2 headline + intro PT Logika Kreatif Indonesia + grid 4 "Layanan Utama" + grid 3 "Nilai Keunggulan" + band CTA (`Mulai Konsultasi` → #konsultasi, `Pelajari Produk Kami` → /paket).
+- Teks diambil APA ADANYA dari draf pemilik (belum digayakan ulang) — lihat catatan editorial di laporan.
+- Kelas konvensi section yang dipakai: `section-padding`, `container-narrow`, `badge badge-info`, `card`, `font-display`/`font-body`, `text-text-main`/`text-text-muted`.
+- CATATAN: `#portfolio` (wrapper di HomePage) dan `#portofolio` (di PortfolioGallery) itu DUA id untuk section yang sama — link hero pakai `#portofolio` (valid, jangan dikira bug).
+
 ## SEO: canonical + meta per-route (14 Sep 2026)
 - BUG DIPERBAIKI: `<link rel="canonical">` di index.html hardcoded `https://logikraf.id/` dan `serveSPAWithMeta` tidak pernah menggantinya → SEMUA halaman (termasuk artikel blog) mengaku duplikat homepage → risiko tidak terindeks.
 - Fix: `spameta.go` — `canonicalRe` mengganti canonical dari `c.Path()` (host-aware: www→apex, subdomain self-referential). Tambah `staticMetaMap` (judul+deskripsi unik) utk /, /layanan, /paket, /blog, /tentang-kami, /kontak, /kebijakan-privasi, /syarat-ketentuan. `main.go`: semua route SPA lewat `serveSPA()` (14 pemanggilan SendFile diganti).
