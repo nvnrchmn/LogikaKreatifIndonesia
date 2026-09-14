@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom'
 
 // Section "Profil Perusahaan" untuk landing page logikraf.id.
-// Salinan (copy) diambil apa adanya dari draf pemilik.
+// Isi dari draf pemilik; nada diturunkan agar menyatu dengan hero (14 Sep 2026).
 
 const services = [
-  { title: 'Custom Software Development', desc: 'Pengembangan aplikasi berbasis web dan mobile yang disesuaikan secara spesifik dengan alur kerja, skala, dan proses bisnis Anda.' },
-  { title: 'Solusi SaaS Komunitas (Smarthub)', desc: 'Ekosistem manajemen lingkungan terpadu untuk RT/RW, perumahan, dan paguyuban — mencakup otomatisasi iuran warga, administrasi digital, dan forum interaksi.' },
-  { title: 'Integrasi Sistem & Pembayaran', desc: 'Implementasi arsitektur cloud, API pihak ketiga, serta integrasi payment gateway untuk transaksi keuangan otomatis dan aman.' },
-  { title: 'Konsultasi TI & Transformasi Digital', desc: 'Pendampingan teknis mulai dari audit infrastruktur, optimalisasi basis data, hingga strategi modernisasi sistem legasi.' },
+  { title: 'Custom Software Development', desc: 'Aplikasi web dan mobile yang dibuat mengikuti alur kerja, skala, dan proses bisnis Anda, bukan template.' },
+  { title: 'Solusi SaaS Komunitas (Smarthub)', desc: 'Ekosistem manajemen lingkungan untuk RT/RW, perumahan, dan paguyuban: iuran warga otomatis, administrasi digital, dan forum interaksi.' },
+  { title: 'Integrasi Sistem & Pembayaran', desc: 'Arsitektur cloud, API pihak ketiga, dan payment gateway supaya transaksi keuangan berjalan otomatis dan aman.' },
+  { title: 'Konsultasi TI & Transformasi Digital', desc: 'Pendampingan teknis: audit infrastruktur, optimalisasi basis data, sampai strategi modernisasi sistem lama.' },
 ]
 
 const values = [
-  { title: 'Presisi Arsitektural', desc: 'Kode yang bersih, modular, dan dirancang untuk performa tinggi serta kemudahan perawatan jangka panjang.' },
-  { title: 'Skalabilitas Tanpa Hambatan', desc: 'Fondasi sistem disiapkan untuk tumbuh selaras dengan ekspansi bisnis Anda.' },
-  { title: 'Pendekatan Berorientasi Hasil', desc: 'Solusi praktis yang langsung menjawab friksi operasional, bukan sekadar implementasi teknologi tanpa dampak nyata.' },
+  { title: 'Presisi Arsitektural', desc: 'Kode yang bersih dan modular: cepat, dan gampang dirawat saat nanti perlu diubah.' },
+  { title: 'Skalabilitas Tanpa Hambatan', desc: 'Fondasi sistem disiapkan supaya ikut tumbuh saat bisnis Anda membesar.' },
+  { title: 'Pendekatan Berorientasi Hasil', desc: 'Yang kami kejar dampaknya, bukan sekadar teknologi terpasang.' },
 ]
 
 export default function CompanyProfile() {
@@ -23,10 +23,10 @@ export default function CompanyProfile() {
         <div className="max-w-3xl mb-12">
           <span className="badge badge-info mb-4 inline-block">Profil Perusahaan</span>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-text-main mb-6">
-            Mengintegrasikan Logika Rekayasa dan Inovasi Digital untuk Solusi Bisnis yang Terukur
+            Software yang mengikuti cara kerja bisnis Anda
           </h2>
           <p className="font-body text-lg text-text-muted leading-relaxed">
-            <strong className="text-text-main">PT Logika Kreatif Indonesia (Logikraf)</strong> adalah studio rekayasa perangkat lunak dan konsultan transformasi digital. Kami merancang solusi teknologi yang presisi — memadukan arsitektur sistem yang solid (<em>logic</em>) dengan pengalaman pengguna yang intuitif (<em>craft</em>) guna membantu bisnis, organisasi, dan komunitas beroperasi lebih efisien.
+            <strong className="text-text-main">PT Logika Kreatif Indonesia (Logikraf)</strong> adalah studio rekayasa perangkat lunak dan konsultan transformasi digital. Kami memadukan arsitektur sistem yang rapi dengan pengalaman pengguna yang nyaman, supaya bisnis, organisasi, dan komunitas bisa bekerja lebih efisien.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function CompanyProfile() {
         <div className="mt-14 rounded-2xl bg-canvas-dark p-8 sm:p-10 text-center">
           <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">Siap Membangun Solusi Digital Anda?</h3>
           <p className="font-body text-white/60 max-w-2xl mx-auto leading-relaxed mb-8">
-            Diskusikan kebutuhan teknis bisnis Anda bersama kami dan bangun fondasi sistem yang andal.
+            Ceritakan kebutuhan teknis Anda, kami bantu susun fondasi sistem yang andal.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#konsultasi" className="btn-primary text-base px-8 py-4">Mulai Konsultasi</a>
