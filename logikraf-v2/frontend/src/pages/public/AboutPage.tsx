@@ -36,7 +36,7 @@ export default function AboutPage() {
 
   const values = [
     { title: 'Logika & Presisi', desc: 'Setiap fitur dirancang dengan arsitektur yang bersih, kode yang teruji, dan proses yang terdokumentasi — agar mudah dikembangkan, dirawat, dan diskalakan.' },
-    { title: 'Engineering yang Berorientasi Bisnis', desc: 'Teknologi dipilih berdasarkan kebutuhan nyata: stabilitas, biaya operasional, dan kecepatan rilis — bukan sekadar tren. Alur kerja sprint bertahap dengan CI/CD di setiap pengiriman.' },
+    { title: 'Teknologi yang Mengikuti Kebutuhan', desc: 'Teknologi dipilih berdasarkan kebutuhan nyata — stabilitas, biaya operasional, dan kecepatan rilis — bukan sekadar tren. Kerja bertahap per sprint, dengan CI/CD di setiap pengiriman.' },
     { title: 'Transparansi Penuh', desc: 'Komunikasi terbuka, cakupan kerja yang jelas, harga jujur, dan timeline yang dapat dipertanggungjawabkan — termasuk akses penuh atas kode dan dokumentasi.' },
   ]
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
                 Software House yang Membangun <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-blue-600">Produk Digital</span> hingga Produksi
               </h1>
               <p className="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl mx-auto font-body">
-                PT. Logika Kreatif Indonesia (Logikraf) adalah software house yang mengerjakan pengembangan perangkat lunak khusus (custom software): aplikasi web &amp; mobile, sistem informasi bisnis, integrasi pembayaran, hingga pendampingan teknis server dan DevOps.
+                PT. Logika Kreatif Indonesia (Logikraf) adalah software house sekaligus konsultan transformasi digital. Kami mengerjakan perangkat lunak khusus (custom software): web app, sistem informasi bisnis, integrasi pembayaran, sampai pendampingan teknis server dan DevOps.
               </p>
             </div>
 

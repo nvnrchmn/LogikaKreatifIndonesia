@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 // Isi dari draf pemilik; nada diturunkan agar menyatu dengan hero (14 Sep 2026).
 
 const services = [
-  { title: 'Custom Software Development', desc: 'Aplikasi web dan mobile yang dibuat mengikuti alur kerja, skala, dan proses bisnis Anda, bukan template.' },
+  { title: 'Custom Software Development', desc: 'Web app yang dibuat mengikuti alur kerja, skala, dan proses bisnis Anda, bukan template.' },
   { title: 'Solusi SaaS Komunitas (Smarthub)', desc: 'Ekosistem manajemen lingkungan untuk RT/RW, perumahan, dan paguyuban: iuran warga otomatis, administrasi digital, dan forum interaksi.' },
   { title: 'Integrasi Sistem & Pembayaran', desc: 'Arsitektur cloud, API pihak ketiga, dan payment gateway supaya transaksi keuangan berjalan otomatis dan aman.' },
   { title: 'Konsultasi TI & Transformasi Digital', desc: 'Pendampingan teknis: audit infrastruktur, optimalisasi basis data, sampai strategi modernisasi sistem lama.' },
