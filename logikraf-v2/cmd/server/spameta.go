@@ -13,9 +13,10 @@ import (
 )
 
 var (
-	spaHTML    string
-	spaModTime time.Time
-	titleRe    = regexp.MustCompile(`(<title>).*?(</title>)`)
+	spaHTML     string
+	spaModTime  time.Time
+	titleRe     = regexp.MustCompile(`(<title>).*?(</title>)`)
+	canonicalRe = regexp.MustCompile(`(<link rel="canonical" href=")[^"]*(")`)
 )
 
 func metaRe(name string) *regexp.Regexp {
@@ -57,6 +58,22 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 	if err != nil {
 		return c.Status(500).SendString("server error")
 	}
+	// Canonical WAJIB self-referential per URL. Sebelumnya canonical warisan
+	// index.html selalu "https://logikraf.id/", sehingga SEMUA halaman (termasuk
+	// artikel blog) mengaku duplikat homepage → berisiko tidak diindeks Google.
+	p := c.Path()
+	if p == "" {
+		p = "/"
+	}
+	if len(p) > 1 {
+		p = strings.TrimSuffix(p, "/")
+	}
+	host := c.Hostname()
+	switch host {
+	case "", "logikraf.id", "www.logikraf.id":
+		host = "logikraf.id"
+	}
+	html = canonicalRe.ReplaceAllString(html, "${1}https://"+host+p+"${2}")
 	if m != nil && m.Title != "" {
 		t := escHTML(m.Title)
 		html = titleRe.ReplaceAllString(html, "${1}"+t+"${2}")
@@ -114,4 +131,60 @@ func blogMeta(slug string) *pageMeta {
 	return &pageMeta{Title: title, Description: excerpt, OGImage: ogImage, Schema: schema}
 }
 
-var _ = filepath.Join
+// serveSPA — sajikan SPA dengan canonical self-referential + meta unik per route statis.
+func serveSPA(c fiber.Ctx, frontendDir string) error {
+	return serveSPAWithMeta(c, frontendDir, staticMeta(c.Path()))
+}
+
+// staticMeta — meta unik per route statis. Sebelumnya semua route memakai meta
+// homepage yang sama, jadi URL di sitemap tampil nyaris kembar di mata Google.
+func staticMeta(path string) *pageMeta {
+	p := path
+	if p == "" {
+		p = "/"
+	}
+	if len(p) > 1 {
+		p = strings.TrimSuffix(p, "/")
+	}
+	m, ok := staticMetaMap[p]
+	if !ok {
+		return nil
+	}
+	mm := m
+	return &mm
+}
+
+var staticMetaMap = map[string]pageMeta{
+	"/": {
+		Title:       "Logika Kreatif Indonesia | Jasa IT, Software & Digital Marketing",
+		Description: "Jasa pembuatan software, website, UI/UX, branding, dan digital marketing terpercaya untuk bisnis Anda.",
+	},
+	"/layanan": {
+		Title:       "Layanan: Software, Website, UI/UX & Digital Marketing | Logika Kreatif Indonesia",
+		Description: "Layanan pembuatan software custom, website, UI/UX design, branding, dan digital marketing untuk UMKM hingga perusahaan.",
+	},
+	"/paket": {
+		Title:       "Paket & Harga Jasa Website dan Software | Logika Kreatif Indonesia",
+		Description: "Pilih paket pembuatan website, aplikasi, dan digital marketing sesuai kebutuhan serta anggaran bisnis Anda.",
+	},
+	"/blog": {
+		Title:       "Blog: Tips Web, SEO & Digital Marketing | Logika Kreatif Indonesia",
+		Description: "Artikel praktis seputar pembuatan website, SEO, keamanan, UI/UX, dan digital marketing untuk bisnis Indonesia.",
+	},
+	"/tentang-kami": {
+		Title:       "Tentang Kami | PT Logika Kreatif Indonesia",
+		Description: "Kenali tim di balik Logika Kreatif Indonesia: software house dan agensi digital yang membangun produk untuk bisnis Indonesia.",
+	},
+	"/kontak": {
+		Title:       "Kontak & Konsultasi Proyek Digital | Logika Kreatif Indonesia",
+		Description: "Hubungi tim Logika Kreatif Indonesia untuk konsultasi pembuatan website, aplikasi, atau kerja sama digital.",
+	},
+	"/kebijakan-privasi": {
+		Title:       "Kebijakan Privasi | Logika Kreatif Indonesia",
+		Description: "Bagaimana Logika Kreatif Indonesia mengumpulkan, memakai, dan melindungi data pribadi pengguna.",
+	},
+	"/syarat-ketentuan": {
+		Title:       "Syarat & Ketentuan Layanan | Logika Kreatif Indonesia",
+		Description: "Syarat dan ketentuan penggunaan layanan serta produk Logika Kreatif Indonesia.",
+	},
+}

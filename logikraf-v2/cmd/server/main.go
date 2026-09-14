@@ -81,42 +81,42 @@ func main() {
 	app.Get("/", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
-			return c.SendFile(filepath.Join(frontendDir, "index.html"))
+			return serveSPA(c, frontendDir)
 		}
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/layanan", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/layanan/:slug", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/portfolio/:slug", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/paket", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/blog", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/blog/:slug", func(c fiber.Ctx) error {
 		if m := blogMeta(c.Params("slug")); m != nil {
 			return serveSPAWithMeta(c, frontendDir, m)
 		}
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/tentang-kami", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/kebijakan-privasi", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/syarat-ketentuan", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 	app.Get("/kontak", func(c fiber.Ctx) error {
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 
 	// Static assets
@@ -337,9 +337,9 @@ func main() {
 	app.Get("/*", func(c fiber.Ctx) error {
 		host := c.Hostname()
 		if strings.Contains(host, ".logikraf.id") && host != "logikraf.id" && host != "www.logikraf.id" && host != "mail.logikraf.id" {
-			return c.SendFile(filepath.Join(frontendDir, "index.html"))
+			return serveSPA(c, frontendDir)
 		}
-		return c.SendFile(filepath.Join(frontendDir, "index.html"))
+		return serveSPA(c, frontendDir)
 	})
 
 	port := os.Getenv("PORT")
