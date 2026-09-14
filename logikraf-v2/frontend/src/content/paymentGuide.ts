@@ -28,12 +28,15 @@ Aplikasi client hanya perlu menerima event dari Hub (status order/invoice):
   bila aman via jaringan internal.
 
 ### Langkah B — Daftarkan store di Admin Logikraf
-1. Buka \`logikraf.id/admin/partner-portal\` → kelola store & **akun login portal mitra**
-   (email + password awal dibuat admin, mitra ganti sendiri).
-2. **Sinkron dari Xendit** → pilih sub-account Managed → **Hubungkan ke mitra**.
-   Otomatis terisi: \`sub_account_id\`, \`entity_type\`, status KYC.
-3. Store di sisi routing (prefix \`mg-\`, webhook_url, secret) tetap dikelola
-   lewat halaman **Mitra & Store** (form Nama Toko/Base URL/Generate Key).
+1. Buka \`logikraf.id/admin/mitra-store\` (**Mitra & Store**) → buat store routing
+   (form Nama Toko / Base URL / fee) + generate key (hanya tampil sekali).
+2. Buka \`logikraf.id/admin/partner-portal\` (**Mitra & Portal**) → buat **akun login
+   portal mitra** (email + password awal dibuat admin, mitra ganti sendiri).
+3. Buat sub-account XenPlatform Managed lewat tombol **Buat Sub-account** di halaman itu
+   (\`POST /v3/accounts\` + kirim invite ke email Authorized Representative), lalu
+   **Sinkron dari Xendit** → **Hubungkan ke mitra**. Otomatis terisi: \`sub_account_id\`,
+   \`entity_type\`, status KYC.
+   → Kontrak API kanonik: \`logikraf-partners/docs/xenplatform-subaccount-api-contract.md\`
 
 ### Langkah C — Pasang key di aplikasi client
 - \`X-Internal-Key\` = key store (hanya tampil sekali saat generate/regenerate).

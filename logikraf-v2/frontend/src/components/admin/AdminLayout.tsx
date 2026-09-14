@@ -33,6 +33,7 @@ const navSections = [
     title: 'Uang Masuk',
     hint: 'Tagihan & pembayaran klien',
     items: [
+      { label: 'Mitra & Store', path: '/admin/mitra-store', icon: ShoppingBagIcon },
       { label: 'Mitra & Portal', path: '/admin/partner-portal', icon: WalletNavIcon },
       { label: 'Panduan Payment', path: '/admin/payment-guide', icon: DocNavIcon },
       { label: 'Transactions', path: '/admin/transactions', icon: TransactionNavIcon },
