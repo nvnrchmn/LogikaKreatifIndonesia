@@ -8,6 +8,7 @@ interface Package {
   name: string
   tagline: string
   price: number
+  strike_price?: number
   formatted_price: string
   features: string[]
   is_featured: boolean
@@ -42,8 +43,9 @@ export default function PackagesPage() {
         id: 1,
         name: 'Logikraf Starter',
         tagline: 'Paket dasar untuk profil bisnis & landing page profesional yang langsung go-digital.',
-        price: 2499000,
-        formatted_price: 'Rp 2.499.000',
+        price: 1499000,
+        strike_price: 1999000,
+        formatted_price: 'Rp 1.499.000',
         is_featured: false,
         slug: 'logikraf-starter',
         sort_order: 1,
@@ -67,8 +69,9 @@ export default function PackagesPage() {
         id: 2,
         name: 'Logikraf Business',
         tagline: 'Tingkatkan dengan katalog produk, blog, hingga manajemen lead & customer terpusat.',
-        price: 4999000,
-        formatted_price: 'Rp 4.999.000',
+        price: 2499000,
+        strike_price: 3999000,
+        formatted_price: 'Rp 2.499.000',
         is_featured: true,
         slug: 'logikraf-business',
         sort_order: 2,
@@ -91,8 +94,9 @@ export default function PackagesPage() {
         id: 3,
         name: 'Logikraf Commerce',
         tagline: 'Toko online lengkap dengan payment gateway, inventori, hingga laporan penjualan.',
-        price: 9999000,
-        formatted_price: 'Rp 9.999.000',
+        price: 5999000,
+        strike_price: 6999000,
+        formatted_price: 'Rp 5.999.000',
         is_featured: false,
         slug: 'logikraf-commerce',
         sort_order: 3,
@@ -200,7 +204,12 @@ export default function PackagesPage() {
 
                       {/* Price Tag */}
                       <div className="mb-8 pb-6 border-b border-border-minimal/40">
-                        <div className="flex items-baseline gap-1">
+                        <div className="flex items-baseline gap-3 flex-wrap">
+                          {pkg.strike_price ? (
+                            <span className={`text-lg font-body line-through ${isFeatured ? 'text-text-light/50' : 'text-text-muted'}`}>
+                              Rp {Number(pkg.strike_price).toLocaleString('id-ID')}
+                            </span>
+                          ) : null}
                           <span className={`text-3xl sm:text-4xl font-display font-black tracking-tight ${isFeatured ? 'text-white' : 'text-text-main'}`}>
                             {pkg.formatted_price || fmt(pkg.price)}
                           </span>
