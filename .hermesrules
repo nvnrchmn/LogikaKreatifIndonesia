@@ -76,3 +76,9 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - Uji cepat: `python3 /tmp/hub_qris_test.py` (panggil 2× → 200 + `diambil_ulang: true`, `reference_id` sama).
 
 - Bukti produksi 13 Sep: owner /api/settings 200 & /api/team 200; ops /api/settings 403, /api/team 403, /api/orders 200; setelah revoke token lama → 403 di /api/orders dan login 403; akun uji dibersihkan (kembali 3 user).
+
+## Harga coret paket + dokumen rujukan stack (15 Sep 2026, commit `d5fcd7c` + `334f538`)
+- BUG: `/paket` tidak pernah merender `strike_price`, padahal kolomnya SUDAH ADA di tabel `packages` dan sudah bisa diisi dari admin (`crudConfigs` -> "Harga Coret / Asli"). Ditambahkan: `strike_price` di tipe `Package` + render `.line-through` sebelum harga berlaku.
+- BUG KEDUA: fallback di `PackagesPage.tsx` menaruh HARGA CORET di field `price` (2.499/4.999/9.999 = angka lama). Disamakan dengan DB: Starter 1.999.000->1.499.000, Business 3.999.000->2.499.000, Commerce 6.999.000->5.999.000. Kalau API gagal, pengunjung tidak lagi melihat harga salah.
+- Bukti: API `/api/packages` sudah mengirim `strike_price`; render live diverifikasi Playwright (coret: 1.999.000/3.999.000/6.999.000 -> berlaku: 1.499.000/2.499.000/5.999.000).
+- DOKUMEN RUJUKAN STACK: `logikraf-v2/docs/stack-per-paket.md` (74 baris). Keputusan Nova 15 Sep: Starter = **Astro** statis, Business = **Astro** statis + CMS, Commerce = **Go + React + TypeScript + Tailwind**. Isinya juga memuat keputusan arsitektur "satu backend multi-tenant + frontend statis per klien" dan daftar yang BELUM diputuskan.
