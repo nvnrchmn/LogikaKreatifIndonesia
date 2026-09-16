@@ -50,7 +50,12 @@ type pageMeta struct {
 	Title       string
 	Description string
 	OGImage     string
+	OGType      string
+	OGLocale    string
+	OGSiteName  string
+	TwitterCard string
 	Schema      string
+	Breadcrumb  string
 }
 
 func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
@@ -91,8 +96,36 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 		}
 		html = metaRe("og:image").ReplaceAllString(html, "${1}"+img+"${2}")
 	}
+	// OpenGraph type, locale, site_name
+	if m != nil && m.OGType != "" {
+		html = metaRe("og:type").ReplaceAllString(html, "${1}"+m.OGType+"${2}")
+	}
+	if m != nil && m.OGLocale != "" {
+		html = metaRe("og:locale").ReplaceAllString(html, "${1}"+m.OGLocale+"${2}")
+	}
+	if m != nil && m.OGSiteName != "" {
+		html = metaRe("og:site_name").ReplaceAllString(html, "${1}"+m.OGSiteName+"${2}")
+	}
+	// Twitter Card
+	if m != nil && m.TwitterCard != "" {
+		html = metaRe("twitter:card").ReplaceAllString(html, "${1}"+m.TwitterCard+"${2}")
+		html = metaRe("twitter:title").ReplaceAllString(html, "${1}"+m.Title+"${2}")
+		html = metaRe("twitter:description").ReplaceAllString(html, "${1}"+m.Description+"${2}")
+		if m.OGImage != "" {
+			img := m.OGImage
+			if !strings.HasPrefix(img, "http") {
+				img = "https://logikraf.id" + img
+			}
+			html = metaRe("twitter:image").ReplaceAllString(html, "${1}"+img+"${2}")
+		}
+	}
+	// JSON-LD schemas
 	if m != nil && m.Schema != "" {
 		inject := "\n    <script type=\"application/ld+json\">" + m.Schema + "</script>"
+		html = strings.Replace(html, "</head>", inject+"\n</head>", 1)
+	}
+	if m != nil && m.Breadcrumb != "" {
+		inject := "\n    <script type=\"application/ld+json\">" + m.Breadcrumb + "</script>"
 		html = strings.Replace(html, "</head>", inject+"\n</head>", 1)
 	}
 	c.Set("Content-Type", "text/html; charset=utf-8")
@@ -128,7 +161,7 @@ func blogMeta(slug string) *pageMeta {
 		`{"@context":"https://schema.org","@type":"BlogPosting","headline":"%s","description":"%s","datePublished":"%s","author":{"@type":"Organization","name":"Logika Kreatif Indonesia"},"publisher":{"@type":"Organization","name":"Logika Kreatif Indonesia"}}`,
 		escHTML(title), escHTML(excerpt), pub.Format(time.RFC3339),
 	)
-	return &pageMeta{Title: title, Description: excerpt, OGImage: ogImage, Schema: schema}
+	return &pageMeta{Title: title, Description: excerpt, OGImage: ogImage, OGType: "article", OGLocale: "id_ID", OGSiteName: "Logika Kreatif Indonesia", TwitterCard: "summary_large_image", Schema: schema}
 }
 
 // serveSPA — sajikan SPA dengan canonical self-referential + meta unik per route statis.
@@ -158,33 +191,66 @@ var staticMetaMap = map[string]pageMeta{
 	"/": {
 		Title:       "Logika Kreatif Indonesia | Jasa IT, Software & Digital Marketing",
 		Description: "Jasa pembuatan software, website, UI/UX, branding, dan digital marketing terpercaya untuk bisnis Anda.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+		Schema:      `{"@context":"https://schema.org","@type":"WebSite","name":"Logika Kreatif Indonesia","url":"https://logikraf.id","potentialAction":{"@type":"SearchAction","target":"https://logikraf.id/?q={search_term_string}","query-input":"required name=search_term_string"}}`,
 	},
 	"/layanan": {
 		Title:       "Layanan: Software, Website, UI/UX & Digital Marketing | Logika Kreatif Indonesia",
 		Description: "Layanan pembuatan software custom, website, UI/UX design, branding, dan digital marketing untuk UMKM hingga perusahaan.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/paket": {
 		Title:       "Paket & Harga Jasa Website dan Software | Logika Kreatif Indonesia",
 		Description: "Pilih paket pembuatan website, aplikasi, dan digital marketing sesuai kebutuhan serta anggaran bisnis Anda.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/blog": {
 		Title:       "Blog: Tips Web, SEO & Digital Marketing | Logika Kreatif Indonesia",
 		Description: "Artikel praktis seputar pembuatan website, SEO, keamanan, UI/UX, dan digital marketing untuk bisnis Indonesia.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/tentang-kami": {
 		Title:       "Tentang Kami | PT Logika Kreatif Indonesia",
 		Description: "Kenali tim di balik Logika Kreatif Indonesia: software house dan agensi digital yang membangun produk untuk bisnis Indonesia.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/kontak": {
 		Title:       "Kontak & Konsultasi Proyek Digital | Logika Kreatif Indonesia",
 		Description: "Hubungi tim Logika Kreatif Indonesia untuk konsultasi pembuatan website, aplikasi, atau kerja sama digital.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/kebijakan-privasi": {
 		Title:       "Kebijakan Privasi | Logika Kreatif Indonesia",
 		Description: "Bagaimana Logika Kreatif Indonesia mengumpulkan, memakai, dan melindungi data pribadi pengguna.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 	"/syarat-ketentuan": {
 		Title:       "Syarat & Ketentuan Layanan | Logika Kreatif Indonesia",
 		Description: "Syarat dan ketentuan penggunaan layanan serta produk Logika Kreatif Indonesia.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
 	},
 }
