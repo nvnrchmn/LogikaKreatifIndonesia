@@ -101,7 +101,11 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 		html = metaRe("og:type").ReplaceAllString(html, "${1}"+m.OGType+"${2}")
 	}
 	if m != nil && m.OGLocale != "" {
-		html = metaRe("og:locale").ReplaceAllString(html, "${1}"+m.OGLocale+"${2}")
+		if !strings.Contains(html, "og:locale") {
+			html = strings.Replace(html, "</head>", "    <meta property=\"og:locale\" content=\""+m.OGLocale+"\" />\n</head>", 1)
+		} else {
+			html = metaRe("og:locale").ReplaceAllString(html, "${1}"+m.OGLocale+"${2}")
+		}
 	}
 	if m != nil && m.OGSiteName != "" {
 		html = metaRe("og:site_name").ReplaceAllString(html, "${1}"+m.OGSiteName+"${2}")
