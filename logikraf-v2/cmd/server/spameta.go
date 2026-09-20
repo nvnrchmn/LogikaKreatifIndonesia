@@ -132,7 +132,11 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 		inject := "\n    <script type=\"application/ld+json\">" + m.Breadcrumb + "</script>"
 		html = strings.Replace(html, "</head>", inject+"\n</head>", 1)
 	}
-	c.Set("Content-Type", "text/html; charset=utf-8")
+	// Default og:image bila tidak diset tiap route — pastikan shareable
+	if !strings.Contains(html, "og:image") && !strings.Contains(html, "og:image:...") {
+		html = strings.Replace(html, "</head>", `    <meta property="og:image" content="https://logikraf.id/og-image.png" />
+</head>`, 1)
+	}
 	c.Set("Cache-Control", "no-cache")
 	return c.SendString(html)
 }
