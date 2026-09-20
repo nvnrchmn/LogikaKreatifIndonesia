@@ -197,8 +197,8 @@ func staticMeta(path string) *pageMeta {
 
 var staticMetaMap = map[string]pageMeta{
 	"/": {
-		Title:       "Logika Kreatif Indonesia | Jasa IT, Software & Digital Marketing",
-		Description: "Jasa pembuatan software, website, UI/UX, branding, dan digital marketing terpercaya untuk bisnis Anda.",
+		Title:       "Logikraf.id | Pembuatan Website & Sistem Digital untuk UMKM Bekasi",
+		Description: "PT Logika Kreatif Indonesia (Bekasi) menyediakan solusi digital untuk UMKM: pembuatan website, toko online, sistem kasir/POS, manajemen stok, dan buku kas berbasis web.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
@@ -207,7 +207,7 @@ var staticMetaMap = map[string]pageMeta{
 	},
 	"/layanan": {
 		Title:       "Layanan: Software, Website, UI/UX & Digital Marketing | Logika Kreatif Indonesia",
-		Description: "Layanan pembuatan software custom, website, UI/UX design, branding, dan digital marketing untuk UMKM hingga perusahaan.",
+		Description: "Layanan pembuatan website, aplikasi web, UI/UX, branding, dan sistem kasir digital untuk UMKM Bekasi & Jakarta.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
@@ -239,7 +239,7 @@ var staticMetaMap = map[string]pageMeta{
 	},
 	"/kontak": {
 		Title:       "Kontak & Konsultasi Proyek Digital | Logika Kreatif Indonesia",
-		Description: "Hubungi tim Logika Kreatif Indonesia untuk konsultasi pembuatan website, aplikasi, atau kerja sama digital.",
+		Description: "Hubungi kami (Bekasi) untuk konsultasi GRATIS pembuatan website UMKM, sistem POS, atau digitalisasi bisnis Anda.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
