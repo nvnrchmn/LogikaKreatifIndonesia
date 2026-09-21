@@ -137,6 +137,9 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 		html = strings.Replace(html, "</head>", `    <meta property="og:image" content="https://logikraf.id/og-image.png" />
 </head>`, 1)
 	}
+	// Content-Type WAJIB text/html — tanpa ini Fiber kirim text/plain dan
+	// crawler memperlakukan halaman sebagai teks biasa (regresi 20 Sep).
+	c.Set("Content-Type", "text/html; charset=utf-8")
 	c.Set("Cache-Control", "no-cache")
 	return c.SendString(html)
 }
