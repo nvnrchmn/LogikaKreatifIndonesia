@@ -101,3 +101,6 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - PELAJARAN ALAT: `write_file`/patch dengan payload > ~1,5 KB terpotong jadi `...[truncated]` dan merusak kode. Tulis skrip ke file kecil, jalankan, verifikasi.
 - CATATAN: konten FAQ di-render React (client-side) sehingga hanya terlihat crawler yang menjalankan JS; schema-nya ada di HTML server (dari Go).
 
+- TIER 2 SELESAI 21 Sep - halaman layanan BARU `/jasa-pembuatan-aplikasi-web` (Opsi A, disetujui pemilik): `ServiceAppPage.tsx` + route di `App.tsx` + tautan navbar (label "Layanan") + meta/sitemap di Go. Isi: 6 jenis aplikasi (kasir-POS, toko online, inventory, sistem informasi, QRIS, integrasi kirim), alur kerja 4 langkah, 5 FAQ, CTA ke `/paket` & `/kontak`. `FAQPage` JSON-LD diturunkan dari array `faqs` komponen (schema & konten visual tak bisa menyimpang). Bukti: 200 `text/html`, JSON-LD `[LocalBusiness, FAQPage(5)]`, sitemap 21 URL, chunk `ServiceAppPage-DIrdpUQx.js` ter-deploy memuat teks + URL baru; 11/11 judul unik, 0 route gagal.
+- CATATAN: modul `/layanan` lama dihapus di `9863298`; halaman ini adalah penggantinya yang berorientasi kata kunci komersial, disetujui pemilik (Opsi A).
+- PELAJARAN: payload tool panjang (`write_file`/patch) terpotong di ~1,5-3 KB; bangun file besar dengan potongan kecil ke /tmp lalu `cat` berurutan.
