@@ -17,6 +17,9 @@ var (
 	spaModTime  time.Time
 	titleRe     = regexp.MustCompile(`(<title>).*?(</title>)`)
 	canonicalRe = regexp.MustCompile(`(<link rel="canonical" href=")[^"]*(")`)
+	// entryRe — menandai bundel entri di HTML. Dipakai memastikan HTML prerender
+	// tidak menunjuk aset yang sudah hilang (gejala: halaman blank setelah deploy).
+	entryRe = regexp.MustCompile(`(/assets/index-[A-Za-z0-9_.-]+\.js)`)
 )
 
 func metaRe(name string) *regexp.Regexp {
@@ -74,7 +77,15 @@ func loadPrerendered(frontendDir, path string) (string, bool) {
 	if err != nil || len(b) < 2000 {
 		return "", false
 	}
-	return string(b), true
+	html := string(b)
+	// Jaring pengaman: bila HTML prerender menunjuk bundel yang sudah tidak ada
+	// (mis. tepat setelah deploy), jangan disajikan - fallback ke shell SPA.
+	if m := entryRe.FindStringSubmatch(html); m != nil {
+		if _, statErr := os.Stat(filepath.Join(frontendDir, m[1])); statErr != nil {
+			return "", false
+		}
+	}
+	return html, true
 }
 
 func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
