@@ -138,6 +138,19 @@ export default function ServiceAppPage() {
             </div>
           </div>
         </div>
+        {/* Solusi terkait */}
+        <div className="container-narrow pb-16 sm:pb-20 px-4">
+          <div className="bg-white rounded-3xl border border-border-minimal p-8 sm:p-10">
+            <h2 className="text-xl sm:text-2xl font-display font-extrabold text-text-main tracking-tight mb-3">
+              Butuh sistem khusus untuk perumahan atau RT/RW?
+            </h2>
+            <p className="text-text-muted text-sm font-body mb-5">
+              Kami punya produk yang sudah berjalan untuk tata kelola perumahan: iuran QRIS, buku kas, sensus warga, sampai keluhan warga.
+            </p>
+            <Link to="/aplikasi-manajemen-perumahan" className="btn-primary">Lihat Aplikasi Manajemen Perumahan</Link>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="container-narrow pb-20 sm:pb-24 px-4">
           <div className="bg-canvas-dark rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden">

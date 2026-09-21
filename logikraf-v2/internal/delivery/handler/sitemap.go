@@ -10,7 +10,7 @@ import (
 
 const siteBaseURL = "https://logikraf.id"
 
-var staticPaths = []string{"/", "/paket", "/jasa-pembuatan-aplikasi-web", "/portfolio", "/blog", "/faq", "/tentang-kami", "/kontak", "/kebijakan-refund", "/kebijakan-privasi", "/syarat-ketentuan"}
+var staticPaths = []string{"/", "/paket", "/jasa-pembuatan-aplikasi-web", "/aplikasi-manajemen-perumahan", "/portfolio", "/blog", "/faq", "/tentang-kami", "/kontak", "/kebijakan-refund", "/kebijakan-privasi", "/syarat-ketentuan"}
 
 func GetSitemap(c fiber.Ctx) error {
 	var b strings.Builder

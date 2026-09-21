@@ -271,6 +271,15 @@ var staticMetaMap = map[string]pageMeta{
 		OGSiteName:  "Logika Kreatif Indonesia",
 		TwitterCard: "summary_large_image",
 	},
+	"/aplikasi-manajemen-perumahan": {
+		Title:       "Aplikasi Manajemen Perumahan & RT/RW - SmartHub | Logikraf",
+		Description: "Aplikasi manajemen perumahan dan RT/RW: iuran warga via QRIS, buku kas, sensus warga terenkripsi, pengingat tunggakan, dan peminjaman fasilitas.",
+		Schema:      `{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Apa itu aplikasi manajemen perumahan SmartHub?", "acceptedAnswer": {"@type": "Answer", "text": "SmartHub adalah platform SaaS tata kelola perumahan buatan Logikraf yang menyatukan pembayaran iuran, buku kas, sensus warga, fasilitas, dan keluhan dalam satu aplikasi untuk pengurus RT/RW beserta warganya."}}, {"@type": "Question", "name": "Bagaimana warga membayar iuran?", "acceptedAnswer": {"@type": "Answer", "text": "Warga membayar iuran melalui QRIS dinamis yang diproses payment gateway berlisensi, dan status pembayaran tercatat otomatis pada kas lingkungan."}}, {"@type": "Question", "name": "Apakah data warga aman?", "acceptedAnswer": {"@type": "Answer", "text": "Data kependudukan disimpan terenkripsi dan aksesnya dibatasi sesuai peran pengguna, sehingga tidak semua orang dapat membukanya."}}, {"@type": "Question", "name": "Bisakah dipakai untuk beberapa perumahan sekaligus?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. SmartHub dirancang multi-tenant dan multi-role, sehingga satu sistem dapat melayani beberapa lingkungan dengan data yang terpisah."}}, {"@type": "Question", "name": "Apakah Logikraf membangun aplikasi serupa untuk kebutuhan khusus?", "acceptedAnswer": {"@type": "Answer", "text": "Ya. SmartHub adalah contoh yang sudah berjalan; kami juga membangun aplikasi web custom lain sesuai proses bisnis Anda."}}]}`,
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+	},
 	"/jasa-pembuatan-aplikasi-web": {
 		Title:       "Jasa Pembuatan Aplikasi Web & Sistem Informasi | Logikraf",
 		Description: "Jasa bikin aplikasi web custom: kasir/POS, inventory, penjualan online, sampai sistem informasi internal. Mulai Rp 1.499.000, garansi pengerjaan.",
