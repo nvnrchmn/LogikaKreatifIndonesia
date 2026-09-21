@@ -142,6 +142,11 @@ func main() {
 	app.Get("/logo.png", func(c fiber.Ctx) error {
 		return c.SendFile(filepath.Join(frontendDir, "logo.png"))
 	})
+	// og:image 1200x630 — tanpa route eksplisit ini jatuh ke catch-all SPA
+	// sehingga URL mengembalikan HTML, bukan gambar.
+	app.Get("/og-image.png", func(c fiber.Ctx) error {
+		return c.SendFile(filepath.Join(frontendDir, "og-image.png"))
+	})
 
 	// Public API
 	api := app.Group("/api")
