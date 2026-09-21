@@ -127,6 +127,29 @@ export default function PackagesPage() {
 
   const fmt = (n: number) => `Rp ${Number(n || 0).toLocaleString('id-ID')}`
 
+  const priceFaqs =[
+    {
+      q: 'Berapa biaya pembuatan website di Logikraf?',
+      a: 'Mulai Rp 1.499.000 (Starter), Rp 2.499.000 (Business), dan Rp 5.999.000 (Commerce). Nominal ini adalah harga tetap pada invoice digital Anda.',
+    },
+    {
+      q: 'Apa saja yang sudah termasuk dalam biaya paket?',
+      a: 'Hosting, SSL, tampilan mobile responsive, dan SEO dasar. Paket Business menambah katalog produk, blog, dashboard admin, dan manajemen lead.',
+    },
+    {
+      q: 'Apakah ada biaya tersembunyi?',
+      a: 'Tidak ada. Total yang dibayar sama persis dengan nominal pada invoice digital Anda.',
+    },
+    {
+      q: 'Bagaimana cara pembayaran biaya paket?',
+      a: 'Online lewat QRIS yang diproses gerbang pembayaran berlisensi PJP Bank Indonesia, dipindai dari m-Banking maupun e-wallet apa pun.',
+    },
+    {
+      q: 'Paket mana yang cocok untuk toko online?',
+      a: 'Logikraf Commerce: katalog produk, checkout, payment gateway, manajemen pesanan, inventori, integrasi pengiriman, dan laporan penjualan.',
+    },
+  ]
+
   return (
     <PublicLayout>
       <div className="min-h-screen bg-canvas-light">
@@ -160,9 +183,9 @@ export default function PackagesPage() {
                 <span>Paket Layanan SaaS &amp; Pembuatan Website</span>
               </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-text-main tracking-tight mb-4 leading-tight">
-                Investasi Transparan untuk <br className="hidden sm:inline" />
+                Harga &amp; Biaya Pembuatan <br className="hidden sm:inline" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary via-blue-600 to-indigo-600">
-                  Pertumbuhan Bisnis Anda
+                  Website untuk Bisnis Anda
                 </span>
               </h1>
               <p className="text-text-muted text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-body">
@@ -365,6 +388,26 @@ export default function PackagesPage() {
                     Setiap kerja sama dilindungi oleh kontrak resmi berbadan hukum PT. Logika Kreatif Indonesia.
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* FAQ biaya — menargetkan pencarian "harga/biaya pembuatan website" */}
+            <div className="mt-16 bg-white rounded-3xl border border-border-minimal p-8 sm:p-12">
+              <h2 className="font-display font-extrabold text-2xl text-text-main mb-2 text-center">
+                Pertanyaan Seputar Biaya Pembuatan Website
+              </h2>
+              <p className="text-xs text-text-muted text-center mb-8">
+                Rincian harga, cakupan paket, dan cara pembayaran proyek Anda.
+              </p>
+              <div className="max-w-3xl mx-auto space-y-3">
+                {priceFaqs.map((f, i) => (
+                  <details key={i} className="border border-border-minimal rounded-xl p-5">
+                    <summary className="cursor-pointer font-display font-semibold text-text-main text-sm sm:text-base list-none">
+                      {f.q}
+                    </summary>
+                    <p className="mt-3 text-text-muted text-xs sm:text-sm leading-relaxed">{f.a}</p>
+                  </details>
+                ))}
               </div>
             </div>
           </div>

@@ -240,7 +240,7 @@ var staticMetaMap = map[string]pageMeta{
 	},
 	"/faq": {
 		Title:       "FAQ: Pertanyaan Umum Jasa Website & Sistem Digital | Logika Kreatif Indonesia",
-		Description: "Jawaban atas pertanyaan umum soal biaya, durasi pengerjaan, revisi, dan garansi untuk pembuatan website maupun sistem internal UMKM.",
+		Description: "Panduan pembayaran logikraf.id: cara memindai QRIS, verifikasi otomatis, status pembayaran, sampai kebijakan refund paket website dan aplikasi.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
@@ -255,8 +255,9 @@ var staticMetaMap = map[string]pageMeta{
 		TwitterCard: "summary_large_image",
 	},
 	"/paket": {
-		Title:       "Paket & Harga Jasa Website dan Software | Logika Kreatif Indonesia",
-		Description: "Pilih paket pembuatan website, aplikasi, dan digital marketing sesuai kebutuhan serta anggaran bisnis Anda.",
+		Title:       "Harga & Biaya Pembuatan Website Perusahaan | Logikraf",
+		Description: "Rincian biaya pembuatan website: Starter Rp 1.499.000, Business Rp 2.499.000, Commerce Rp 5.999.000 - termasuk hosting, SSL, dan SEO dasar.",
+		Schema:      `{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Berapa biaya pembuatan website di Logikraf?", "acceptedAnswer": {"@type": "Answer", "text": "Mulai Rp 1.499.000 (Starter), Rp 2.499.000 (Business), dan Rp 5.999.000 (Commerce). Nominal ini adalah harga tetap pada invoice digital Anda."}}, {"@type": "Question", "name": "Apa saja yang sudah termasuk dalam biaya paket?", "acceptedAnswer": {"@type": "Answer", "text": "Hosting, SSL, tampilan mobile responsive, dan SEO dasar. Paket Business menambah katalog produk, blog, dashboard admin, dan manajemen lead."}}, {"@type": "Question", "name": "Apakah ada biaya tersembunyi?", "acceptedAnswer": {"@type": "Answer", "text": "Tidak ada. Total yang dibayar sama persis dengan nominal pada invoice digital Anda."}}, {"@type": "Question", "name": "Bagaimana cara pembayaran biaya paket?", "acceptedAnswer": {"@type": "Answer", "text": "Online lewat QRIS yang diproses gerbang pembayaran berlisensi PJP Bank Indonesia, dipindai dari m-Banking maupun e-wallet apa pun."}}, {"@type": "Question", "name": "Paket mana yang cocok untuk toko online?", "acceptedAnswer": {"@type": "Answer", "text": "Logikraf Commerce: katalog produk, checkout, payment gateway, manajemen pesanan, inventori, integrasi pengiriman, dan laporan penjualan."}}]}`,
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
