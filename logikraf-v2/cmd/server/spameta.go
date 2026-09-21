@@ -271,6 +271,14 @@ var staticMetaMap = map[string]pageMeta{
 		OGSiteName:  "Logika Kreatif Indonesia",
 		TwitterCard: "summary_large_image",
 	},
+	"/jasa-pembuatan-aplikasi-web": {
+		Title:       "Jasa Pembuatan Aplikasi Web & Sistem Informasi | Logikraf",
+		Description: "Jasa bikin aplikasi web custom: kasir/POS, inventory, penjualan online, sampai sistem informasi internal. Mulai Rp 1.499.000, garansi pengerjaan.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+	},
 	"/portfolio": {
 		Title:       "Portofolio & Studi Kasus | Logika Kreatif Indonesia",
 		Description: "Kumpulan studi kasus proyek digital Logikraf: platform manajemen perumahan, sistem internal, dan website bisnis untuk klien UMKM hingga perusahaan.",

@@ -32,6 +32,7 @@ export default function Navbar({ transparent = true, forceScrolled = false }: Na
   }, [isHome, transparent, forceScrolled, pathname])
 
   const links = [
+    { to: '/jasa-pembuatan-aplikasi-web', label: 'Layanan' },
     { to: '/paket', label: 'Paket' },
     { to: '/portfolio', label: 'Portofolio' },
     { to: '/blog', label: 'Blog' },

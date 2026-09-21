@@ -21,6 +21,7 @@ const RefundPolicyPage = lazy(() => import('./pages/public/RefundPolicyPage'))
 const VerifyEmailPage = lazy(() => import('./pages/client/VerifyEmailPage'))
 const ClientNotificationsPage = lazy(() => import('./pages/client/ClientNotificationsPage'))
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
+const ServiceAppPage = lazy(() => import('./pages/public/ServiceAppPage'))
 
 // Admin Components & Pages (Lazy Loaded)
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
@@ -116,6 +117,7 @@ export default function App() {
       <Route path="/portfolio" element={<PortfolioPage />} />
       <Route path="/portfolio/:slug" element={<PortfolioDetailPage />} />
       <Route path="/paket" element={<PackagesPage />} />
+      <Route path="/jasa-pembuatan-aplikasi-web" element={<ServiceAppPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/tentang-kami" element={<AboutPage />} />
