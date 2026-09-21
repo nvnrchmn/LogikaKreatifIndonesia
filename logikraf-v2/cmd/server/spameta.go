@@ -58,10 +58,35 @@ type pageMeta struct {
 	Breadcrumb  string
 }
 
+// prerenderDir — lokasi HTML hasil prerender. Sengaja DI LUAR dist/ supaya tidak
+// terhapus oleh rsync --delete saat deploy dari CI.
+func prerenderDir(frontendDir string) string {
+	return filepath.Join(filepath.Dir(frontendDir), "prerender")
+}
+
+// loadPrerendered — baca HTML statis untuk path tertentu bila tersedia.
+func loadPrerendered(frontendDir, path string) (string, bool) {
+	name := "index.html"
+	if path != "" && path != "/" {
+		name = strings.Trim(path, "/") + ".html"
+	}
+	b, err := os.ReadFile(filepath.Join(prerenderDir(frontendDir), name))
+	if err != nil || len(b) < 2000 {
+		return "", false
+	}
+	return string(b), true
+}
+
 func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
-	html, err := loadSpaHTML(frontendDir)
-	if err != nil {
-		return c.Status(500).SendString("server error")
+	// Utamakan HTML hasil prerender supaya crawler tanpa JavaScript tetap
+	// membaca judul, paragraf, dan tautan — bukan shell kosong.
+	html, ok := loadPrerendered(frontendDir, c.Path())
+	if !ok {
+		var err error
+		html, err = loadSpaHTML(frontendDir)
+		if err != nil {
+			return c.Status(500).SendString("server error")
+		}
 	}
 	// Canonical WAJIB self-referential per URL. Sebelumnya canonical warisan
 	// index.html selalu "https://logikraf.id/", sehingga SEMUA halaman (termasuk
