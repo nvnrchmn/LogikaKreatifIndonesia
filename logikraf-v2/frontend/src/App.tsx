@@ -23,6 +23,7 @@ const ClientNotificationsPage = lazy(() => import('./pages/client/ClientNotifica
 const FaqPage = lazy(() => import('./pages/public/FaqPage'))
 const ServiceAppPage = lazy(() => import('./pages/public/ServiceAppPage'))
 const ResidentialAppPage = lazy(() => import('./pages/public/ResidentialAppPage'))
+const SolutionsPage = lazy(() => import('./pages/public/SolutionsPage'))
 
 // Admin Components & Pages (Lazy Loaded)
 const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
@@ -120,6 +121,7 @@ export default function App() {
       <Route path="/paket" element={<PackagesPage />} />
       <Route path="/jasa-pembuatan-aplikasi-web" element={<ServiceAppPage />} />
       <Route path="/aplikasi-manajemen-perumahan" element={<ResidentialAppPage />} />
+      <Route path="/solusi" element={<SolutionsPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<BlogDetailPage />} />
       <Route path="/tentang-kami" element={<AboutPage />} />

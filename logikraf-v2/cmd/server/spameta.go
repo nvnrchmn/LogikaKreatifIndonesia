@@ -271,6 +271,15 @@ var staticMetaMap = map[string]pageMeta{
 		OGSiteName:  "Logika Kreatif Indonesia",
 		TwitterCard: "summary_large_image",
 	},
+	"/solusi": {
+		Title:       "Solusi Sistem Digital per Industri & Usaha | Logikraf",
+		Description: "Solusi sistem digital untuk berbagai usaha: kasir, stok, laundry, bengkel, apotek, administrasi internal, sampai tata kelola perumahan dan RT/RW.",
+		Schema:      `{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Bisakah sistem disesuaikan dengan alur kerja usaha saya?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. Kami membangun aplikasi mengikuti proses bisnis Anda, bukan memaksa Anda menyesuaikan diri dengan template yang sudah jadi."}}, {"@type": "Question", "name": "Apakah kasir, stok, dan laporan bisa digabung dalam satu aplikasi?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. Satu aplikasi dapat mencakup penjualan, persediaan, pelanggan, invoice, dan laporan sekaligus."}}, {"@type": "Question", "name": "Apakah aplikasinya bisa dibuka dari ponsel?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. Aplikasi dibangun sebagai web app sehingga dapat diakses lewat browser di desktop maupun ponsel."}}, {"@type": "Question", "name": "Berapa biaya dan bagaimana pembayarannya?", "acceptedAnswer": {"@type": "Answer", "text": "Biaya paket mulai Rp 1.499.000 dan dibayar online melalui QRIS. Rincian tiap paket ada di halaman Paket & Harga."}}, {"@type": "Question", "name": "Untuk perumahan atau RT/RW, apakah ada produk yang sudah jadi?", "acceptedAnswer": {"@type": "Answer", "text": "Ada. SmartHub by Logikraf sudah berjalan dan menangani iuran QRIS, buku kas, sensus warga, sampai keluhan warga."}}]}`,
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+	},
 	"/aplikasi-manajemen-perumahan": {
 		Title:       "Aplikasi Manajemen Perumahan & RT/RW - SmartHub | Logikraf",
 		Description: "Aplikasi manajemen perumahan dan RT/RW: iuran warga via QRIS, buku kas, sensus warga terenkripsi, pengingat tunggakan, dan peminjaman fasilitas.",
