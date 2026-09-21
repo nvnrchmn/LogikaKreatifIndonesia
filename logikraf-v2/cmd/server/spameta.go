@@ -199,7 +199,7 @@ func portfolioMeta(slug string) *pageMeta {
 		creator = "Logika Kreatif Indonesia"
 	}
 	schema := fmt.Sprintf(
-		`{"@context":"https://***@type":"CreativeWork","name":"%s","description":"%s","dateModified":"%s","creator":{"@type":"Organization","name":"%s"},"url":"https://logikraf.id/portfolio/%s"}`,
+		`{"@context":"https://schema.org","@type":"CreativeWork","name":"%s","description":"%s","dateModified":"%s","creator":{"@type":"Organization","name":"%s"},"url":"https://logikraf.id/portfolio/%s"}`,
 		escHTML(title), escHTML(excerpt), upd, escHTML(creator), escHTML(slug),
 	)
 	return &pageMeta{Title: title, Description: excerpt, OGImage: img, OGType: "article", OGLocale: "id_ID", OGSiteName: "Logika Kreatif Indonesia", TwitterCard: "summary_large_image", Schema: schema}
