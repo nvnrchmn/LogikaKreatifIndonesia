@@ -175,6 +175,36 @@ func blogMeta(slug string) *pageMeta {
 	return &pageMeta{Title: title, Description: excerpt, OGImage: ogImage, OGType: "article", OGLocale: "id_ID", OGSiteName: "Logika Kreatif Indonesia", TwitterCard: "summary_large_image", Schema: schema}
 }
 
+// portfolioMeta — meta unik per studi kasus portfolio (pola sama dengan blogMeta).
+// Sebelumnya /portfolio/:slug jatuh ke meta homepage sehingga judulnya kembar.
+func portfolioMeta(slug string) *pageMeta {
+	var title, excerpt, client, img, upd string
+	err := model.DB.Raw(
+		"SELECT title, COALESCE(excerpt, LEFT(description, 155), ''), COALESCE(client_name, ''), COALESCE(thumbnail, ''), DATE_FORMAT(COALESCE(updated_at, created_at), '%Y-%m-%dT%H:%i:%sZ') FROM portfolios WHERE slug=? AND is_published=1 AND deleted_at IS NULL",
+		slug,
+	).Row().Scan(&title, &excerpt, &client, &img, &upd)
+	if err != nil || title == "" {
+		return nil
+	}
+	if suffix := " | Logika Kreatif Indonesia"; len(title)+len(suffix) <= 65 {
+		title += suffix
+	}
+	excerpt = strings.ReplaceAll(excerpt, "\n", " ")
+	excerpt = strings.NewReplacer("<", "", ">", "").Replace(excerpt)
+	if len(excerpt) > 160 {
+		excerpt = excerpt[:157] + "..."
+	}
+	creator := client
+	if creator == "" {
+		creator = "Logika Kreatif Indonesia"
+	}
+	schema := fmt.Sprintf(
+		`{"@context":"https://***@type":"CreativeWork","name":"%s","description":"%s","dateModified":"%s","creator":{"@type":"Organization","name":"%s"},"url":"https://logikraf.id/portfolio/%s"}`,
+		escHTML(title), escHTML(excerpt), upd, escHTML(creator), escHTML(slug),
+	)
+	return &pageMeta{Title: title, Description: excerpt, OGImage: img, OGType: "article", OGLocale: "id_ID", OGSiteName: "Logika Kreatif Indonesia", TwitterCard: "summary_large_image", Schema: schema}
+}
+
 // serveSPA — sajikan SPA dengan canonical self-referential + meta unik per route statis.
 func serveSPA(c fiber.Ctx, frontendDir string) error {
 	return serveSPAWithMeta(c, frontendDir, staticMeta(c.Path()))
@@ -227,6 +257,14 @@ var staticMetaMap = map[string]pageMeta{
 	"/blog": {
 		Title:       "Blog: Tips Web, SEO & Digital Marketing | Logika Kreatif Indonesia",
 		Description: "Artikel praktis seputar pembuatan website, SEO, keamanan, UI/UX, dan digital marketing untuk bisnis Indonesia.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+	},
+	"/portfolio": {
+		Title:       "Portofolio & Studi Kasus | Logika Kreatif Indonesia",
+		Description: "Kumpulan studi kasus proyek digital Logikraf: platform manajemen perumahan, sistem internal, dan website bisnis untuk klien UMKM hingga perusahaan.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",

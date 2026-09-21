@@ -92,6 +92,9 @@ func main() {
 		return serveSPA(c, frontendDir)
 	})
 	app.Get("/portfolio/:slug", func(c fiber.Ctx) error {
+		if m := portfolioMeta(c.Params("slug")); m != nil {
+			return serveSPAWithMeta(c, frontendDir, m)
+		}
 		return serveSPA(c, frontendDir)
 	})
 	app.Get("/paket", func(c fiber.Ctx) error {
