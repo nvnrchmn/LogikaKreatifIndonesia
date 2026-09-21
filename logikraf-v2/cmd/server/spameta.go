@@ -238,9 +238,17 @@ var staticMetaMap = map[string]pageMeta{
 		TwitterCard: "summary_large_image",
 		Schema:      `{"@context":"https://schema.org","@type":"WebSite","name":"Logika Kreatif Indonesia","url":"https://logikraf.id","potentialAction":{"@type":"SearchAction","target":"https://logikraf.id/?q={search_term_string}","query-input":"required name=search_term_string"}}`,
 	},
-	"/layanan": {
-		Title:       "Layanan: Software, Website, UI/UX & Digital Marketing | Logika Kreatif Indonesia",
-		Description: "Layanan pembuatan website, aplikasi web, UI/UX, branding, dan sistem kasir digital untuk UMKM Bekasi & Jakarta.",
+	"/faq": {
+		Title:       "FAQ: Pertanyaan Umum Jasa Website & Sistem Digital | Logika Kreatif Indonesia",
+		Description: "Jawaban atas pertanyaan umum soal biaya, durasi pengerjaan, revisi, dan garansi untuk pembuatan website maupun sistem internal UMKM.",
+		OGType:      "website",
+		OGLocale:    "id_ID",
+		OGSiteName:  "Logika Kreatif Indonesia",
+		TwitterCard: "summary_large_image",
+	},
+	"/kebijakan-refund": {
+		Title:       "Kebijakan Refund | Logika Kreatif Indonesia",
+		Description: "Ketentuan pengembalian dana (refund) untuk layanan pembuatan website dan sistem digital Logikraf, termasuk syarat dan alur pengajuannya.",
 		OGType:      "website",
 		OGLocale:    "id_ID",
 		OGSiteName:  "Logika Kreatif Indonesia",
