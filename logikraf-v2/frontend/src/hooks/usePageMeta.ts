@@ -1,22 +1,12 @@
-import { useEffect, useState } from 'react'
-
+// CATATAN PENTING (21 Sep):
+// Hook ini DULU menimpa document.title, meta description, dan og:title di klien
+// dengan string statis "Digital Creative Agency & Software House". Karena dipanggil
+// di main.tsx (akar aplikasi), efeknya menghapus meta per-route yang sudah di-inject
+// server (spameta.go) — termasuk judul artikel blog dan studi kasus — sehingga
+// crawler yang menjalankan JavaScript bisa membaca judul generik yang salah.
+//
+// Meta per-route kini sepenuhnya ditangani server. Hook dibiarkan sebagai no-op
+// supaya pemanggilan di main.tsx tetap valid tanpa perlu diubah.
 export default function usePageMeta() {
-  const [meta, setMeta] = useState({ title: '', description: '' })
-
-  useEffect(() => {
-    fetch('/api/settings/public')
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(data => {
-        const title = data.company_name ? `${data.company_name} — Digital Creative Agency & Software House` : 'Logika Kreatif Indonesia'
-        const description = 'PT. Logika Kreatif Indonesia — Agensi kreatif digital & software house.'
-        setMeta({ title, description })
-        document.title = title
-        const desc = document.querySelector('meta[name="description"]')
-        if (desc) desc.setAttribute('content', description)
-        const og = document.querySelector('meta[property="og:title"]')
-        if (og) og.setAttribute('content', title)
-      })
-  }, [])
-
-  return meta
+  return { title: '', description: '' }
 }
