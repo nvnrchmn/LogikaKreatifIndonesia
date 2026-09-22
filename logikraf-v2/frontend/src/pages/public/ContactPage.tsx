@@ -41,7 +41,7 @@ export default function ContactPage() {
   const contactWhatsapp = settings.contact_whatsapp || '+62 898 3342 429'
   const contactEmail = settings.contact_email || 'support@logikraf.id'
   const contactHours = settings.contact_hours || 'Senin – Jumat, pukul 09:00 – 18:00 WIB'
-  const contactAddress = settings.contact_address || 'Jakarta, DKI Jakarta, Indonesia'
+  const contactAddress = settings.contact_address || 'Jl. Cijengkol Setu No.35a, Cijengkol, Kec. Setu, Kabupaten Bekasi, Jawa Barat 17320'
   const companyName = settings.company_name || 'PT. Logika Kreatif Indonesia'
   const cleanWaNumber = contactWhatsapp.replace(/[^0-9]/g, '')
 
@@ -275,6 +275,56 @@ export default function ContactPage() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Info tambahan: memperkaya konteks sebelum menghubungi (kontak, jam, area) */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="grid lg:grid-cols-2 gap-8">
+          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-border-minimal">
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-text-main mb-4">
+              Agar konsultasi pertama lebih efektif
+            </h2>
+            <p className="text-sm text-text-muted leading-relaxed mb-4">
+              Kami tidak memerlukan dokumen formal untuk diskusi awal. Empat hal berikut biasanya sudah
+              cukup bagi kami untuk memberi gambaran solusi dan estimasi biaya:
+            </p>
+            <ul className="space-y-3 text-sm text-text-muted leading-relaxed">
+              <li>• <strong className="text-text-main">Alur kerja saat ini</strong> — bagaimana proses berjalan sekarang, dari awal sampai selesai.</li>
+              <li>• <strong className="text-text-main">Bagian yang paling menyita waktu</strong> — supaya prioritas pengembangan jelas sejak awal.</li>
+              <li>• <strong className="text-text-main">Perkiraan pengguna &amp; volume harian</strong> — menentukan kapasitas sistem yang kami siapkan.</li>
+              <li>• <strong className="text-text-main">Target waktu</strong> — kapan sistem diharapkan bisa mulai dipakai.</li>
+            </ul>
+          </div>
+
+          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-border-minimal">
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-text-main mb-4">
+              Area layanan &amp; waktu respons
+            </h2>
+            <p className="text-sm text-text-muted leading-relaxed mb-4">
+              Kami berbasis di Kabupaten Bekasi dan mengerjakan proyek dari seluruh Indonesia secara
+              daring — pertemuan tatap muka dapat diatur untuk wilayah Jabodetabek. Konsultasi awal
+              tidak dikenakan biaya.
+            </p>
+            <dl className="space-y-3 text-sm">
+              <div className="flex gap-2">
+                <dt className="text-text-muted min-w-28">Jam kerja</dt>
+                <dd className="text-text-main font-medium">{contactHours}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="text-text-muted min-w-28">Balasan</dt>
+                <dd className="text-text-main font-medium">Umumnya dalam 1×24 jam pada hari kerja</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="text-text-muted min-w-28">WhatsApp</dt>
+                <dd className="text-text-main font-medium">{contactWhatsapp}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="text-text-muted min-w-28">Email</dt>
+                <dd className="text-text-main font-medium">{contactEmail}</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </div>

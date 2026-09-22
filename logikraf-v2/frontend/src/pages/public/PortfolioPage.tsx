@@ -31,21 +31,28 @@ export default function PortfolioPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const categories = ['Semua', 'Web Application', 'Website UMKM', 'Mobile App', 'UI/UX Design']
+  // Kategori tampil HANYA bila ada proyek yang benar-benar cocok. Dengan begitu tidak
+  // ada filter yang menghasilkan grid kosong, dan kategori seperti "Mobile App" tidak
+  // diiklankan selagi belum ada proyeknya.
+  const KATEGORI = ['Web Application', 'Website UMKM', 'Mobile App', 'UI/UX Design']
+  type Item = (typeof items)[number]
 
-  const filteredItems = items.filter(item => {
-    if (filter === 'Semua') return true
-    const cat = item.service_category || ''
+  const cocok = (item: Item, k: string) => {
+    const cat = (item.service_category || '').toLowerCase()
     const title = item.title.toLowerCase()
     const desc = (item.description || item.excerpt || '').toLowerCase()
-    const f = filter.toLowerCase()
+    const f = k.toLowerCase()
 
     if (f === 'web application') return cat.includes('web') || title.includes('app') || desc.includes('aplikasi')
     if (f === 'website umkm') return cat.includes('umkm') || title.includes('umkm') || title.includes('landing')
     if (f === 'mobile app') return cat.includes('mobile') || title.includes('mobile') || title.includes('ios') || title.includes('android')
     if (f === 'ui/ux design') return cat.includes('design') || title.includes('ui') || title.includes('ux')
-    return true
-  })
+    return false
+  }
+
+  const categories = ['Semua', ...KATEGORI.filter(k => items.some(i => cocok(i, k)))]
+
+  const filteredItems = items.filter(item => filter === 'Semua' || cocok(item, filter))
 
   return (
     <PublicLayout>
@@ -71,22 +78,24 @@ export default function PortfolioPage() {
               </p>
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 mb-14 px-2">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setFilter(cat)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                    filter === cat
-                      ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/25 scale-105'
-                      : 'bg-white text-text-muted hover:text-text-main border border-border-minimal hover:border-brand-primary/30'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {/* Category Filter Pills — hanya bila ada kategori yang benar-benar terisi */}
+            {categories.length > 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-2.5 mb-14 px-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setFilter(cat)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                      filter === cat
+                        ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/25 scale-105'
+                        : 'bg-white text-text-muted hover:text-text-main border border-border-minimal hover:border-brand-primary/30'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {error && (
               <div className="max-w-xl mx-auto mb-10 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm text-center">
@@ -173,6 +182,36 @@ export default function PortfolioPage() {
                 ))}
               </div>
             )}
+
+            {/* Cara kerja — konten nyata, bukan sekadar daftar kartu */}
+            <div className="mt-20 max-w-3xl mx-auto">
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-text-main mb-5 text-center">
+                Bagaimana Kami Mengerjakan Proyek
+              </h2>
+              <p className="text-sm text-text-muted leading-relaxed mb-6">
+                Setiap proyek dimulai dari pemetaan proses bisnis, bukan dari daftar fitur. Kami mencatat
+                alur kerja yang berjalan sekarang, bagian yang paling banyak menyita waktu, lalu menyusun
+                ruang lingkup bertahap. Pendekatan ini kami pakai untuk website UMKM maupun sistem internal
+                berbasis web, karena kebutuhan sebenarnya biasanya baru terlihat setelah sistem dipakai
+                sehari-hari.
+              </p>
+              <div className="grid sm:grid-cols-3 gap-5 text-left">
+                {[
+                  { t: '1. Pemetaan kebutuhan', d: 'Diskusi awal 30–60 menit untuk memahami alur kerja, volume transaksi, dan siapa saja yang akan memakai sistem.' },
+                  { t: '2. Rancangan & estimasi', d: 'Kami susun alur layar, daftar fitur, dan estimasi biaya secara transparan sebelum pengerjaan dimulai.' },
+                  { t: '3. Pengerjaan bertahap', d: 'Fitur inti dirilis lebih dulu agar bisa segera diuji, lalu penyempurnaan menyusul dari masukan pemakai.' },
+                ].map(s => (
+                  <div key={s.t} className="p-5 rounded-2xl bg-white border border-border-minimal">
+                    <h3 className="font-display font-bold text-sm text-text-main mb-2">{s.t}</h3>
+                    <p className="text-xs text-text-muted leading-relaxed">{s.d}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-text-muted leading-relaxed mt-6 text-center">
+                Dua studi kasus di halaman ini — SmartHub dan Livine Urban Manajemen — berjalan di
+                lingkungan produksi dan dipakai pengguna setiap hari, bukan purwarupa.
+              </p>
+            </div>
 
             {/* Bottom CTA Card */}
             <div className="mt-20 rounded-3xl bg-gradient-to-br from-canvas-dark via-gray-900 to-canvas-dark p-8 sm:p-12 text-white text-center relative overflow-hidden shadow-xl">

@@ -115,6 +115,16 @@ func serveSPAWithMeta(c fiber.Ctx, frontendDir string, m *pageMeta) error {
 		host = "logikraf.id"
 	}
 	html = canonicalRe.ReplaceAllString(html, "${1}https://"+host+p+"${2}")
+	// hreflang: situs ini hanya berbahasa Indonesia, jadi yang dipasang adalah
+	// alternatif self-referencing (id-ID + x-default). Versi "en" sengaja TIDAK
+	// ditambahkan karena halaman Inggrisnya memang belum ada — menandai hreflang
+	// ke URL yang tidak ada justru sinyal palsu bagi mesin pencari.
+	if !strings.Contains(html, "hreflang=") {
+		href := "https://" + host + p
+		tags := "    <link rel=\"alternate\" hreflang=\"id-ID\" href=\"" + href + "\" />\n" +
+			"    <link rel=\"alternate\" hreflang=\"x-default\" href=\"" + href + "\" />\n"
+		html = strings.Replace(html, "</head>", tags+"</head>", 1)
+	}
 	if m != nil && m.Title != "" {
 		t := escHTML(m.Title)
 		html = titleRe.ReplaceAllString(html, "${1}"+t+"${2}")
