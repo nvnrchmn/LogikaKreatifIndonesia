@@ -4,7 +4,7 @@
 - Backend: Go 1.25+ + GoFiber v3 + GORM (MySQL/SQLite) + JWT, port 8081 (systemd: `logikraf-server`), app di `logikraf-v2/`
 - Frontend: React 19 + TypeScript + Vite + Ant Design + Tailwind CSS v4 + TanStack Query
 - Database: MySQL `logikraf_v2`
-- Deploy: `git push origin main` → GitHub Actions (`.github/workflows/deploy.yml`, SSH ke VPS) → systemd restart. **JANGAN build di server.**
+- Deploy: build lokal di VPS — `build-lokal.sh logikraf rilis` (blok+health+rollback). Workflow Actions kini `workflow_dispatch` (manual).
 - Serving: nginx → Go API; statis frontend dari Vite build
 
 ## Arsitektur
@@ -15,7 +15,7 @@
 
 ## Status Terakhir (cek 2026-09-03)
 - ✅ HEAD 2026-09-03: Xendit aktif utk checkout logikraf.id (Fase 1) — handler `CreateXenditInvoice` + `XenditWebhook` setara iPaymu (payload alias order_id/email, OrderID=external_id, webhook lengkap: Transaction/Invoice/Notification/email/idempotency); frontend CheckoutModal gateway-aware dinamis
-- ✅ CI/CD GitHub Actions SSH ke VPS (systemd `logikraf-server`)
+- ✅ Deploy = build lokal VPS (`build-lokal.sh`), CI GitHub manual (22 Sep)
 - ✅ **Payment Hub satu pintu invoice (2026-09-07)**: `POST /api/client-store-invoices` — auth header `X-Internal-Key` (cocok dgn store.internal_key), body {external_id, amount, payer_email, given_names, description, success_redirect_url, failure_redirect_url}; validasi external_id diawali store.ext_prefix; buat invoice Xendit pakai `xendit_secret_key` tenant 'logikraf' (settings) → passthrough respons. Dipanggil MG (`LOGIKRAF_HUB_URL`) — key Xendit HANYA di settings DB.
 - ✅ **Payment Hub webhook routing (2026-09-07)**: `client_stores` + kolom `ext_prefix` (routing external_id, contoh `mg-`), `webhook_url`, `webhook_secret` (shared secret X-Logikraf-Signature). `XenditWebhook` (payment.go) → cek prefix → `ForwardToClientStore` (file `client_store_webhook.go`): forward body mentah ke webhook_url store dgn header `X-Logikraf-Signature` (+ X-Callback-Token asli kalau ada); gagal → 502 (Xendit retry); tidak ada store cocok → proses tenant lokal. Verifikasi masuk: X-Callback-Token thd tabel settings tenant (production: daftarkan token account di settings ATAU env). Store MG terisi: ext_prefix `mg-`, webhook_url `http://127.0.0.1:8095/api/v1/webhook/xendit`.
 - ✅ Dashboard Settlement Client (2026-09-07): `GET /api/client-store-settlements` (admin) menarik summary+settlements dari aplikasi client store via API internal key-protected (MG: `/api/v1/internal/*`, header `X-Internal-Key`). **Kelola via UI**: tabel `client_stores` (model `ClientStore`, AutoMigrate + seed sekali dari env `CLIENT_STORES`/`MG_INTERNAL_*`); CRUD admin `/api/client-store-settlements/stores` + generate/reveal/regenerate key (hex 24B, tampil sekali). Frontend: `/admin/client-settlements` (menu Uang Masuk → Settlement Client) — `ClientStoreManager.tsx` + kartu pantauan + modal "Tandai Dibayar" (upload bukti transfer → proxy multipart `POST .../pay` → MG internal PATCH). MG menyimpan bukti di `/uploads/settlements/`, owner MG unduh via `/admin/settlements/:id/proof`.
