@@ -119,3 +119,6 @@ UPDATE 2026-09-10 (malam) — HALAMAN BAYAR QRIS KUSTOM (logikraf.id):
 - BUKTI build lokal 9 proyek (rc=0): logikraf 112s, partners 86s, export 92s, nova 81s, livine 77s, mysticglide 92s, smarthub 12s, kenichi 9s, lemburin 16s. Rilis terbukti: logikraf+nova (health 200), kenichi (statis 200).
 - CI GITHUB DIMATIKAN untuk deploy: `on.push` -> `workflow_dispatch` saja di 9 workflow deploy (build-apk/ci-quality/verify-native lemburin DIBIARKAN). Workflow lama dikomentari di file. Bukti: smarthub-v3 tidak ada run baru setelah commit migrasi.
 - lemburin: repo lokal DIHAPUS dari VPS (821 MB, atas permintaan pemilik) + conf build-lokal dihapus; situs statis tetap 200. Nilai EXPO_PUBLIC_* bisa direkonstruksi dari bundle live bila perlu.
+
+- HAPUS lemburin.logikraf.id (22 Sep, perintah pemilik): vhost + webroot `/www/wwwroot/lemburin.logikraf.id` (867 MB) dihapus; nginx -t OK + reload; domain kini 000, 8 situs lain tetap 200.
+  Isi webroot = klon repo branch `web` @33108e1 (bersih, identik GitHub) + node_modules 794M. Cadangan `~/backups/lemburin-final-20260922.tar.gz` (4,6 MB: web/ + vhost). Probe uptime: baris lemburin dicopot (kini 9 domain, diuji diam). SISA pemilik: hapus DNS Cloudflare.
