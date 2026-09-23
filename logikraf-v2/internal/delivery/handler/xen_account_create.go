@@ -15,8 +15,9 @@ import (
 )
 
 // CreateXenplatformAccountAdmin — POST /api/admin/xenplatform/accounts
-// Membuat sub-account XenPlatform baru via POST /v3/accounts, lalu (bila
-// store_id diberikan) menghubungkannya ke client_store terkait.
+// Membuat sub-account XenPlatform baru via POST /v2/accounts (v2 API).
+// Payload v2 flat: { email, type, public_profile: { business_name, country } }.
+// KYC dihandle otomatis oleh Xendit via type=MANAGED (undangan email ke AR).
 func CreateXenplatformAccountAdmin(c fiber.Ctx) error {
 	secret := setting("xendit_secret_key", "logikraf")
 	if secret == "" {
@@ -25,8 +26,10 @@ func CreateXenplatformAccountAdmin(c fiber.Ctx) error {
 	var body struct {
 		Name            string `json:"name"`
 		Email           string `json:"email"`
-		EntityType      string `json:"entity_type"`
-		SendEmailInvite bool   `json:"send_email_invite"`
+		Type            string `json:"type"` // MANAGED | OWNED (OWNED restricted untuk Indonesia)
+		BusinessName    string `json:"business_name"`
+		Description     string `json:"description"`
+		Country         string `json:"country"` // ISO 3166-1 Alpha-2, default ID
 		StoreID         *uint  `json:"store_id"`
 	}
 	if err := c.Bind().Body(&body); err != nil {
@@ -34,24 +37,31 @@ func CreateXenplatformAccountAdmin(c fiber.Ctx) error {
 	}
 	body.Name = strings.TrimSpace(body.Name)
 	body.Email = strings.TrimSpace(body.Email)
-	body.EntityType = strings.ToUpper(strings.TrimSpace(body.EntityType))
-	if body.Name == "" || body.Email == "" || body.EntityType == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "name, email, entity_type wajib diisi")
+	body.BusinessName = strings.TrimSpace(body.BusinessName)
+	body.Type = strings.ToUpper(strings.TrimSpace(body.Type))
+	body.Country = strings.ToUpper(strings.TrimSpace(body.Country))
+	if body.Name == "" || body.Email == "" || body.BusinessName == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "name, email, business_name wajib diisi")
+	}
+	if body.Type != "MANAGED" && body.Type != "OWNED" {
+		body.Type = "MANAGED"
+	}
+	if body.Country == "" {
+		body.Country = "ID"
 	}
 	payload := map[string]any{
-		"name":  body.Name,
 		"email": body.Email,
-		"identity": map[string]any{
-			"country_of_incorporation": "ID",
-			"entity_type":              body.EntityType,
-		},
-		"configuration": map[string]any{
-			"users":    map[string]any{"send_email_invite": body.SendEmailInvite},
-			"webhooks": map[string]any{"recipient": "MASTER_ACCOUNT"},
+		"type":  body.Type,
+		"public_profile": map[string]any{
+			"business_name": body.BusinessName,
+			"country":       body.Country,
 		},
 	}
+	if body.Description != "" {
+		payload["public_profile"].(map[string]any)["description"] = body.Description
+	}
 	bodyBytes, _ := json.Marshal(payload)
-	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v3/accounts", bytes.NewReader(bodyBytes))
+	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v2/accounts", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "gagal membuat request")
 	}
@@ -63,7 +73,7 @@ func CreateXenplatformAccountAdmin(c fiber.Ctx) error {
 	}
 	defer resp.Body.Close()
 	respBody, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
 		msg := strings.TrimSpace(string(respBody))
 		if len(msg) > 200 {
 			msg = msg[:200]

@@ -6,7 +6,7 @@ import { apiGet, apiPatch, apiPost } from '../../lib/api'
 interface PartnerUserView { id: number; email: string; wa_phone?: string; active: boolean; must_change_pass: boolean; last_login_at?: string }
 interface StoreView {
   id: number; slug: string; name: string; is_active: boolean
-  sub_account_id?: string; entity_type?: string; kyc_status?: string; fee_pct: number
+  sub_account_id?: string; kyc_status?: string; fee_pct: number
   xendit_account_status?: string; xendit_synced_at?: string
   partner_user?: PartnerUserView
 }
@@ -108,7 +108,7 @@ export default function PartnerPortalPage() {
       password: '', show_pass: '',
     })
     formXp.setFieldsValue({
-      sub_account_id: s.sub_account_id || '', entity_type: s.entity_type || 'INDIVIDUAL',
+      sub_account_id: s.sub_account_id || '',
       kyc_status: s.kyc_status || 'REGISTERED',
     })
   }
@@ -129,8 +129,9 @@ export default function PartnerPortalPage() {
     const v = await formXp.validateFields()
     setSavingXp(true)
     try {
-      // Hanya entity_type yang manual; sub_account_id & kyc_status dikelola dari Xendit (read-only).
-      await apiPatch(`/api/client-stores/${openId}/xenplatform`, { entity_type: v.entity_type })
+      // entity_type tidak lagi dikirim ke Xendit (v2 API tidak memakai field ini).
+      // sub_account_id & kyc_status dikelola dari Xendit (read-only).
+      await apiPatch(`/api/client-stores/${openId}/xenplatform`, { entity_type: '' })
       message.success('Data XenPlatform disimpan')
       setOpenId(null); load()
     } catch (e) { message.error((e as Error).message) } finally { setSavingXp(false) }
@@ -194,7 +195,6 @@ export default function PartnerPortalPage() {
                 {s.kyc_status ? <Tag color={KYC_COLOR[s.kyc_status] || 'default'}>{KYC_LABEL[s.kyc_status] || s.kyc_status}</Tag> : <Tag>—</Tag>}
               </div>
               <div className="mt-2 space-y-1 text-sm">
-                <div className="flex justify-between"><span className="text-text-muted">Entity</span><span>{s.entity_type || '—'}</span></div>
                 <div className="flex justify-between gap-3"><span className="text-text-muted shrink-0">Sub-account</span>
                   <span className="truncate text-right">{s.sub_account_id ? <Typography.Text code style={{ fontSize: 11 }}>{s.sub_account_id.slice(0, 16)}…</Typography.Text> : <Typography.Text type="secondary">Belum terhubung</Typography.Text>}</span>
                 </div>
@@ -233,19 +233,8 @@ export default function PartnerPortalPage() {
           <Space style={{ marginTop: 12 }}>
             <Button icon={<ReloadOutlined />} loading={refreshing} disabled={!openStore?.sub_account_id} onClick={() => openId && refreshXendit(openId)}>Refresh Data Xendit</Button>
           </Space>
-          <Form.Item name="entity_type" label="Jenis Badan Usaha (opsional — Xendit tidak menyediakan data ini)" style={{ marginTop: 12, maxWidth: 440 }}>
-              <Select options={[
-                { value: 'SOLE_PROPRIETORSHIP', label: 'Badan Usaha Perorangan (CV / PT Perorangan)' },
-                { value: 'INDIVIDUAL', label: 'Perorangan (khusus sub-account XenPlatform)' },
-                { value: 'CORPORATION', label: 'Perseroan Terbatas (PT)' },
-                { value: 'PARTNERSHIP', label: 'Persekutuan Komanditer (CV)' },
-                { value: 'UNION', label: 'Koperasi' },
-                { value: 'NON_PROFIT', label: 'Yayasan / Nirlaba' },
-                { value: 'PMA', label: 'PT PMA (Penanaman Modal Asing)' },
-              ]} />
-            </Form.Item>
           <Space style={{ marginTop: 4 }}>
-            <Button type="primary" ghost loading={savingXp} onClick={saveXp}>Simpan Jenis Badan Usaha</Button>
+            <Button type="primary" ghost loading={savingXp} onClick={saveXp}>Simpan</Button>
           </Space>
         </Form>
 
@@ -274,20 +263,6 @@ export default function PartnerPortalPage() {
           </Form.Item>
           <Form.Item name="email" label="Email Authorized Representative" rules={[{ required: true, type: 'email', message: 'Email valid wajib diisi' }]}>
             <Input placeholder="owner@tokomitra.id" />
-          </Form.Item>
-          <Form.Item name="entity_type" label="Jenis badan usaha" initialValue="SOLE_PROPRIETORSHIP" rules={[{ required: true, message: 'Wajib dipilih' }]}>
-            <Select options={[
-              { value: 'SOLE_PROPRIETORSHIP', label: 'Usaha Perseorangan (Sole Prop.)' },
-              { value: 'INDIVIDUAL', label: 'Perorangan (Individual)' },
-              { value: 'CORPORATION', label: 'Perseroan Terbatas (PT)' },
-              { value: 'PARTNERSHIP', label: 'Persekutuan Komanditer (CV)' },
-              { value: 'UNION', label: 'Koperasi' },
-              { value: 'NON_PROFIT', label: 'Yayasan / Nirlaba' },
-              { value: 'PMA', label: 'PT PMA (Penanaman Modal Asing)' },
-            ]} />
-          </Form.Item>
-          <Form.Item name="send_email_invite" valuePropName="checked" initialValue={true}>
-            <Switch /> Kirim undangan KYC ke email AR (via Xendit)
           </Form.Item>
           <Form.Item name="store_id" label="Hubungkan ke mitra (opsional)">
             <Select allowClear showSearch optionFilterProp="label" placeholder="Pilih mitra…" options={stores.map((s) => ({ value: s.id, label: `${s.name} (${s.slug})` }))} />
