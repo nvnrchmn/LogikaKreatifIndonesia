@@ -57,6 +57,34 @@ func handleAccountEventWebhook(c fiber.Ctx) error {
 		return c.Status(200).JSON(fiber.Map{"status": "ok", "message": "account event ignored"})
 	}
 
+	// Multi-tenant: cocokkan dulu ke sub-akun per tenant (client_sub_accounts).
+	// Bila ketemu, perbarui status sub-akun dan teruskan event ke store pemiliknya.
+	for _, cid := range cands {
+		if cid == "" {
+			continue
+		}
+		var sub model.ClientSubAccount
+		if err := model.DB.Where("sub_account_id = ?", cid).First(&sub).Error; err != nil {
+			continue
+		}
+		if status != "" && status != sub.StatusKYC {
+			sub.StatusKYC = status
+		}
+		var reasons []kycReason
+		collectFailureReasons(body, &reasons)
+		if len(reasons) > 0 {
+			if b, err := json.Marshal(reasons); err == nil {
+				sub.FailureJSON = string(b)
+			}
+		}
+		_ = model.DB.Save(&sub).Error
+		_, _ = ForwardSubAccountEvent(c, cid)
+		return c.JSON(fiber.Map{
+			"status": "ok", "message": "sub-account event processed",
+			"sub_account_id": cid, "tenant_ref": sub.TenantRef, "kyc_status": sub.StatusKYC,
+		})
+	}
+
 	var store model.ClientStore
 	found := false
 	for _, cid := range cands {

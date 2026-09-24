@@ -108,28 +108,43 @@ LOGIKRAF_INTERNAL_KEY=<internal-key-dari-dashboard>
 Setiap request ke Payment Hub harus menyertakan header:
 
 ```http
-X-Logikraf-Internal-Key: <your-internal-key>
+X-Internal-Key: <your-internal-key>
 Content-Type: application/json
 ```
 
+> **Catatan (2026-09-24):** implementasi live memakai `X-Internal-Key`. Nama lama
+> `X-Logikraf-Internal-Key` pada versi awal dokumen **tidak dipakai** kode Hub dan
+> hanya dipertahankan sebagai catatan historis.
+
 ### 3.2 Verifikasi Webhook Signature
 
-Saat Logikraf meneruskan webhook ke app Anda, ia menyertakan header:
+Saat Logikraf meneruskan webhook ke app Anda, ia menyertakan **dua** header:
 
 ```http
-X-Logikraf-Signature: <hmac-sha256-payload>
+X-Logikraf-Signature: <shared-secret-mentah>   # kompatibilitas lama
+X-Logikraf-Signature-Hmac: <hmac-sha256-hex>   # cara aman (disarankan)
+X-Logikraf-Store: <slug-store>
+X-Logikraf-Tenant-Ref: <tenant-ref>            # untuk event akun/payout (tanpa external_id)
 ```
 
-App Anda **WAJIB** memverifikasi signature ini untuk memastikan payload berasal dari Logikraf:
+App Anda **WAJIB** memverifikasi `X-Logikraf-Signature-Hmac` untuk memastikan payload berasal dari Logikraf:
 
 ```typescript
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 function verifySignature(payload: string, signature: string, secret: string): boolean {
   const expected = createHmac('sha256', secret).update(payload).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  try {
+    return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  } catch {
+    return false;
+  }
 }
 ```
+
+> Selama masa transisi, konsumen lama (mis. MysticGlide) masih menerima
+> `X-Logikraf-Signature` berisi shared secret. Konsumen baru **wajib** memakai
+> `X-Logikraf-Signature-Hmac`.
 
 ### 3.3 Constant-Time Comparison
 
@@ -324,7 +339,7 @@ Xendit → logikraf.id/api/webhooks/xendit
 ```typescript
 // Hono (Smarthub V3)
 app.post('/api/webhooks/xendit', async (c) => {
-  const signature = c.req.header('X-Logikraf-Signature');
+  const signature = c.req.header('X-Logikraf-Signature-Hmac');
   const payload = await c.req.text();
   
   // 1. Verifikasi signature
@@ -503,11 +518,15 @@ Body:
 
 ### 9.1 Konsep
 
-Setiap client store bisa punya **sub-account Xendit sendiri** (KTP pemilik ≠ master). Setelah KYC LIVE:
+Setiap **tenant** di dalam client store bisa punya **sub-account Xendit sendiri** (KTP pemilik ≠ master), didaftarkan di tabel `client_sub_accounts` (kolom `store_id` + `tenant_ref`). Setelah KYC LIVE:
 
-- Dana langsung masuk sub-account store (bukan akun induk)
-- Store bisa tarik saldo sendiri via portal partners.logikraf.id
+- Dana langsung masuk sub-account **tenant** (bukan akun induk), via header `for-user-id`
+- Pencairan/settlement diinisiasi dari aplikasi SaaS (client store) lewat endpoint payout di §9.4
 - Logikraf tetap potong fee otomatis
+
+> **Arsitektur:** Logikraf = Master Account Xendit; produk SaaS (Smarthub) memetakan
+> setiap tenant ke satu sub-akun `MANAGED`. Client app tidak pernah memegang kunci
+> penyedia — semua panggilan memakai `X-Internal-Key` ke Hub.
 
 ### 9.2 Status KYC
 
@@ -529,7 +548,107 @@ Hub menerima event berikut dari Xendit:
 - `payout.succeeded` / `payout.failed`
 - `split_rule.created`
 
-Event di-forward ke client app via internal endpoint.
+Event di-forward ke client app via webhook store (`X-Logikraf-Signature-Hmac`),
+dengan header `X-Logikraf-Tenant-Ref` berisi `tenant_ref` pemilik sub-akun.
+
+### 9.4 Endpoint Client Store (sub-akun per tenant)
+
+Semua endpoint memakai `X-Internal-Key` (client store) dan memanggil Xendit atas
+nama sub-akun tenant (`for-user-id`).
+
+| Method | Endpoint | Keterangan |
+|--------|----------|------------|
+| `POST` | `/api/client-store/accounts` | Buat sub-akun `MANAGED` untuk `tenant_ref` (idempoten per tenant) |
+| `GET`  | `/api/client-store/accounts/{id}` | Detail sub-akun + status KYC (alternatif `?tenant_ref=`) |
+| `GET`  | `/api/client-store/balance?account_id=` | Saldo sub-akun (alternatif `?tenant_ref=`) |
+| `GET`  | `/api/client-store/agreement` | Naskah perjanjian layanan `{version, text, hash}` untuk ditampilkan di UI |
+| `POST` | `/api/client-store/kyc/files` | Unggah dokumen KYC (multipart, `purpose=KYC_DOCUMENT`) |
+| `POST` | `/api/client-store/kyc/submit` | Submit verifikasi KYC (`account_verification`) + `consent` clickwrap |
+| `POST` | `/api/client-store/payouts` | Payout ke rekening bank tenant (idempoten via `external_id`/`idempotency-key`) |
+| `GET`  | `/api/client-store/payouts/{id}` | Status payout (`id` = provider id atau `external_id`) |
+
+Contoh payout:
+
+```json
+POST /api/client-store/payouts
+X-Internal-Key: <internal-key>
+
+{
+  "external_id": "sb-pencairan-33",
+  "tenant_ref": "tenant-abc",
+  "amount": 50000,
+  "description": "Pencairan dana iuran RT",
+  "recipient": {
+    "bank_code": "BCA",
+    "account_holder_name": "RT 05",
+    "account_number": "1234567890"
+  }
+}
+```
+
+Status payout yang dikembalikan: `MENUNGGU`, `PROCESSING`, `SELESAI`, `GAGAL`
+(dinormalisasi dari status provider; `DUPLICATE` diperlakukan idempoten).
+
+> **Catatan implementasi (Xendit Payouts v3, `api-version: 2025-09-01`).** Hub
+> menerjemahkan body ringkas di atas ke skema v3 (`recipient.account_details`,
+> `payout_details`, `source_of_fund`, `purpose_code`) dan membaca `payout_id`
+> (bukan `id`). `routing_type_1` bank Indonesia disetel via env
+> `XENDIT_PAYOUT_ROUTING_TYPE` (default `BANK_CODE`) karena belum tercantum di
+> enum global dokumentasi. Diperlukan API key berizin **MONEY-OUT**.
+
+> **Catatan implementasi (Xendit Accounts v3).** Sub-akun dibuat via
+> `POST /v3/accounts` dengan `identity {country_of_incorporation:"ID",
+> entity_type:"INDIVIDUAL"}` dan `configuration.webhooks.recipient="MASTER_ACCOUNT"`.
+> Individu hanya diizinkan sebagai sub-akun XenPlatform (sesuai catatan Xendit ID).
+
+### 9.6 Pemetaan KYC (account_verification)
+
+Hub memetakan input SmartHub ke `POST /account_verification` (Xendit) di dalam
+`kyc_details`: alamat → `business_address`/`legal_entity_address`/`authorized_person_address`,
+`data_usaha.sumber_dana` → `business_source_of_funds`, `rata_rata_transaksi_bulanan`
+→ `business_average_monthly_basket_size`, `nama_penandatangan` → authorized/contact/stakeholder,
+`files.*` → `authorized_person_identification` (type `ID_NATIONAL_ID_KTP`) +
+`authorized_person_selfie_document`, dan consent → `service_agreement_document`.
+Nilai yang belum dikumpulkan UI diambil dari env (opsional):
+`XENDIT_KYC_MOBILE_NUMBER`, `XENDIT_KYC_MOBILE_COUNTRY_CODE` (default `+62`),
+`XENDIT_KYC_ROLE` (default `BUSINESS_OWNER`), `XENDIT_KYC_INDUSTRY_CODE`,
+`XENDIT_KYC_BUSINESS_REGISTRATION_NUMBER`, `XENDIT_KYC_BUSINESS_ESTABLISHMENT_DATE`,
+`XENDIT_ACCOUNT_COUNTRY` (default `ID`), `PLATFORM_WEBSITE_URL`
+(untuk `proof_of_business_websites`).
+
+**Deployment live:** Hub = `https://logikraf.id` (callback Xendit di
+`/api/webhooks/xendit` & `/api/webhooks/xendit/qris`); SmartHub =
+`https://smarthub.logikraf.id`. Untuk store Smarthub, set
+`ClientStore.WebhookURL = https://smarthub.logikraf.id/api/v1/billing/webhook`
+dan `ClientStore.BaseURL = https://smarthub.logikraf.id`; set juga
+`PLATFORM_WEBSITE_URL=https://smarthub.logikraf.id`.
+
+### 9.5 Service agreement (clickwrap) pada KYC
+
+Xendit tidak mewajibkan template tertentu; yang penting ada **bukti persetujuan
+tenant**. Hub menggenerate PDF bukti persetujuan secara otomatis berisi:
+identitas pendaftar, waktu persetujuan, IP, User-Agent, Log ID, hash naskah, dan
+naskah perjanjian penuh. PDF diunggah ke `POST /files`, lalu `file_id`-nya
+dilampirkan pada field `service_agreement_document` saat `POST /account_verification`.
+
+Client store wajib:
+1. Ambil naskah via `GET /api/client-store/agreement` (`{version, text, hash}`).
+2. Tampilkan ke tenant dan minta centang "Setuju".
+3. Kirim blok `consent` pada `POST /api/client-store/kyc/submit`:
+
+```json
+"consent": {
+  "version": "v1",
+  "hash": "<sha256 naskah>",
+  "agreed_at": "2026-09-24T22:00:00+07:00",
+  "ip": "203.0.113.10",
+  "user_agent": "Mozilla/5.0 ...",
+  "log_id": "consent-uuid",
+  "signer_name": "Nama Penandatangan"
+}
+```
+
+Versi/hash di luar naskah yang berlaku akan ditolak `422`.
 
 ---
 
@@ -583,7 +702,7 @@ CREATE POLICY tenant_isolation ON invoices
 
 Ketika webhook datang, Smarthub harus:
 
-1. Verifikasi `X-Logikraf-Signature`
+1. Verifikasi `X-Logikraf-Signature-Hmac`
 2. Parse `external_id` → extract `tenant_id`
 3. Set `app.current_tenant` session variable
 4. Update invoice (idempotent)
@@ -597,7 +716,7 @@ Ketika webhook datang, Smarthub harus:
 
 | Praktik | Alasan |
 |---------|--------|
-| Selalu verifikasi `X-Logikraf-Signature` | Mencegah pemalsuan webhook |
+| Selalu verifikasi `X-Logikraf-Signature-Hmac` | Mencegah pemalsuan webhook |
 | Gunakan idempotency (`WHERE status='pending'`) | Mencegah double-processing |
 | Kirim `metadata.product_subtotal` | Fee dihitung dari subtotal, bukan ongkir |
 | Set `QRIS_ALLOW_SIMULATE=false` di production | Mencegah pelunasan palsu |
@@ -683,7 +802,7 @@ export class PaymentHubService {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'X-Logikraf-Internal-Key': INTERNAL_KEY,
+        'X-Internal-Key': INTERNAL_KEY,
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -747,7 +866,7 @@ function verifySignature(payload: string, signature: string): boolean {
 }
 
 app.post('/xendit', async (c) => {
-  const signature = c.req.header('X-Logikraf-Signature');
+  const signature = c.req.header('X-Logikraf-Signature-Hmac');
   const rawBody = await c.req.text();
 
   // 1. Verify

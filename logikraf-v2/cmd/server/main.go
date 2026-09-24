@@ -211,6 +211,17 @@ func main() {
 	api.Post("/client-store-refunds", handler.RefundClientStoreInvoice)
 	api.Post("/client-store-qris", handler.CreateClientStoreQris)
 	api.Post("/client-store-fee-reverse", handler.ReversePlatformFee)
+	// Sub-akun tenant (XenPlatform) + KYC + saldo + payout — multi-tenant (Smarthub).
+	// Autentikasi: header X-Internal-Key milik ClientStore.
+	api.Post("/client-store/accounts", handler.CreateClientStoreAccount)
+	api.Get("/client-store/accounts", handler.GetClientStoreAccount)
+	api.Get("/client-store/accounts/:id", handler.GetClientStoreAccount)
+	api.Get("/client-store/balance", handler.GetClientStoreBalance)
+	api.Get("/client-store/agreement", handler.GetClientStoreAgreement)
+	api.Post("/client-store/kyc/files", handler.CreateClientStoreKycFile)
+	api.Post("/client-store/kyc/submit", handler.SubmitClientStoreKyc)
+	api.Post("/client-store/payouts", handler.CreateClientStorePayout)
+	api.Get("/client-store/payouts/:id", handler.GetClientStorePayout)
 	api.Post("/webhooks/midtrans", handler.MidtransWebhook)
 	api.Post("/webhooks/ipaymu", handler.IpaymuWebhook)
 	app.Get("/sitemap.xml", handler.GetSitemap)

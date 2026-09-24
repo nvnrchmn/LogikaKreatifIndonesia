@@ -28,7 +28,10 @@ func TestMain(m *testing.M) {
 	if sqlDB, err := db.DB(); err == nil {
 		sqlDB.SetMaxOpenConns(1)
 	}
-	if err := db.AutoMigrate(&model.Transaction{}, &model.Order{}, &model.Invoice{}, &model.Project{}, &model.Client{}, &model.User{}, &model.Setting{}); err != nil {
+	if err := db.AutoMigrate(
+		&model.Transaction{}, &model.Order{}, &model.Invoice{}, &model.Project{}, &model.Client{}, &model.User{}, &model.Setting{},
+		&model.ClientStore{}, &model.ClientSubAccount{}, &model.Payout{}, &model.QrisPayment{}, &model.KycAgreement{},
+	); err != nil {
 		panic(err)
 	}
 	model.DB = db

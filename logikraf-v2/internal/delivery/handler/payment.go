@@ -359,9 +359,17 @@ func XenditWebhook(c fiber.Ctx) error {
 	}
 
 	// XenPlatform payout events (v3): body tidak punya external_id invoice —
-	// ciri: ada reference_id berprefix "pt-". Payment Hub meneruskan mentah ke
+	// ciri: ada token "v3_payout"/"payout.*"/reference_id "pt-". Payment Hub
+	// meneruskan mentah ke store pemilik sub-akun (bila terdaftar) DAN ke
 	// logikraf-partners utk update status payout + notif WA mitra.
-	if p.ExternalID == "" && (strings.Contains(string(c.Body()), "v3_payout") || (strings.Contains(string(c.Body()), "reference_id") && strings.Contains(string(c.Body()), "pt-"))) {
+	bodyStr := string(c.Body())
+	isPayoutEvent := strings.Contains(bodyStr, "v3_payout") ||
+		strings.Contains(bodyStr, "payout.succeeded") || strings.Contains(bodyStr, "payout.failed") ||
+		strings.Contains(bodyStr, "payout") ||
+		(strings.Contains(bodyStr, "reference_id") && strings.Contains(bodyStr, "pt-"))
+	if p.ExternalID == "" && isPayoutEvent {
+		// Teruskan dulu ke client store pemilik sub-akun (bila ada), lalu ke portal mitra.
+		ForwardPayoutToOwningStore(c)
 		return forwardPayoutToPartners(c)
 	}
 
