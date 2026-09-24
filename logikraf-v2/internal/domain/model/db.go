@@ -52,8 +52,11 @@ func Connect() error {
 		&Section{},
 		&Media{},
 		&ClientStore{},
+		&ClientSubAccount{},
+		&KycAgreement{},
 		&PartnerUser{},
 		&QrisPayment{},
+		&Payout{},
 		&PlatformFee{},
 	); err != nil {
 		log.Printf("AutoMigrate warning: %v\n", err)

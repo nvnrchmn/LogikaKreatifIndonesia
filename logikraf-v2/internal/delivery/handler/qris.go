@@ -496,6 +496,13 @@ func XenditQrisWebhook(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{"received": true, "matched": false})
 	}
 	qrisApplyStatus(row, status, p.Data.PayerName)
+	// Client store: teruskan payload mentah ke webhook store agar tagihan tenant
+	// (Smarthub) ikut tersinkron. Best-effort — kegagalan tidak memblokir webhook.
+	if row.StoreID > 0 {
+		if _, err := ForwardToClientStore(c, row.ExternalID); err != nil {
+			log.Printf("[qris-webhook] forward ke store %d gagal: %v", row.StoreID, err)
+		}
+	}
 	return c.JSON(fiber.Map{"received": true, "matched": true, "status": row.Status})
 }
 

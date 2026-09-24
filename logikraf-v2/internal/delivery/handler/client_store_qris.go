@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -21,25 +20,9 @@ import (
 // Body: { external_id, amount, description }
 // Respons: { reference_id, qr_string, amount, expires_at, simulate_allowed }
 func CreateClientStoreQris(c fiber.Ctx) error {
-	got := c.Get("X-Internal-Key")
-	if got == "" {
-		return c.Status(401).JSON(fiber.Map{"error": "missing X-Internal-Key"})
-	}
-	var stores []model.ClientStore
-	if err := model.DB.Where("is_active = 1").Find(&stores).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "db error"})
-	}
-	var store model.ClientStore
-	found := false
-	for _, s := range stores {
-		if s.InternalKey != "" && subtle.ConstantTimeCompare([]byte(got), []byte(s.InternalKey)) == 1 {
-			store = s
-			found = true
-			break
-		}
-	}
-	if !found {
-		return c.Status(401).JSON(fiber.Map{"error": "invalid internal key"})
+	store, ok := resolveClientStore(c)
+	if !ok {
+		return clientStoreAuthError(c)
 	}
 
 	var in struct {
@@ -47,9 +30,25 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 		Amount      int    `json:"amount"`
 		Description string `json:"description"`
 		ExpiresIn   int    `json:"expires_in_minutes"`
+		// Sub-akun tenant (multi-tenant): salah satu boleh diisi.
+		AccountID string `json:"account_id"`
+		ForUserID string `json:"for_user_id"`
+		TenantRef string `json:"tenant_ref"`
 	}
 	if err := c.Bind().JSON(&in); err != nil || in.ExternalID == "" || in.Amount <= 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "external_id & amount wajib"})
+	}
+
+	// Tentukan for-user-id: sub-akun TENANT (diutamakan) → fallback sub-akun store.
+	forUser := ""
+	subAccountID := ""
+	if sub, serr := resolveSubAccount(store.ID, firstNonEmpty(in.AccountID, in.ForUserID), in.TenantRef); serr == nil && sub != nil {
+		subAccountID = sub.SubAccountID
+		forUser = sub.SubAccountID
+	}
+	if forUser == "" && store.SubAccountID != "" && strings.EqualFold(store.KYCStatus, "LIVE") {
+		forUser = store.SubAccountID
+		subAccountID = store.SubAccountID
 	}
 	// Prefix store wajib (mis. MG-) — mencegah klaim lintas store.
 	if store.ExtPrefix != "" && !strings.HasPrefix(strings.ToLower(in.ExternalID), strings.ToLower(store.ExtPrefix)) {
@@ -95,6 +94,7 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 			"expires_at":       ada.ExpiresAt,
 			"simulate_allowed": qrisSimulateAllowed(),
 			"store":            store.Name,
+			"sub_account_id":   ada.SubAccountID,
 			"diambil_ulang":    true,
 		})
 	default:
@@ -129,9 +129,9 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("api-version", "2024-11-11")
 	req.Header.Set("Authorization", qrisBasicAuth(secret))
-	// Sub-account store: dipakai hanya kalau KYC sudah LIVE (kalau belum, dana di akun master)
-	if store.SubAccountID != "" && strings.EqualFold(store.KYCStatus, "LIVE") {
-		req.Header.Set("for-user-id", store.SubAccountID)
+	// Dana masuk ke sub-akun tenant bila tersedia (kalau belum, dana di akun master).
+	if forUser != "" {
+		req.Header.Set("for-user-id", forUser)
 	}
 	resp, err := (&http.Client{Timeout: 30 * time.Second}).Do(req)
 	if err != nil {
@@ -164,18 +164,19 @@ func CreateClientStoreQris(c fiber.Ctx) error {
 		exp = time.Now().Add(time.Duration(in.ExpiresIn) * time.Minute)
 	}
 	p := model.QrisPayment{
-		ReferenceID: refID,
-		StoreID:     store.ID,
-		ExternalID:  in.ExternalID,
-		ProviderID:  out.ID,
-		QrString:    qrString,
-		Amount:      in.Amount,
-		Currency:    "IDR",
-		ChannelCode: "QRIS",
-		Status:      "pending",
-		Mode:        qrisMode(),
-		ExpiresAt:   &exp,
-		RawProvider: string(raw),
+		ReferenceID:  refID,
+		StoreID:      store.ID,
+		SubAccountID: subAccountID,
+		ExternalID:   in.ExternalID,
+		ProviderID:   out.ID,
+		QrString:     qrString,
+		Amount:       in.Amount,
+		Currency:     "IDR",
+		ChannelCode:  "QRIS",
+		Status:       "pending",
+		Mode:         qrisMode(),
+		ExpiresAt:    &exp,
+		RawProvider:  string(raw),
 	}
 	if err := model.DB.Create(&p).Error; err != nil {
 		log.Printf("[qris-store] gagal simpan: %v", err)

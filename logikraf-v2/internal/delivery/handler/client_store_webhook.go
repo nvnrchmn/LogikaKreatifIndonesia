@@ -73,15 +73,62 @@ func accruePlatformFee(store *model.ClientStore, body []byte) {
 	log.Printf("[fee] accrual store=%s ext=%s basis=%s gross=%d fee=%d (pct=%.2f)", store.Slug, p.ExternalID, basisLabel, basis, fee, store.FeePct)
 }
 
+// forwardRawToStore — kirim payload mentah ke webhook store.
+//
+// Header yang dikirim:
+//   - X-Logikraf-Signature       : shared secret mentah (perilaku lama, kompatibel MysticGlide)
+//   - X-Logikraf-Signature-Hmac  : HMAC-SHA256(body, shared secret) — cara aman bagi konsumen baru (Smarthub)
+//   - X-Logikraf-Store           : slug store
+//   - X-Logikraf-Tenant-Ref      : tenant_ref (untuk event akun/payout yang tidak punya external_id)
+//   - X-Callback-Token           : diteruskan bila ada
+func forwardRawToStore(store *model.ClientStore, body []byte, tenantRef, callbackToken string) error {
+	if store == nil {
+		return fmt.Errorf("store nil")
+	}
+	whURL := store.WebhookURL
+	if whURL == "" {
+		whURL = strings.TrimSuffix(store.BaseURL, "/") + "/api/v1/webhook/xendit"
+	}
+	if whURL == "" {
+		return fmt.Errorf("client store %s tanpa base_url/webhook_url", store.Slug)
+	}
+	req, err := http.NewRequest(http.MethodPost, whURL, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Logikraf-Signature", store.WebhookSecret) // kompatibilitas lama (raw secret)
+	if store.WebhookSecret != "" {
+		req.Header.Set("X-Logikraf-Signature-Hmac", hmacSHA256Hex(store.WebhookSecret, body))
+	}
+	req.Header.Set("X-Logikraf-Store", store.Slug)
+	if tenantRef != "" {
+		req.Header.Set("X-Logikraf-Tenant-Ref", tenantRef)
+	}
+	if callbackToken != "" {
+		req.Header.Set("X-Callback-Token", callbackToken) // fallback utk store jalur langsung
+	}
+
+	client := &http.Client{Timeout: 12 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	_, _ = io.Copy(io.Discard, resp.Body)
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		// Biaya layanan platform dihitung dari transaksi yang benar-benar dibayar.
+		accruePlatformFee(store, body)
+		return nil
+	}
+	return fmt.Errorf("webhook store %s balas HTTP %d", store.Slug, resp.StatusCode)
+}
+
 // ForwardToClientStore — Payment Hub routing: kalau external_id webhook Xendit
 // diawali prefix client store aktif (contoh "mg-"), seluruh payload callback
-// DIFORWARD ke webhook store (`BaseURL + /api/v1/webhook/xendit`, atau kolom
-// webhook_url kalau diisi) dengan header `X-Logikraf-Signature` (shared secret
-// per store). Alasan: akun Xendit milik Logikraf → satu URL webhook di dashboard
-// (logikraf.id) → store tidak perlu konfigurasi webhook sendiri.
-//
-// Return handled=true artinya request ini milik client store (sukses diforward
-// atau gagal — error mesti diteruskan ke caller supaya Xendit me-retry).
+// DIFORWARD ke webhook store. Return handled=true artinya request ini milik
+// client store (sukses diforward atau gagal — error mesti diteruskan ke caller
+// supaya Xendit me-retry).
 func ForwardToClientStore(c fiber.Ctx, externalID string) (bool, error) {
 	if externalID == "" {
 		return false, nil
@@ -100,37 +147,98 @@ func ForwardToClientStore(c fiber.Ctx, externalID string) (bool, error) {
 	if store == nil {
 		return false, nil // bukan client store — proses lokal
 	}
-
-	whURL := store.WebhookURL
-	if whURL == "" {
-		whURL = strings.TrimSuffix(store.BaseURL, "/") + "/api/v1/webhook/xendit"
+	tenantRef := tenantRefForExternal(*store, externalID)
+	if err := forwardRawToStore(store, c.Body(), tenantRef, c.Get("X-Callback-Token")); err != nil {
+		return true, err
 	}
-	if whURL == "" {
-		return true, fmt.Errorf("client store %s tanpa base_url/webhook_url", store.Slug)
-	}
+	return true, nil
+}
 
+// tenantRefForExternal — cari sub-akun tenant yang cocok dengan external_id/QRIS
+// agar header X-Logikraf-Tenant-Ref terisi saat forward.
+func tenantRefForExternal(store model.ClientStore, externalID string) string {
+	var qp model.QrisPayment
+	if err := model.DB.Where("store_id = ? AND external_id = ?", store.ID, externalID).
+		Order("id desc").First(&qp).Error; err == nil && qp.SubAccountID != "" {
+		var sub model.ClientSubAccount
+		if err := model.DB.Where("sub_account_id = ?", qp.SubAccountID).First(&sub).Error; err == nil {
+			return sub.TenantRef
+		}
+	}
+	return ""
+}
+
+// ForwardSubAccountEvent — teruskan event akun XenPlatform (account.verification
+// dll) atau payout ke store pemilik sub-akun, dengan tenant_ref sebagai konteks.
+// Return true bila event berhasil dipetakan ke store (sukses atau gagal forward).
+func ForwardSubAccountEvent(c fiber.Ctx, subAccountID string) (bool, error) {
+	subAccountID = strings.TrimSpace(subAccountID)
+	if subAccountID == "" {
+		return false, nil
+	}
+	var sub model.ClientSubAccount
+	if err := model.DB.Where("sub_account_id = ?", subAccountID).First(&sub).Error; err != nil {
+		return false, nil
+	}
+	var store model.ClientStore
+	if err := model.DB.First(&store, sub.StoreID).Error; err != nil {
+		return false, nil
+	}
+	if err := forwardRawToStore(&store, c.Body(), sub.TenantRef, c.Get("X-Callback-Token")); err != nil {
+		return true, err
+	}
+	return true, nil
+}
+
+// payoutStatusFromBody — ambil status payout dari payload v3 (status bisa
+// top-level atau di dalam `data`).
+func payoutStatusFromBody(body []byte) string {
+	var ev struct {
+		Status string `json:"status"`
+		Data   struct {
+			Status string `json:"status"`
+		} `json:"data"`
+	}
+	_ = json.Unmarshal(body, &ev)
+	s := ev.Status
+	if s == "" {
+		s = ev.Data.Status
+	}
+	return statusPayoutNormalized(s)
+}
+
+// ForwardPayoutToOwningStore — petakan event payout ke baris Payout
+// (reference_id / provider_id), perbarui status lokal, lalu teruskan payload ke
+// store pemilik sub-akun. Return true bila event berhasil dipetakan ke store.
+func ForwardPayoutToOwningStore(c fiber.Ctx) bool {
 	body := c.Body()
-	req, err := http.NewRequest(http.MethodPost, whURL, bytes.NewReader(body))
-	if err != nil {
-		return true, err
+	var ev struct {
+		ReferenceID string `json:"reference_id"`
+		Data        struct {
+			ReferenceID string `json:"reference_id"`
+		} `json:"data"`
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Logikraf-Signature", store.WebhookSecret)
-	if tk := c.Get("X-Callback-Token"); tk != "" {
-		req.Header.Set("X-Callback-Token", tk) // fallback utk store jalur langsung
+	_ = json.Unmarshal(body, &ev)
+	ref := ev.ReferenceID
+	if ref == "" {
+		ref = ev.Data.ReferenceID
 	}
-
-	client := &http.Client{Timeout: 12 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return true, err
+	if ref == "" {
+		return false
 	}
-	defer resp.Body.Close()
-	_, _ = io.Copy(io.Discard, resp.Body)
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		// Biaya layanan platform dihitung dari transaksi yang benar-benar dibayar.
-		accruePlatformFee(store, body)
-		return true, nil
+	var row model.Payout
+	if err := model.DB.Where("external_id = ? OR provider_id = ?", ref, ref).First(&row).Error; err != nil {
+		return false
 	}
-	return true, fmt.Errorf("webhook store %s balas HTTP %d", store.Slug, resp.StatusCode)
+	var store model.ClientStore
+	if err := model.DB.First(&store, row.StoreID).Error; err != nil {
+		return false
+	}
+	if status := payoutStatusFromBody(body); status != "" {
+		_ = model.DB.Model(&model.Payout{}).Where("id = ?", row.ID).Update("status", status).Error
+	}
+	if err := forwardRawToStore(&store, body, row.TenantRef, c.Get("X-Callback-Token")); err != nil {
+		log.Printf("[payout-webhook] forward ke store %s gagal: %v", store.Slug, err)
+	}
+	return true
 }
