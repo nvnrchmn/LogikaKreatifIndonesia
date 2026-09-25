@@ -28,7 +28,7 @@ Pengaturan *driver* yang aktif diatur secara dinamis melalui kolom `payment_gate
 Sesuai rencana penggunaan Xendit sebagai Payment Gateway utama untuk berbagai produk SaaS milik Logikraf, telah ditemukan implementasi awal **XenPlatform** (Payment Hub) di dalam proyek:
 
 - **Sub-Account Creation (`Api\PaymentHub\SubAccountController`)**
-  Terintegrasi dengan API Xendit (`/v2/accounts`) untuk membuat akun turunan (*sub-account*) dengan tipe `OWNED` bagi *business_name* / entitas SaaS yang tergabung.
+  Terintegrasi dengan API Xendit (`/v2/accounts`) untuk membuat akun turunan (*sub-account*) dengan tipe `OWNED` bagi *business_name* / entitas SaaS yang tergabung. *(Catatan 2026-09: implementasi Go saat ini memakai `POST /v3/accounts` dengan `identity.entity_type=INDIVIDUAL` untuk tenant perorangan; tipe `OWNED` dibatasi untuk Indonesia. Endpoint `/v2/accounts` kini legacy.)*
 - **Invoice & Disbursement**
   Terdapat controller `InvoiceController` dan `DisbursementController` pada *namespace* `PaymentHub` yang menandakan bahwa sistem juga telah memfasilitasi pembuatan invoice dan pencairan dana (*disbursement*) untuk masing-masing *sub-account*.
 - **Routing Webhook Multi-Tenant (`XenditWebhookController`)**

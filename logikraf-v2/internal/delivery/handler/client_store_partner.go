@@ -73,9 +73,11 @@ func CreateClientStoreAccount(c fiber.Ctx) error {
 	if strings.TrimSpace(in.Country) == "" {
 		in.Country = "ID"
 	}
+	// Xendit: tenant perorangan tanpa badan usaha = MANAGED + identity INDIVIDUAL.
+	// Pada Test key, v3 hanya mengizinkan CORPORATION — atur XENDIT_ACCOUNTS_ENTITY_TYPE.
 	entity := strings.ToUpper(strings.TrimSpace(in.EntityType))
 	if entity == "" {
-		entity = "INDIVIDUAL"
+		entity = firstNonEmpty(os.Getenv("XENDIT_ACCOUNTS_ENTITY_TYPE"), "INDIVIDUAL")
 	}
 
 	secret := xenditPlatformSecret()
@@ -91,6 +93,8 @@ func CreateClientStoreAccount(c fiber.Ctx) error {
 		})
 	}
 
+	// POST /v3/accounts (endpoint resmi; v2 legacy). Verify-on-behalf aktif untuk
+	// xenPlatform Logikraf → KYC disubmit via API, jadi tidak mengirim undangan email.
 	country := strings.ToUpper(firstNonEmpty(in.Country, os.Getenv("XENDIT_ACCOUNT_COUNTRY"), "ID"))
 	payload := map[string]any{
 		"name":  name,
@@ -101,7 +105,7 @@ func CreateClientStoreAccount(c fiber.Ctx) error {
 		},
 		"configuration": map[string]any{
 			"users":    map[string]any{"send_email_invite": false},
-			"webhooks": map[string]any{"recipient": "MASTER_ACCOUNT"},
+			"webhooks": map[string]any{"recipient": firstNonEmpty(os.Getenv("XENDIT_WEBHOOK_RECIPIENT"), "MASTER_ACCOUNT")},
 		},
 	}
 	bodyBytes, _ := json.Marshal(payload)
