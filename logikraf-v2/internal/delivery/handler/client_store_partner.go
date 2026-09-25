@@ -92,20 +92,23 @@ func CreateClientStoreAccount(c fiber.Ctx) error {
 	}
 
 	country := strings.ToUpper(firstNonEmpty(in.Country, os.Getenv("XENDIT_ACCOUNT_COUNTRY"), "ID"))
+	// Xendit /v2/accounts (type MANAGED). `/v3/accounts` tidak diizinkan untuk
+	// akun ini (lihat fix pada xen_account_create.go). `entity` tetap disimpan
+	// lokal di ClientSubAccount untuk keperluan pemetaan KYC.
+	publicProfile := map[string]any{
+		"business_name": name,
+		"country":       country,
+	}
+	if d := strings.TrimSpace(in.Description); d != "" {
+		publicProfile["description"] = d
+	}
 	payload := map[string]any{
-		"name":  name,
-		"email": in.Email,
-		"identity": map[string]any{
-			"country_of_incorporation": country,
-			"entity_type":              entity,
-		},
-		"configuration": map[string]any{
-			"users":    map[string]any{"send_email_invite": false},
-			"webhooks": map[string]any{"recipient": "MASTER_ACCOUNT"},
-		},
+		"email":          in.Email,
+		"type":           "MANAGED",
+		"public_profile": publicProfile,
 	}
 	bodyBytes, _ := json.Marshal(payload)
-	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v3/accounts", bytes.NewReader(bodyBytes))
+	req, err := http.NewRequest(http.MethodPost, "https://api.xendit.co/v2/accounts", bytes.NewReader(bodyBytes))
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "gagal membuat request")
 	}
