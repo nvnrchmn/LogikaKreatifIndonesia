@@ -616,6 +616,16 @@ Nilai yang belum dikumpulkan UI diambil dari env (opsional):
 `XENDIT_ACCOUNT_COUNTRY` (default `ID`), `PLATFORM_WEBSITE_URL`
 (untuk `proof_of_business_websites`).
 
+**Sub-akun (Xendit Accounts v3).** Buat via `POST /v3/accounts` dengan
+`identity.entity_type = INDIVIDUAL` (tenant perorangan tanpa badan usaha) dan
+`configuration.webhooks.recipient` (`MASTER_ACCOUNT`/`SUB_ACCOUNT`). Karena
+verify-on-behalf aktif untuk xenPlatform Logikraf, undangan email tidak dikirim
+(`send_email_invite=false`) — KYC disubmit lewat `POST /account_verification`
+dengan header `for-user-id`. Syarat: API key berizin **Account Write** dan master
+**enabled xenPlatform**. **Test key:** v3 hanya menerima `CORPORATION`; untuk
+INDIVIDUAL gunakan Live key, atau set `XENDIT_ACCOUNTS_ENTITY_TYPE=CORPORATION`
+saat menguji. Aktivasi kanal QRIS/VA dilakukan manual oleh Master per sub-account.
+
 **Deployment live:** Hub = `https://logikraf.id` (callback Xendit di
 `/api/webhooks/xendit` & `/api/webhooks/xendit/qris`); SmartHub =
 `https://smarthub.logikraf.id`. Untuk store Smarthub, set
